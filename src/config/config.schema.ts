@@ -40,4 +40,9 @@ type MultipartOptions = yup.InferType<typeof multipartOptionsSchema>;
 
 // ------------------------------------------------------------------------------------------------------------------
 
-export type { AppConfig, PayloadValidationConfig, ServerOptionsConfig, MultipartOptions };
+export type {
+    AppConfig,
+    PayloadValidationConfig,
+    ServerOptionsConfig,
+    MultipartOptions,
+};

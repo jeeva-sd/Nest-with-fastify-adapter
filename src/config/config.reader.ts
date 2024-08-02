@@ -4,10 +4,11 @@ import { Logger } from '@nestjs/common';
 import { AppConfig, AppConfigSchema } from './config.schema';
 
 export class ConfigReader {
+    private static instance: ConfigReader;
     public config: AppConfig;
     public readonly logger = new Logger(ConfigReader.name);
 
-    constructor() {
+    private constructor() {
         const env = process.env.NODE_ENV || 'development';
         this.logger.debug(`Loading ${env} environment`);
 
@@ -26,9 +27,18 @@ export class ConfigReader {
         this.config = this.applyValidation(mergedConfigs);
     }
 
+    public static getInstance(): ConfigReader {
+        if (!ConfigReader.instance) {
+            ConfigReader.instance = new ConfigReader();
+        }
+        return ConfigReader.instance;
+    }
+
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
-            return AppConfigSchema.validateSync(mergedConfigs, { abortEarly: false });
+            return AppConfigSchema.validateSync(mergedConfigs, {
+                abortEarly: false,
+            });
         } catch (error) {
             this.logger.error('Configuration validation error:', error);
             process.exit(1);
@@ -46,5 +56,9 @@ export class ConfigReader {
             }
         }
         return baseConfig;
+    }
+
+    public get<K extends keyof AppConfig>(key: K): AppConfig[K] {
+        return this.config[key];
     }
 }
