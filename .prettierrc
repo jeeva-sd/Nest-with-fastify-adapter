@@ -1,4 +1,11 @@
 {
+  "trailingComma": "all",
+  "semi": true,
   "singleQuote": true,
-  "trailingComma": "all"
+  "arrowParens": "always",
+  "breakLongMethodChains": true,
+  "maxEmptyLines": 2,
+  "endOfLine": "auto",
+  "tabWidth": 4,
+  "useTabs": false
 }

@@ -21,5 +21,18 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn'],
+    'prettier/prettier': [
+      'warn',
+      {
+        printWidth: 150,
+        trailingComma: 'all',
+        semi: true,
+        singleQuote: true,
+        arrowParens: 'always',
+        endOfLine: 'auto',
+        maxEmptyLines: 2,
+      },
+    ],
   },
 };

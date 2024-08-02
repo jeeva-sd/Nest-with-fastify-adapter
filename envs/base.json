@@ -1,0 +1,23 @@
+{
+  "appPort": 3000,
+  "server": {
+    "logger": false,
+    "bodyLimit": 1048576,
+    "caseSensitive": false,
+    "ignoreTrailingSlash": true,
+    "ignoreDuplicateSlashes": true
+  },
+  "payloadValidation": {
+    "abortEarly": true,
+    "stripUnknown": true,
+    "recursive": true
+  },
+  "multipart": {
+    "limits": {
+      "fileSize": 5242880,
+      "fieldSize": 1048576,
+      "fields": 10,
+      "files": 1
+    }
+  }
+}
