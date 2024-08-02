@@ -22,17 +22,17 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['warn'],
-    'prettier/prettier': [
-      'warn',
-      {
-        printWidth: 150,
-        trailingComma: 'all',
-        semi: true,
-        singleQuote: true,
-        arrowParens: 'always',
-        endOfLine: 'auto',
-        maxEmptyLines: 2,
-      },
-    ],
+    'prettier/prettier': ['warn', {
+      "trailingComma": "all",
+      "semi": true,
+      "singleQuote": true,
+      "arrowParens": "always",
+      "breakLongMethodChains": true,
+      "bracketSpacing": true,
+      "maxEmptyLines": 2,
+      "endOfLine": "auto",
+      "tabWidth": 4,
+      "useTabs": false
+    }],
   },
 };

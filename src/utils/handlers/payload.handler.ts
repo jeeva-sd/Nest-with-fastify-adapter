@@ -6,7 +6,10 @@ import { ValidationError } from './error.handler';
 import { appConfig } from 'src/config';
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
-    return applyDecorators(SetMetadata('validationSchema', schema), UseInterceptors(new ValidationInterceptor(schema)));
+    return applyDecorators(
+        SetMetadata('validationSchema', schema),
+        UseInterceptors(new ValidationInterceptor(schema)),
+    );
 };
 
 export class ValidationInterceptor {
@@ -42,13 +45,18 @@ export class ValidationInterceptor {
                 }
             }
 
-            const validatedPayload = await this.schema.validate(params, appConfig.get('payloadValidation'));
+            const validatedPayload = await this.schema.validate(
+                params,
+                appConfig.get('payloadValidation'),
+            );
 
             request.payload = validatedPayload;
             request.sanitized = true;
             return next.handle();
         } catch (e) {
-            const error = e?.errors?.length ? e.errors[0] : 'Payload validation failed';
+            const error = e?.errors?.length
+                ? e.errors[0]
+                : 'Payload validation failed';
             throw new ValidationError(error);
         }
     }

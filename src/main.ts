@@ -1,10 +1,13 @@
-import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
+import {
+    FastifyAdapter as AppAdapter,
+    NestFastifyApplication as Application,
+} from '@nestjs/platform-fastify';
 import multiPart from '@fastify/multipart';
 import { NestFactory } from '@nestjs/core';
 import { Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { appConfig } from './config';
-import { AllExceptionsFilter, HttpExceptionFilter, readError } from './utils';
+import { HttpExceptionFilter, readError } from './utils';
 
 class Bootstrap {
     private logger: Logger;
@@ -22,7 +25,9 @@ class Bootstrap {
 
             await this.listen(app);
         } catch (error) {
-            this.logger.error(`Failed to bootstrap application: ${readError(error)}`);
+            this.logger.error(
+                `Failed to bootstrap application: ${readError(error)}`,
+            );
             process.exit(1);
         }
     }
@@ -33,7 +38,7 @@ class Bootstrap {
     }
 
     private async registerPluginsAndFilters(app: Application) {
-        app.useGlobalFilters(new AllExceptionsFilter(), new HttpExceptionFilter());
+        app.useGlobalFilters(new HttpExceptionFilter());
         await app.register(multiPart, appConfig.get('multiPart'));
     }
 

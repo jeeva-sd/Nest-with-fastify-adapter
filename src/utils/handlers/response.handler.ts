@@ -3,7 +3,9 @@ import { readError } from './error.handler';
 
 // Common function to build an ResponseX
 const buildResponseX = (code: number, data?: any, options?: any) => {
-    const message = options?.message ? readError(options?.message) : (actionMessages[code]?.message ?? null);
+    const message = options?.message
+        ? readError(options?.message)
+        : (actionMessages[code]?.message ?? null);
     const status = actionMessages[code]?.status ?? MessageStatus.success;
     const error = options?.error ? readError(options?.error) : null;
 
@@ -30,7 +32,17 @@ export const clientError = (error?: any) => {
     });
 };
 
-export const customResponse = (code = 200, message?: string, data = null, error = null) => {
+// specific code
+export const takeException = (code = 200, message = null, error = null) => {
+    return buildResponseX(code, null, { message, error });
+};
+
+export const customResponse = (
+    code = 200,
+    message?: string,
+    data = null,
+    error = null,
+) => {
     return buildResponseX(code, data, { error, message });
 };
 
@@ -47,6 +59,7 @@ export const dataNotFound = (res: any = []) => {
 export const dataList = (data: any) => {
     if (!data) return dataNotFound();
     else if (Array.isArray(data) && data.length > 0) return dataFound(data);
-    else if (typeof data === 'object' && Object.keys(data).length > 0) return dataFound(data);
+    else if (typeof data === 'object' && Object.keys(data).length > 0)
+        return dataFound(data);
     else return dataNotFound();
 };

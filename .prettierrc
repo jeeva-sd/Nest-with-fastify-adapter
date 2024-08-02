@@ -4,6 +4,7 @@
   "singleQuote": true,
   "arrowParens": "always",
   "breakLongMethodChains": true,
+  "bracketSpacing": true,
   "maxEmptyLines": 2,
   "endOfLine": "auto",
   "tabWidth": 4,

@@ -1,6 +1,12 @@
 import { FastifyReply } from 'fastify';
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { customResponse, take } from './response.handler';
+import {
+    ArgumentsHost,
+    Catch,
+    ExceptionFilter,
+    HttpException,
+    HttpStatus,
+} from '@nestjs/common';
+import { customResponse, take, takeException } from './response.handler';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -8,8 +14,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<FastifyReply>();
         const exceptionResponse: any = exception.getResponse();
-        const errorCode = exceptionResponse.code > 100 && exceptionResponse.code < 1000 ? exceptionResponse.code : 400;
-        response.code(errorCode).send(exceptionResponse);
+        const errorCode =
+            exceptionResponse.statusCode > 100 &&
+            exceptionResponse.statusCode < 1000
+                ? exceptionResponse.statusCode
+                : 400;
+
+        response
+            .code(errorCode)
+            .send(
+                takeException(
+                    errorCode,
+                    exceptionResponse.message,
+                    exceptionResponse.error,
+                ),
+            );
     }
 }
 
@@ -26,21 +45,14 @@ export class Exception extends HttpException {
 
 export class ValidationError extends HttpException {
     constructor(message?: string) {
-        const response = customResponse(HttpStatus.BAD_REQUEST, message, null, 'Validation error');
+        const response = customResponse(
+            HttpStatus.BAD_REQUEST,
+            message,
+            null,
+            'Validation error',
+        );
 
         super(response, HttpStatus.BAD_REQUEST);
-    }
-}
-
-@Catch()
-export class AllExceptionsFilter {
-    catch(exception: any, host: ArgumentsHost): void {
-        const ctx = host.switchToHttp();
-        const response = ctx.getResponse<FastifyReply>();
-        const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-        console.error(exception);
-
-        response.code(status).send(customResponse(HttpStatus.INTERNAL_SERVER_ERROR, null, null, exception));
     }
 }
 
@@ -49,9 +61,14 @@ export function readError(error: any): string | null {
     if (Array.isArray(error)) return error.length > 0 ? error[0] : null;
     if (error instanceof Error) return error.message;
     if (typeof error === 'object') {
-        const errorMessage = error.message || (error.error && error.error.message);
+        const errorMessage =
+            error.message || (error.error && error.error.message);
         if (errorMessage) return errorMessage;
-        if (error.response && error.response.data && error.response.data.message) {
+        if (
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+        ) {
             return error.response.data.message;
         }
         return error.toString?.();
