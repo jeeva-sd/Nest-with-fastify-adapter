@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { MessageData, MessageStatus } from './types';
 
 export const actionMessages: { [key: number]: MessageData } = {

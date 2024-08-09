@@ -24,7 +24,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             .code(errorCode)
             .send(
                 takeException(
-                    errorCode,
+                    exceptionResponse.statusCode,
                     exceptionResponse.message,
                     exceptionResponse.error,
                 ),
