@@ -9,10 +9,7 @@ export class EcoAppsGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest();
         const token = request.params.token || request.query.token;
-
-        if (!token) {
-            return false;
-        }
+        if (!token) return false;
 
         try {
             const payload = this.jwtService.verify(token, {

@@ -43,7 +43,7 @@ export const actionMessages: { [key: number]: MessageData } = {
     // Custom
     1000: { message: 'Data found', status: MessageStatus.success },
     1001: { message: 'Data not found', status: MessageStatus.success },
-    1003: { message: 'Validation Errors', status: MessageStatus.error },
+    1003: { message: 'Validation Error', status: MessageStatus.error },
     1004: { message: 'Unexpected error', status: MessageStatus.error },
     1005: { message: 'Something went wrong', status: MessageStatus.error },
     1006: { message: 'Request timed out', status: MessageStatus.error },

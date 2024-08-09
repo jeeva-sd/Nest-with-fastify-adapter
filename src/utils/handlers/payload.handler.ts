@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { applyDecorators, SetMetadata, UseInterceptors } from '@nestjs/common';
 import * as yup from 'yup';
-import { ValidationError } from './error.handler';
 import { appConfig } from 'src/config';
+import { Exception } from './error.handler';
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
     return applyDecorators(
@@ -54,10 +54,10 @@ export class ValidationInterceptor {
             request.sanitized = true;
             return next.handle();
         } catch (e) {
-            const error = e?.errors?.length
+            const message = e?.errors?.length
                 ? e.errors[0]
                 : 'Payload validation failed';
-            throw new ValidationError(error);
+            throw new Exception(1003, message, 'Payload validation failed');
         }
     }
 }

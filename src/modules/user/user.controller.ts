@@ -1,7 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { Sanitize } from 'src/utils';
 import { getUserRule } from './user.rule';
 import { UserService } from './user.service';
+import { JwtAuthGuard } from '../auth';
 
 @Controller('user')
 export class UserController {
@@ -9,6 +10,7 @@ export class UserController {
 
     @Get()
     @Sanitize(getUserRule)
+    @UseGuards(JwtAuthGuard)
     findAll() {
         return this.userService.findAll();
     }

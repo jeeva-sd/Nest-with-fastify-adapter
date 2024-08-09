@@ -1,6 +1,6 @@
 import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Sanitize } from 'src/utils';
+import { Sanitize, take } from 'src/utils';
 import { loginRule } from './auth.rule';
 import { EcoAppsGuard, JwtAuthGuard, LocalAuthGuard } from './guards';
 
@@ -12,7 +12,8 @@ export class AuthController {
     @Sanitize(loginRule)
     @UseGuards(LocalAuthGuard)
     async login(@Request() req) {
-        return this.authService.login(req.user);
+        const response = await this.authService.login(req.user);
+        return take(1051, response);
     }
 
     @UseGuards(JwtAuthGuard)

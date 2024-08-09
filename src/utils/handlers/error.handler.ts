@@ -6,7 +6,7 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
-import { customResponse, take, takeException } from './response.handler';
+import { takeException } from './response.handler';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -14,43 +14,41 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<FastifyReply>();
         const exceptionResponse: any = exception.getResponse();
+        console.log(exceptionResponse, 'exceptionResponse');
+        let actualResponse = null;
+
         const errorCode =
             exceptionResponse.statusCode > 100 &&
             exceptionResponse.statusCode < 1000
                 ? exceptionResponse.statusCode
                 : 400;
 
-        response
-            .code(errorCode)
-            .send(
-                takeException(
-                    exceptionResponse.statusCode,
-                    exceptionResponse.message,
-                    exceptionResponse.error,
-                ),
+        if (exceptionResponse.prepared) {
+            actualResponse = exceptionResponse.data;
+        } else {
+            actualResponse = takeException(
+                exceptionResponse.errorCode,
+                exceptionResponse.message,
+                exceptionResponse.error,
             );
+        }
+
+        response.code(errorCode).send(actualResponse);
     }
 }
 
 export class Exception extends HttpException {
-    constructor(code: number, message?: string) {
-        let response = null;
+    constructor(code: number, message?: string, error?: any) {
+        const response = {
+            data: undefined,
+            prepared: true,
+        };
 
-        if (code) response = take(code);
-        else response = customResponse(HttpStatus.BAD_REQUEST, message);
-
-        super(response, HttpStatus.BAD_REQUEST);
-    }
-}
-
-export class ValidationError extends HttpException {
-    constructor(message?: string) {
-        const response = customResponse(
-            HttpStatus.BAD_REQUEST,
-            message,
-            null,
-            'Validation error',
-        );
+        if (code) {
+            response.data = takeException(code, message, error);
+        } else {
+            response.data = takeException(HttpStatus.BAD_REQUEST, message);
+        }
 
         super(response, HttpStatus.BAD_REQUEST);
     }
