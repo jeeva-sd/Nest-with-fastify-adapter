@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { FastifyRequest } from 'fastify';
 import { applyDecorators, SetMetadata, UseInterceptors } from '@nestjs/common';
 import * as yup from 'yup';
 import { appConfig } from 'src/config';
@@ -11,6 +12,12 @@ export const Sanitize = (schema: yup.ObjectSchema<any>) => {
         UseInterceptors(new ValidationInterceptor(schema)),
     );
 };
+
+export interface RequestX extends FastifyRequest {
+    user?: any;
+    payload: any;
+    sanitized: boolean;
+}
 
 export class ValidationInterceptor {
     constructor(private readonly schema: yup.ObjectSchema<any>) {}

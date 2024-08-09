@@ -2,8 +2,8 @@ import { Strategy } from 'passport-custom';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from 'src/constants';
 import { Exception } from 'src/utils';
+import { appConfig } from 'src/config';
 
 @Injectable()
 export class CustomStrategy extends PassportStrategy(Strategy, 'custom') {
@@ -17,7 +17,7 @@ export class CustomStrategy extends PassportStrategy(Strategy, 'custom') {
 
         try {
             const userData = this.jwtService.verify(token, {
-                secret: jwtConstants.secret,
+                secret: appConfig.get('auth').jwt.secret,
             });
 
             request.user = userData;
