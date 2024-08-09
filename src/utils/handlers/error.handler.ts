@@ -1,10 +1,10 @@
+import { ActionMessageCodes } from './../../constants';
 import { FastifyReply } from 'fastify';
 import {
     ArgumentsHost,
     Catch,
     ExceptionFilter,
     HttpException,
-    HttpStatus,
 } from '@nestjs/common';
 import { takeException } from './response.handler';
 
@@ -14,7 +14,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<FastifyReply>();
         const exceptionResponse: any = exception.getResponse();
-        console.log(exceptionResponse, 'exceptionResponse');
         let actualResponse = null;
 
         const errorCode =
@@ -27,7 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             actualResponse = exceptionResponse.data;
         } else {
             actualResponse = takeException(
-                exceptionResponse.errorCode,
+                exceptionResponse.statusCode,
                 exceptionResponse.message,
                 exceptionResponse.error,
             );
@@ -38,38 +37,42 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }
 
 export class Exception extends HttpException {
-    constructor(code: number, message?: string, error?: any) {
+    constructor(code: ActionMessageCodes, error?: any, message?: string) {
         const response = {
-            data: undefined,
+            data: takeException(code, message, error),
             prepared: true,
         };
 
-        if (code) {
-            response.data = takeException(code, message, error);
-        } else {
-            response.data = takeException(HttpStatus.BAD_REQUEST, message);
-        }
-
-        super(response, HttpStatus.BAD_REQUEST);
+        super(response, code);
     }
 }
 
 export function readError(error: any): string | null {
-    if (typeof error === 'string') return error;
-    if (Array.isArray(error)) return error.length > 0 ? error[0] : null;
-    if (error instanceof Error) return error.message;
-    if (typeof error === 'object') {
-        const errorMessage =
-            error.message || (error.error && error.error.message);
-        if (errorMessage) return errorMessage;
-        if (
-            error.response &&
-            error.response.data &&
-            error.response.data.message
-        ) {
-            return error.response.data.message;
+    try {
+        if (typeof error === 'string') {
+            return error;
         }
-        return error.toString?.();
+
+        if (Array.isArray(error)) {
+            return error.length > 0 ? error[0] : null;
+        }
+
+        if (error instanceof Error) {
+            return error.message;
+        }
+
+        if (error && typeof error === 'object') {
+            return (
+                error.message ||
+                error.error?.message ||
+                error.response?.data?.message ||
+                error.toString()
+            );
+        }
+
+        return error?.toString() || null;
+    } catch (e) {
+        console.error('Error in readError function:', e);
+        return 'unknown error';
     }
-    return error?.toString?.() || null;
 }

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { MessageData, MessageStatus } from './types';
+import {  MessageStatus } from './types';
 
-export const actionMessages: { [key: number]: MessageData } = {
+export const actionMessages = {
     // Successful
     200: { message: 'Request completed successfully', status: MessageStatus.success },
     201: { message: 'Resource successfully created', status: MessageStatus.success },
@@ -59,3 +59,5 @@ export const actionMessages: { [key: number]: MessageData } = {
     1201: { message: 'User successfully updated', status: MessageStatus.success },
     1202: { message: 'User successfully deleted', status: MessageStatus.success },
 };
+
+export type ActionMessageCodes = keyof typeof actionMessages;

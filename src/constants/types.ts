@@ -6,7 +6,8 @@ export enum MessageStatus {
 
 export interface MessageData {
     message: string;
-    status: string;
+    status: MessageStatus;
+    error?: string;
 }
 
 export interface Messages {
