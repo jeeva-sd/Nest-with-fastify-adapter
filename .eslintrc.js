@@ -3,12 +3,12 @@ module.exports = {
   parserOptions: {
       project: 'tsconfig.json',
       tsconfigRootDir: __dirname,
-      sourceType: 'module',
+      sourceType: 'module'
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
       'plugin:@typescript-eslint/recommended',
-      'plugin:prettier/recommended',
+      'plugin:prettier/recommended'
   ],
   root: true,
   env: {
@@ -35,8 +35,8 @@ module.exports = {
             arrowParens: 'always',      // Always include parentheses around arrow function arguments
             endOfLine: 'auto',          // Maintain existing line endings (for cross-platform compatibility)
             quoteProps: 'consistent',   // Consistently quote object properties either all or none
-            bracketSameLine: false,     // Keep the closing bracket of objects or arrays on a new line
-        },
-    ],
-  },
+            bracketSameLine: false      // Keep the closing bracket of objects or arrays on a new line
+        }
+    ]
+  }
 };
