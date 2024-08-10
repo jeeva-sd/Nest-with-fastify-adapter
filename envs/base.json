@@ -13,6 +13,10 @@
       "expiresIn": "7d"
     }
   },
+  "static": {
+    "folder": "public",
+    "prefix": "/static/"
+  },
   "payloadValidation": {
     "abortEarly": true,
     "stripUnknown": true,

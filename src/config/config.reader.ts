@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '@nestjs/common';
-import { AppConfig, AppConfigSchema } from './config.schema';
+import { AppConfig, AppConfigRule } from './config.rule';
 
 export class ConfigReader {
     private static instance: ConfigReader;
@@ -34,9 +34,7 @@ export class ConfigReader {
 
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
-            return AppConfigSchema.validateSync(mergedConfigs, {
-                abortEarly: false
-            });
+            return AppConfigRule.validateSync(mergedConfigs, { abortEarly: false });
         } catch (error) {
             this.logger.error('Configuration validation error:', error);
             process.exit(1);

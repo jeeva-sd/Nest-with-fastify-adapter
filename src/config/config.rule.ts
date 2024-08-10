@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-const serverOptionsSchema = yup.object().shape({
+const serverConfigRule = yup.object().shape({
     logger: yup.boolean(),
     bodyLimit: yup.number(),
     caseSensitive: yup.boolean(),
@@ -8,13 +8,13 @@ const serverOptionsSchema = yup.object().shape({
     ignoreDuplicateSlashes: yup.boolean()
 });
 
-const payloadValidationSchema = yup.object().shape({
+const payloadConfigRule = yup.object().shape({
     abortEarly: yup.boolean().default(true),
     stripUnknown: yup.boolean().default(true),
     recursive: yup.boolean().default(true)
 });
 
-const multipartOptionsSchema = yup.object().shape({
+const multipartConfigRule = yup.object().shape({
     limits: yup.object().shape({
         fileSize: yup.number().default(5242880), // 5MB
         fieldSize: yup.number().default(1024 * 1024), // 1MB
@@ -23,29 +23,35 @@ const multipartOptionsSchema = yup.object().shape({
     })
 });
 
-const authSchema = yup.object().shape({
+const authConfigRule = yup.object().shape({
     jwt: yup.object().shape({
         secret: yup.string().required(),
         expiresIn: yup.string().default('7d') // 7 days
     })
 });
 
-export const AppConfigSchema = yup.object().shape({
+const staticPathConfigRule = yup.object().shape({
+    folder: yup.string().required(),
+    prefix: yup.string().default('/static/')
+});
+
+export const AppConfigRule = yup.object().shape({
     appPort: yup.number().required(),
     appPrefix: yup.string().default('api'),
-    server: serverOptionsSchema,
-    auth: authSchema,
-    payloadValidation: payloadValidationSchema,
-    multiPart: multipartOptionsSchema
+    server: serverConfigRule,
+    auth: authConfigRule,
+    static: staticPathConfigRule,
+    payloadValidation: payloadConfigRule,
+    multiPart: multipartConfigRule
 });
 
 // ------------------------------------------------------------------------------------------------------------------
 
-type AppConfig = yup.InferType<typeof AppConfigSchema>;
-type AuthConfig = yup.InferType<typeof authSchema>;
-type ServerOptionsConfig = yup.InferType<typeof serverOptionsSchema>;
-type PayloadValidationConfig = yup.InferType<typeof payloadValidationSchema>;
-type MultipartOptions = yup.InferType<typeof multipartOptionsSchema>;
+type AppConfig = yup.InferType<typeof AppConfigRule>;
+type AuthConfig = yup.InferType<typeof authConfigRule>;
+type ServerOptionsConfig = yup.InferType<typeof serverConfigRule>;
+type PayloadValidationConfig = yup.InferType<typeof payloadConfigRule>;
+type MultipartOptions = yup.InferType<typeof multipartConfigRule>;
 
 // ------------------------------------------------------------------------------------------------------------------
 

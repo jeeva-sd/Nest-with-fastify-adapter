@@ -1,10 +1,12 @@
 import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
 import multiPart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
 import { NestFactory } from '@nestjs/core';
 import { Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { appConfig } from './config';
 import { HttpExceptionFilter, readError } from './utils';
+import { join } from 'path';
 
 class Bootstrap {
     private logger: Logger;
@@ -34,7 +36,12 @@ class Bootstrap {
 
     private async registerPluginsAndFilters(app: Application) {
         app.useGlobalFilters(new HttpExceptionFilter());
+
         await app.register(multiPart, appConfig.get('multiPart'));
+        await app.register(fastifyStatic, {
+            root: join(__dirname, '..', appConfig.get('static').folder),
+            prefix: appConfig.get('static').prefix
+        });
     }
 
     private async enableVersioning(app: Application) {
