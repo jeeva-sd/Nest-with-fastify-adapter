@@ -22,6 +22,7 @@ module.exports = {
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': ['warn'],
+      'space-before-function-paren': ['error', 'never'],
       'prettier/prettier': [
         'warn',
         {
@@ -32,10 +33,11 @@ module.exports = {
             singleQuote: true,          // Use single quotes instead of double quotes
             trailingComma: 'none',      // No trailing commas
             bracketSpacing: true,       // Add spaces inside object literal braces
-            arrowParens: 'always',      // Always include parentheses around arrow function arguments
+            arrowParens: 'avoid',       // Always include parentheses around arrow function arguments
             endOfLine: 'auto',          // Maintain existing line endings (for cross-platform compatibility)
             quoteProps: 'consistent',   // Consistently quote object properties either all or none
-            bracketSameLine: false      // Keep the closing bracket of objects or arrays on a new line
+            bracketSameLine: false,     // Keep the closing bracket of objects or arrays on a new line
+            proseWrap: "never"          // Prevents wrapping prose (like in Markdown)
         }
     ]
   }

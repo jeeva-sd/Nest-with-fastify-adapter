@@ -9,5 +9,6 @@
   "arrowParens": "always",
   "endOfLine": "auto",
   "quoteProps": "consistent",
-  "bracketSameLine": false
+  "bracketSameLine": false,
+  "proseWrap": "never"
 }
