@@ -3,24 +3,26 @@ import { readError } from './error.handler';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require('chalk');
 
-export const redChalk = chalk.hex('#D32F2F');
-export const greenChalk = chalk.hex('#1cba2c');
-export const blueChalk = chalk.hex('#1976D2');
-export const yellowChalk = chalk.hex('#FFFF00');
-
-export const orangeChalk = chalk.hex('#FFA500');
-export const tealChalk = chalk.hex('#008080');
-export const coralChalk = chalk.hex('#FF7F50');
-export const indigoChalk = chalk.hex('#4B0082');
-export const oliveChalk = chalk.hex('#808000');
-export const plumChalk = chalk.hex('#DDA0DD');
-export const navyChalk = chalk.hex('#000080');
-export const fuchsiaChalk = chalk.hex('#FF00FF');
-export const salmonChalk = chalk.hex('#FA8072');
-export const turquoiseChalk = chalk.hex('#40E0D0');
+// Define colors
+const colors = {
+    red: chalk.red,
+    green: chalk.green,
+    blue: chalk.blue,
+    yellow: chalk.yellow,
+    orange: chalk.hex('#FFA500'),
+    teal: chalk.hex('#008080'),
+    coral: chalk.hex('#FF7F50'),
+    indigo: chalk.hex('#4B0082'),
+    olive: chalk.hex('#808000'),
+    plum: chalk.hex('#DDA0DD'),
+    navy: chalk.hex('#000080'),
+    fuchsia: chalk.hex('#FF00FF'),
+    salmon: chalk.hex('#FA8072'),
+    turquoise: chalk.hex('#40E0D0')
+};
 
 export class Chalk implements LoggerService {
-    private context: string | undefined;
+    private context?: string;
 
     constructor(context?: string) {
         if (context) this.context = context;
@@ -32,42 +34,54 @@ export class Chalk implements LoggerService {
 
     private getTimestamp(): string {
         const now = new Date();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours % 12 || 12;
-        const formattedMinutes = minutes.toString().padStart(2, '0');
-        const formattedSeconds = seconds.toString().padStart(2, '0');
-        const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-        return `${formattedDate}, ${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+
+        const options: Intl.DateTimeFormatOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+
+        if (process.env.NODE_ENV === 'development') {
+            // Time only format for development
+            return now.toLocaleTimeString('en-US', options);
+        } else {
+            // Full date and time format for other environments
+            const fullOptions: Intl.DateTimeFormatOptions = {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            return now.toLocaleString('en-US', fullOptions);
+        }
     }
 
-    private formatMessage(level: string, message: string, color: (text: string) => string): string {
+    private formatMessage(level: string | undefined, message: string, color: (text: string) => string): string {
         const timestamp = this.getTimestamp();
-        const contextPart = this.context ? ` ${yellowChalk(`[${this.context}]`)}` : '';
-        const logMessage = ` ${color(message)}`;
-        const levelInfo = level ? ` \n${level}` : '';
-
-        return `${timestamp} -${contextPart}${levelInfo}${logMessage}`;
+        const contextPart = this.context ? ` ${colors.yellow(`[${this.context}]`)}` : '';
+        const levelInfo = level ? ` ${color(level)}` : '';
+        return `${timestamp}${contextPart}${levelInfo} ${color(message)}`;
     }
 
     log(message: string) {
-        console.log(this.formatMessage(undefined, message, greenChalk));
+        console.log(this.formatMessage(undefined, message, colors.green));
     }
 
     error(message: string, trace?: string) {
-        const level = redChalk('ERROR:');
-
+        const level = colors.red('ERROR:');
         console.error(
-            this.formatMessage(level, readError(message), redChalk),
-            trace ? redChalk(`\nStack Trace: ${trace}`) : ''
+            this.formatMessage(level, readError(message), colors.red),
+            trace ? colors.red(`\nStack Trace: ${trace}`) : ''
         );
     }
 
     warn(message: string) {
-        const level = redChalk('[WARN]:');
-        console.warn(this.formatMessage(orangeChalk(level), orangeChalk(message), orangeChalk));
+        const level = colors.orange('WARN:');
+        console.warn(this.formatMessage(level, message, colors.orange));
     }
 
     debug(message: string) {
@@ -79,17 +93,17 @@ export class Chalk implements LoggerService {
     }
 
     info(message: string) {
-        console.debug(this.formatMessage(undefined, message, blueChalk));
+        console.debug(this.formatMessage(undefined, message, colors.blue));
     }
 
     exception(error: any) {
-        const level = redChalk('EXCEPTION:');
+        const level = colors.red('EXCEPTION:');
         const trace = error instanceof Error ? error.stack : undefined;
 
         console.log('\n');
         console.error(
-            this.formatMessage(level, readError(error), redChalk),
-            trace ? redChalk(`\nStack Trace: ${trace}`) : ''
+            this.formatMessage(level, readError(error), colors.red),
+            trace ? colors.red(`\nStack Trace: ${trace}`) : ''
         );
         console.log('\n');
     }
