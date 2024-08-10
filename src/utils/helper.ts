@@ -321,6 +321,24 @@ export class Helper {
                 throw error;
             }
         }
+
+        static convertBytes(
+            bytes: number,
+            unit: 'B' | 'KB' | 'MB' | 'GB' = 'KB',
+            decimals = 2,
+        ) {
+            if (bytes === 0) return '0 Bytes';
+
+            const units = {
+                B: 1,
+                KB: 1024,
+                MB: 1024 * 1024,
+                GB: 1024 * 1024 * 1024,
+            };
+
+            const value = bytes / units[unit];
+            return Number(value.toFixed(decimals));
+        }
     };
 
     static Number = class {

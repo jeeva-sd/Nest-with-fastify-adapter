@@ -5,7 +5,7 @@ import { Helper } from 'src/utils';
 @Injectable()
 export class UserService {
     async findAll(newUserPayload: NewUserPayload) {
-        await Helper.File.readFile(newUserPayload.profileOne as string);
+        await Helper.File.readFile(newUserPayload.profileOne.filePath);
         return `This action returns all user`;
     }
 

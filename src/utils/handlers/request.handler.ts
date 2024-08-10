@@ -14,6 +14,19 @@ import { Exception, readError } from './error.handler';
 import { Helper } from '../helper';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { ALL_FILE_TYPES } from 'src/constants';
+
+export interface RequestX extends FastifyRequest {
+    user?: any;
+    payload: any;
+    sanitized: boolean;
+}
+
+export interface FileSchemaOverrides {
+    allowedMimeTypes?: string[];
+    minFileSize?: number; // Minimum file size in MB
+    maxFileSize?: number; // Maximum file size in MB
+}
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
     return applyDecorators(
@@ -22,11 +35,20 @@ export const Sanitize = (schema: yup.ObjectSchema<any>) => {
     );
 };
 
-export interface RequestX extends FastifyRequest {
-    user?: any;
-    payload: any;
-    sanitized: boolean;
-}
+export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
+    return yup.object().shape({
+        mimetype: yup
+            .string()
+            .oneOf(overrides.allowedMimeTypes || ALL_FILE_TYPES)
+            .required(),
+        filePath: yup.string().required(),
+        fileSize: yup
+            .number()
+            .min(overrides.minFileSize || 0) // Size in MB
+            .max(overrides.maxFileSize || 1) // Default max size 1MB in MB
+            .required(),
+    });
+};
 
 export class ValidationInterceptor {
     private uploadedFiles: string[] = [];
@@ -51,7 +73,6 @@ export class ValidationInterceptor {
                 for await (const part of parts) {
                     if (part.file) {
                         const uploadDir = path.join('public', 'uploads');
-
                         const filename = Helper.File.generateFilename(
                             part.filename,
                         );
@@ -60,8 +81,17 @@ export class ValidationInterceptor {
                         await fs.promises.mkdir(uploadDir, { recursive: true });
                         await fs.promises.writeFile(filePath, part.file);
 
-                        params[part.fieldname] = filePath;
-                        this.uploadedFiles.push(filePath); // Track only files for this request
+                        const fileBytes = Buffer.byteLength(
+                            await Helper.File.readFile(filePath),
+                        );
+
+                        params[part.fieldname] = {
+                            mimetype: part.mimetype,
+                            filePath,
+                            fileSize: Helper.File.convertBytes(fileBytes, 'MB'),
+                        };
+
+                        this.uploadedFiles.push(filePath);
                     } else {
                         params[part.fieldname] = part.value;
                     }

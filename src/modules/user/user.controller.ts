@@ -6,7 +6,7 @@ import {
     Request,
     UseGuards,
 } from '@nestjs/common';
-import { Helper, RequestX, ResponseX, Sanitize, take } from 'src/utils';
+import { RequestX, ResponseX, Sanitize, take } from 'src/utils';
 import { newUserRule } from './user.rule';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth';
@@ -19,7 +19,6 @@ export class UserController {
     @Sanitize(newUserRule)
     @UseGuards(JwtAuthGuard)
     async createUser(@Request() req: RequestX): Promise<ResponseX> {
-        await Helper.wait(5000);
         const response = await this.userService.findAll(req.payload);
         return take(1051, response);
     }
@@ -28,7 +27,6 @@ export class UserController {
     @Sanitize(newUserRule)
     @UseGuards(JwtAuthGuard)
     async createUserV1(@Request() req: RequestX): Promise<ResponseX> {
-        await Helper.wait(10000);
         const response = await this.userService.findAll(req.payload);
         return take(1051, response);
     }

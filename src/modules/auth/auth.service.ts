@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { appConfig } from 'src/config';
 
 const users = [
     {
@@ -29,7 +30,9 @@ export class AuthService {
 
         return {
             ...payload,
-            access_token: this.jwtService.sign(payload),
+            access_token: this.jwtService.sign(payload, {
+                expiresIn: appConfig.get('auth').jwt.expiresIn,
+            }),
         };
     }
 }
