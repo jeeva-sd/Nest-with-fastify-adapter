@@ -12,18 +12,10 @@ import { appConfig } from 'src/config';
         PassportModule,
         JwtModule.register({
             secret: appConfig.get('auth').jwt.secret,
-            signOptions: { expiresIn: '60m' },
-        }),
+            signOptions: { expiresIn: '60m' }
+        })
     ],
-    providers: [
-        AuthService,
-        LocalStrategy,
-        JwtStrategy,
-        CustomStrategy,
-        CustomAuthGuard,
-        JwtAuthGuard,
-        LocalAuthGuard,
-    ],
-    controllers: [AuthController],
+    providers: [AuthService, LocalStrategy, JwtStrategy, CustomStrategy, CustomAuthGuard, JwtAuthGuard, LocalAuthGuard],
+    controllers: [AuthController]
 })
 export class AuthModule {}

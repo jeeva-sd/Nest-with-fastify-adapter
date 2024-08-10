@@ -17,7 +17,7 @@ export class CustomStrategy extends PassportStrategy(Strategy, 'custom') {
 
         try {
             const userData = this.jwtService.verify(token, {
-                secret: appConfig.get('auth').jwt.secret,
+                secret: appConfig.get('auth').jwt.secret
             });
 
             request.user = userData;

@@ -10,7 +10,7 @@ export const loginRule = yup.object().shape({
         .string()
         .required('Password is required')
         .min(4, 'Password must be at least 4 characters long')
-        .max(50, 'Password must be less than or equal to 50 characters long'),
+        .max(50, 'Password must be less than or equal to 50 characters long')
 });
 
 export type LoginPayload = yup.InferType<typeof loginRule>;

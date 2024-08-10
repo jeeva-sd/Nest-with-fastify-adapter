@@ -1,7 +1,4 @@
-import {
-    FastifyAdapter as AppAdapter,
-    NestFastifyApplication as Application,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
 import multiPart from '@fastify/multipart';
 import { NestFactory } from '@nestjs/core';
 import { Logger, VersioningType } from '@nestjs/common';
@@ -25,9 +22,7 @@ class Bootstrap {
 
             await this.listen(app);
         } catch (error) {
-            this.logger.error(
-                `Failed to bootstrap application: ${readError(error)}`,
-            );
+            this.logger.error(`Failed to bootstrap application: ${readError(error)}`);
             process.exit(1);
         }
     }

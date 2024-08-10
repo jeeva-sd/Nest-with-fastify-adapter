@@ -6,13 +6,13 @@ const users = [
     {
         username: 'admin',
         password: 'admin',
-        userId: 1,
+        userId: 1
     },
     {
         username: 'user',
         password: 'user',
-        userId: 2,
-    },
+        userId: 2
+    }
 ];
 
 @Injectable()
@@ -20,9 +20,7 @@ export class AuthService {
     constructor(private jwtService: JwtService) {}
 
     async validateUser(username: string, pass: string): Promise<any> {
-        return users.find(
-            (u) => u.username === username && u.password === pass,
-        );
+        return users.find((u) => u.username === username && u.password === pass);
     }
 
     async login(user: any) {
@@ -31,8 +29,8 @@ export class AuthService {
         return {
             ...payload,
             access_token: this.jwtService.sign(payload, {
-                expiresIn: appConfig.get('auth').jwt.expiresIn,
-            }),
+                expiresIn: appConfig.get('auth').jwt.expiresIn
+            })
         };
     }
 }

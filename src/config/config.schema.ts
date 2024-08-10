@@ -5,13 +5,13 @@ const serverOptionsSchema = yup.object().shape({
     bodyLimit: yup.number(),
     caseSensitive: yup.boolean(),
     ignoreTrailingSlash: yup.boolean(),
-    ignoreDuplicateSlashes: yup.boolean(),
+    ignoreDuplicateSlashes: yup.boolean()
 });
 
 const payloadValidationSchema = yup.object().shape({
     abortEarly: yup.boolean().default(true),
     stripUnknown: yup.boolean().default(true),
-    recursive: yup.boolean().default(true),
+    recursive: yup.boolean().default(true)
 });
 
 const multipartOptionsSchema = yup.object().shape({
@@ -19,15 +19,15 @@ const multipartOptionsSchema = yup.object().shape({
         fileSize: yup.number().default(5242880), // 5MB
         fieldSize: yup.number().default(1024 * 1024), // 1MB
         fields: yup.number().default(10),
-        files: yup.number().default(5),
-    }),
+        files: yup.number().default(5)
+    })
 });
 
 const authSchema = yup.object().shape({
     jwt: yup.object().shape({
         secret: yup.string().required(),
-        expiresIn: yup.string().default('7d'), // 7 days
-    }),
+        expiresIn: yup.string().default('7d') // 7 days
+    })
 });
 
 export const AppConfigSchema = yup.object().shape({
@@ -36,7 +36,7 @@ export const AppConfigSchema = yup.object().shape({
     server: serverOptionsSchema,
     auth: authSchema,
     payloadValidation: payloadValidationSchema,
-    multiPart: multipartOptionsSchema,
+    multiPart: multipartOptionsSchema
 });
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -49,10 +49,4 @@ type MultipartOptions = yup.InferType<typeof multipartOptionsSchema>;
 
 // ------------------------------------------------------------------------------------------------------------------
 
-export type {
-    AppConfig,
-    AuthConfig,
-    PayloadValidationConfig,
-    ServerOptionsConfig,
-    MultipartOptions,
-};
+export type { AppConfig, AuthConfig, PayloadValidationConfig, ServerOptionsConfig, MultipartOptions };

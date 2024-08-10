@@ -29,8 +29,8 @@ export class AuthController {
             ...req.user,
             ecoApps: [
                 { id: 1, name: 'EcoApp 1' },
-                { id: 2, name: 'EcoApp 2' },
-            ],
+                { id: 2, name: 'EcoApp 2' }
+            ]
         };
 
         return take(200, response);

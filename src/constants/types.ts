@@ -1,7 +1,7 @@
 export enum MessageStatus {
     success = 'success',
     failure = 'failure',
-    error = 'error',
+    error = 'error'
 }
 
 export interface MessageData {

@@ -14,7 +14,7 @@ export enum FileTypes {
 
     APPLICATION_ZIP = 'application/zip',
     APPLICATION_RAR = 'application/x-rar-compressed',
-    APPLICATION_TAR = 'application/x-tar',
+    APPLICATION_TAR = 'application/x-tar'
 }
 
 export const IMAGE_FILE_TYPES = [
@@ -22,7 +22,7 @@ export const IMAGE_FILE_TYPES = [
     FileTypes.IMAGE_JPEG,
     FileTypes.IMAGE_GIF,
     FileTypes.IMAGE_WEBP,
-    FileTypes.IMAGE_SVG,
+    FileTypes.IMAGE_SVG
 ];
 
 export const DOCUMENT_FILE_TYPES = [
@@ -31,17 +31,9 @@ export const DOCUMENT_FILE_TYPES = [
     FileTypes.APPLICATION_DOCX,
     FileTypes.APPLICATION_XLS,
     FileTypes.APPLICATION_XLSX,
-    FileTypes.TEXT_PLAIN,
+    FileTypes.TEXT_PLAIN
 ];
 
-export const OTHER_FILE_TYPES = [
-    FileTypes.APPLICATION_ZIP,
-    FileTypes.APPLICATION_RAR,
-    FileTypes.APPLICATION_TAR,
-];
+export const OTHER_FILE_TYPES = [FileTypes.APPLICATION_ZIP, FileTypes.APPLICATION_RAR, FileTypes.APPLICATION_TAR];
 
-export const ALL_FILE_TYPES = [
-    ...IMAGE_FILE_TYPES,
-    ...DOCUMENT_FILE_TYPES,
-    ...OTHER_FILE_TYPES,
-];
+export const ALL_FILE_TYPES = [...IMAGE_FILE_TYPES, ...DOCUMENT_FILE_TYPES, ...OTHER_FILE_TYPES];

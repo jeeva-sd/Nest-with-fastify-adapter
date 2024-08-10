@@ -1,13 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { FastifyRequest } from 'fastify';
-import {
-    applyDecorators,
-    SetMetadata,
-    UseInterceptors,
-    CallHandler,
-    ExecutionContext,
-} from '@nestjs/common';
+import { applyDecorators, SetMetadata, UseInterceptors, CallHandler, ExecutionContext } from '@nestjs/common';
 import * as yup from 'yup';
 import { appConfig } from 'src/config';
 import { Exception, readError } from './error.handler';
@@ -29,10 +23,7 @@ export interface FileSchemaOverrides {
 }
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
-    return applyDecorators(
-        SetMetadata('validationSchema', schema),
-        UseInterceptors(new ValidationInterceptor(schema)),
-    );
+    return applyDecorators(SetMetadata('validationSchema', schema), UseInterceptors(new ValidationInterceptor(schema)));
 };
 
 export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
@@ -42,25 +33,19 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
             yup.object().shape({
                 mimetype: yup
                     .string()
-                    .oneOf(
-                        overrides.allowedMimeTypes || ALL_FILE_TYPES,
-                        'Invalid request syntax or parameters',
-                    )
+                    .oneOf(overrides.allowedMimeTypes || ALL_FILE_TYPES, 'Invalid request syntax or parameters')
                     .required('File type is required'),
                 filePath: yup.string().required('File path is required'),
                 fileSize: yup
                     .number()
-                    .min(
-                        overrides.minFileSize || 0,
-                        `File size must be at least ${overrides.minFileSize || 0} MB`,
-                    )
+                    .min(overrides.minFileSize || 0, `File size must be at least ${overrides.minFileSize || 0} MB`)
                     .max(
                         overrides.maxFileSize || 1,
-                        `File size must be less than or equal to ${overrides.maxFileSize || 1} MB`,
+                        `File size must be less than or equal to ${overrides.maxFileSize || 1} MB`
                     )
                     .typeError('Invalid request syntax or parameters')
-                    .required('File size is required'),
-            }),
+                    .required('File size is required')
+            })
         )
         .typeError('Invalid request syntax or parameters')
         .required('Invalid request syntax');
@@ -70,10 +55,7 @@ export class ValidationInterceptor {
     private uploadedFiles: string[] = [];
     constructor(private readonly schema: yup.ObjectSchema<any>) {}
 
-    async intercept(
-        context: ExecutionContext,
-        next: CallHandler,
-    ): Promise<Observable<any>> {
+    async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
         const request = context.switchToHttp().getRequest();
         let params: any = {};
 
@@ -87,30 +69,21 @@ export class ValidationInterceptor {
                 const parts = await request.parts();
                 for await (const part of parts) {
                     if (part.file) {
-                        const files = Array.isArray(part.file)
-                            ? part.file
-                            : [part.file];
+                        const files = Array.isArray(part.file) ? part.file : [part.file];
 
                         for (const file of files) {
                             const uploadDir = path.join('public', 'uploads');
-                            const filename = Helper.File.generateFilename(
-                                part.filename,
-                            );
+                            const filename = Helper.File.generateFilename(part.filename);
                             const filePath = path.join(uploadDir, filename);
 
                             await fs.promises.mkdir(uploadDir, {
-                                recursive: true,
+                                recursive: true
                             });
                             await fs.promises.writeFile(filePath, file);
 
-                            const fileBytes = Buffer.byteLength(
-                                await Helper.File.readFile(filePath),
-                            );
+                            const fileBytes = Buffer.byteLength(await Helper.File.readFile(filePath));
 
-                            const fileSizeInMB = Helper.File.convertBytes(
-                                fileBytes,
-                                'MB',
-                            );
+                            const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
 
                             // Initialize the field in params if not already
                             if (!params[part.fieldname]) {
@@ -121,7 +94,7 @@ export class ValidationInterceptor {
                             params[part.fieldname].push({
                                 mimetype: part.mimetype,
                                 filePath,
-                                fileSize: fileSizeInMB,
+                                fileSize: fileSizeInMB
                             });
 
                             this.uploadedFiles.push(filePath);
@@ -132,10 +105,7 @@ export class ValidationInterceptor {
                 }
             }
 
-            const validatedPayload = await this.schema.validate(
-                params,
-                appConfig.get('payloadValidation'),
-            );
+            const validatedPayload = await this.schema.validate(params, appConfig.get('payloadValidation'));
 
             request.payload = validatedPayload;
             request.sanitized = true;
@@ -144,15 +114,13 @@ export class ValidationInterceptor {
                 // Cleanup after the response is sent
                 tap({
                     complete: () => this.cleanupFiles(),
-                    error: () => this.cleanupFiles(),
-                }),
+                    error: () => this.cleanupFiles()
+                })
             );
         } catch (e) {
             this.cleanupFiles();
 
-            const message = e?.errors?.length
-                ? e.errors[0]
-                : (readError(e) ?? 'Payload validation failed');
+            const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
             throw new Exception(1003, 'Invalid input payload', message);
         }
     }
@@ -162,9 +130,7 @@ export class ValidationInterceptor {
             try {
                 await fs.promises.unlink(filePath);
             } catch (err) {
-                console.error(
-                    `Failed to delete file ${filePath}: ${err.message}`,
-                );
+                console.error(`Failed to delete file ${filePath}: ${err.message}`);
             }
         }
 

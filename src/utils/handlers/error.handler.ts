@@ -1,11 +1,6 @@
 import { ActionMessageCodes } from './../../constants';
 import { FastifyReply } from 'fastify';
-import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { takeException } from './response.handler';
 
 @Catch(HttpException)
@@ -17,8 +12,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         let actualResponse = null;
 
         const errorCode =
-            exceptionResponse.statusCode > 100 &&
-            exceptionResponse.statusCode < 1000
+            exceptionResponse.statusCode > 100 && exceptionResponse.statusCode < 1000
                 ? exceptionResponse.statusCode
                 : 400;
 
@@ -28,7 +22,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             actualResponse = takeException(
                 exceptionResponse.statusCode,
                 exceptionResponse.message,
-                exceptionResponse.error,
+                exceptionResponse.error
             );
         }
 
@@ -40,7 +34,7 @@ export class Exception extends HttpException {
     constructor(code: ActionMessageCodes, error?: any, message?: string) {
         const response = {
             data: takeException(code, message, error),
-            prepared: true,
+            prepared: true
         };
 
         super(response, code);
@@ -62,12 +56,7 @@ export function readError(error: any): string | null {
         }
 
         if (error && typeof error === 'object') {
-            return (
-                error.message ||
-                error.error?.message ||
-                error.response?.data?.message ||
-                error.toString()
-            );
+            return error.message || error.error?.message || error.response?.data?.message || error.toString();
         }
 
         return error?.toString() || null;

@@ -13,13 +13,10 @@ export interface ResponseX {
 const buildResponseX = (
     code: number,
     data: any = null,
-    options: { message?: string; error?: string } = {},
+    options: { message?: string; error?: string } = {}
 ): ResponseX => {
-    const message = options.message
-        ? readError(options.message)
-        : (actionMessages[code]?.message ?? null);
-    const status = (actionMessages[code]?.status ??
-        MessageStatus.success) as MessageStatus;
+    const message = options.message ? readError(options.message) : (actionMessages[code]?.message ?? null);
+    const status = (actionMessages[code]?.status ?? MessageStatus.success) as MessageStatus;
     const error = options.error
         ? readError(options.error)
         : actionMessages[code]?.error
@@ -31,25 +28,17 @@ const buildResponseX = (
         status,
         message,
         data,
-        error,
+        error
     };
 };
 
 // Specific functions
-export const take = (
-    code = 200,
-    res?: any,
-    options?: { message?: string; error?: string },
-): ResponseX => {
+export const take = (code = 200, res?: any, options?: { message?: string; error?: string }): ResponseX => {
     const data = res?.data ?? res;
     return buildResponseX(code, data, options);
 };
 
-export const takeException = (
-    code = 200,
-    message: string | null = null,
-    error: string | null = null,
-): ResponseX => {
+export const takeException = (code = 200, message: string | null = null, error: string | null = null): ResponseX => {
     return buildResponseX(code, null, { message, error });
 };
 
@@ -66,7 +55,6 @@ const dataNotFound = (res: any = []): ResponseX => {
 export const dataList = (data: any): ResponseX => {
     if (!data) return dataNotFound();
     if (Array.isArray(data) && data.length > 0) return dataFound(data);
-    if (typeof data === 'object' && Object.keys(data).length > 0)
-        return dataFound(data);
+    if (typeof data === 'object' && Object.keys(data).length > 0) return dataFound(data);
     return dataNotFound();
 };

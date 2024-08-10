@@ -1,11 +1,4 @@
-import {
-    Controller,
-    Get,
-    Param,
-    Post,
-    Request,
-    UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { Helper, RequestX, ResponseX, Sanitize, take } from 'src/utils';
 import { newUserRule } from './user.rule';
 import { UserService } from './user.service';
