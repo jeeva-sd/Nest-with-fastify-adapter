@@ -22,7 +22,7 @@ Set the `NODE_ENV` environment variable to control which configuration file is l
 
 - **`development`**: Loads configuration from `development.json`.
 - **`production`**: Loads configuration from `production.json`.
-- **Other values**: Defaults to the `development` configuration.
+- **Other values**: Defaults to the `base` configuration.
 
 ## Installation
 
@@ -50,5 +50,5 @@ Set the `NODE_ENV` environment variable to control which configuration file is l
 - **Production Mode**
 
    ```bash
-   npm run start:prod
+   npm run prod
    ```
