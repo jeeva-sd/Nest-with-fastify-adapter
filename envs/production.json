@@ -1,3 +1,9 @@
 {
-  "appPort": 8000
+  "appPort": 8000,
+  "auth": {
+    "jwt": {
+      "secret": "jwt_secret_here",
+      "expiresIn": "7d"
+    }
+  }
 }
