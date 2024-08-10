@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { randomUUID } from 'crypto';
 
 export class Helper {
@@ -288,7 +289,7 @@ export class Helper {
     // Filename and Number Utilities
     // ---------------------------------------
 
-    static Filename = class {
+    static File = class {
         static generateFilename(originalFilename: string): string {
             const uuid = randomUUID();
             const extension = originalFilename.split('.').pop();
@@ -299,6 +300,26 @@ export class Helper {
                 .replace(/\..+/, '');
 
             return `${Helper.String.slugify(originalFilename)}-${timestamp}-${uuid}.${extension}`;
+        }
+
+        static async readFile(filePath: string): Promise<string | Buffer> {
+            try {
+                // Check if the file exists
+                await fs.promises.access(filePath, fs.constants.F_OK);
+
+                // Read the file
+                const data = await fs.promises.readFile(filePath);
+                return data; // Return the content as a Buffer
+            } catch (error) {
+                if (error.code === 'ENOENT') {
+                    console.error(`File does not exist at ${filePath}`);
+                } else {
+                    console.error(
+                        `Failed to read file at ${filePath}: ${error.message}`,
+                    );
+                }
+                throw error;
+            }
         }
     };
 

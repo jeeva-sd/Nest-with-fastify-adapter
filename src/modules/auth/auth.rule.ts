@@ -9,7 +9,7 @@ export const loginRule = yup.object().shape({
     password: yup
         .string()
         .required('Password is required')
-        .min(4, 'Password must be at least 6 characters long')
+        .min(4, 'Password must be at least 4 characters long')
         .max(50, 'Password must be less than or equal to 50 characters long'),
 });
 

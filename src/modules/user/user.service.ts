@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { NewUserPayload } from './user.rule';
+import { Helper } from 'src/utils';
 
 @Injectable()
 export class UserService {
-    findAll() {
+    async findAll(newUserPayload: NewUserPayload) {
+        await Helper.File.readFile(newUserPayload.profileOne as string);
         return `This action returns all user`;
     }
 
