@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import * as yup from 'yup';
 import { appConfig } from 'src/config';
-import { Exception } from './error.handler';
+import { Exception, readError } from './error.handler';
 import { Helper } from '../helper';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -84,10 +84,12 @@ export class ValidationInterceptor {
                 }),
             );
         } catch (e) {
+            this.cleanupFiles();
+
             const message = e?.errors?.length
                 ? e.errors[0]
-                : 'Payload validation failed';
-            throw new Exception(1003, message, 'Payload validation failed');
+                : (readError(e) ?? 'Payload validation failed');
+            throw new Exception(1003, 'Invalid input payload', message);
         }
     }
 
