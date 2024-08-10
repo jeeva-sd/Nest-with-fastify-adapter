@@ -19,7 +19,7 @@ const multipartOptionsSchema = yup.object().shape({
         fileSize: yup.number().default(5242880), // 5MB
         fieldSize: yup.number().default(1024 * 1024), // 1MB
         fields: yup.number().default(10),
-        files: yup.number().default(2),
+        files: yup.number().default(5),
     }),
 });
 

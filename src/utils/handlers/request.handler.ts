@@ -36,18 +36,34 @@ export const Sanitize = (schema: yup.ObjectSchema<any>) => {
 };
 
 export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
-    return yup.object().shape({
-        mimetype: yup
-            .string()
-            .oneOf(overrides.allowedMimeTypes || ALL_FILE_TYPES)
-            .required(),
-        filePath: yup.string().required(),
-        fileSize: yup
-            .number()
-            .min(overrides.minFileSize || 0) // Size in MB
-            .max(overrides.maxFileSize || 1) // Default max size 1MB in MB
-            .required(),
-    });
+    return yup
+        .array()
+        .of(
+            yup.object().shape({
+                mimetype: yup
+                    .string()
+                    .oneOf(
+                        overrides.allowedMimeTypes || ALL_FILE_TYPES,
+                        'Invalid request syntax or parameters',
+                    )
+                    .required('File type is required'),
+                filePath: yup.string().required('File path is required'),
+                fileSize: yup
+                    .number()
+                    .min(
+                        overrides.minFileSize || 0,
+                        `File size must be at least ${overrides.minFileSize || 0} MB`,
+                    )
+                    .max(
+                        overrides.maxFileSize || 1,
+                        `File size must be less than or equal to ${overrides.maxFileSize || 1} MB`,
+                    )
+                    .typeError('Invalid request syntax or parameters')
+                    .required('File size is required'),
+            }),
+        )
+        .typeError('Invalid request syntax or parameters')
+        .required('Invalid request syntax');
 };
 
 export class ValidationInterceptor {
@@ -59,10 +75,9 @@ export class ValidationInterceptor {
         next: CallHandler,
     ): Promise<Observable<any>> {
         const request = context.switchToHttp().getRequest();
+        let params: any = {};
 
         try {
-            let params: any = {};
-
             if (request.body) params = { ...params, ...request.body };
             if (request.params) params = { ...params, ...request.params };
             if (request.query) params = { ...params, ...request.query };
@@ -72,26 +87,45 @@ export class ValidationInterceptor {
                 const parts = await request.parts();
                 for await (const part of parts) {
                     if (part.file) {
-                        const uploadDir = path.join('public', 'uploads');
-                        const filename = Helper.File.generateFilename(
-                            part.filename,
-                        );
-                        const filePath = path.join(uploadDir, filename);
+                        const files = Array.isArray(part.file)
+                            ? part.file
+                            : [part.file];
 
-                        await fs.promises.mkdir(uploadDir, { recursive: true });
-                        await fs.promises.writeFile(filePath, part.file);
+                        for (const file of files) {
+                            const uploadDir = path.join('public', 'uploads');
+                            const filename = Helper.File.generateFilename(
+                                part.filename,
+                            );
+                            const filePath = path.join(uploadDir, filename);
 
-                        const fileBytes = Buffer.byteLength(
-                            await Helper.File.readFile(filePath),
-                        );
+                            await fs.promises.mkdir(uploadDir, {
+                                recursive: true,
+                            });
+                            await fs.promises.writeFile(filePath, file);
 
-                        params[part.fieldname] = {
-                            mimetype: part.mimetype,
-                            filePath,
-                            fileSize: Helper.File.convertBytes(fileBytes, 'MB'),
-                        };
+                            const fileBytes = Buffer.byteLength(
+                                await Helper.File.readFile(filePath),
+                            );
 
-                        this.uploadedFiles.push(filePath);
+                            const fileSizeInMB = Helper.File.convertBytes(
+                                fileBytes,
+                                'MB',
+                            );
+
+                            // Initialize the field in params if not already
+                            if (!params[part.fieldname]) {
+                                params[part.fieldname] = [];
+                            }
+
+                            // Add file details to the field array
+                            params[part.fieldname].push({
+                                mimetype: part.mimetype,
+                                filePath,
+                                fileSize: fileSizeInMB,
+                            });
+
+                            this.uploadedFiles.push(filePath);
+                        }
                     } else {
                         params[part.fieldname] = part.value;
                     }
@@ -126,7 +160,7 @@ export class ValidationInterceptor {
     private async cleanupFiles() {
         for (const filePath of this.uploadedFiles) {
             try {
-                if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
+                await fs.promises.unlink(filePath);
             } catch (err) {
                 console.error(
                     `Failed to delete file ${filePath}: ${err.message}`,
@@ -134,6 +168,6 @@ export class ValidationInterceptor {
             }
         }
 
-        this.uploadedFiles = [];
+        this.uploadedFiles = []; // Clear the list of tracked files
     }
 }
