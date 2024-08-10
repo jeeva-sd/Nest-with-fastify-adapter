@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '@nestjs/common';
-import { AppConfig, AppConfigSchema } from './config.schema';
+import { AppConfig, AppConfigRule } from './config.rule';
 
 export class ConfigReader {
     private static instance: ConfigReader;
@@ -17,12 +17,8 @@ export class ConfigReader {
         const envPath = path.resolve(__dirname, `../../envs/${env}.json`);
 
         // Read and parse the JSON configurations
-        const baseConfig = JSON.parse(
-            fs.readFileSync(basePath, 'utf8'),
-        ) as AppConfig;
-        const envConfig = JSON.parse(
-            fs.readFileSync(envPath, 'utf8'),
-        ) as Partial<AppConfig>;
+        const baseConfig = JSON.parse(fs.readFileSync(basePath, 'utf8')) as AppConfig;
+        const envConfig = JSON.parse(fs.readFileSync(envPath, 'utf8')) as Partial<AppConfig>;
 
         // Merge the base and environment configurations
         const mergedConfigs = this.mergeConfigs(baseConfig, envConfig);
@@ -32,43 +28,30 @@ export class ConfigReader {
     }
 
     public static getInstance(): ConfigReader {
-        if (!ConfigReader.instance) {
-            ConfigReader.instance = new ConfigReader();
-        }
+        if (!ConfigReader.instance) ConfigReader.instance = new ConfigReader();
         return ConfigReader.instance;
     }
 
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
-            return AppConfigSchema.validateSync(mergedConfigs, {
-                abortEarly: false,
-            });
+            return AppConfigRule.validateSync(mergedConfigs, { abortEarly: false });
         } catch (error) {
             this.logger.error('Configuration validation error:', error);
             process.exit(1);
         }
     }
 
-    private mergeConfigs(
-        baseConfig: AppConfig,
-        envConfig: Partial<AppConfig>,
-    ): AppConfig {
+    private mergeConfigs(baseConfig: AppConfig, envConfig: Partial<AppConfig>): AppConfig {
         for (const key of Object.keys(envConfig)) {
-            if (
-                typeof envConfig[key] === 'object' &&
-                envConfig[key] !== null &&
-                !Array.isArray(envConfig[key])
-            ) {
+            if (typeof envConfig[key] === 'object' && envConfig[key] !== null && !Array.isArray(envConfig[key])) {
                 if (!(key in baseConfig)) baseConfig[key] = {};
-                baseConfig[key] = this.mergeConfigs(
-                    baseConfig[key],
-                    envConfig[key] as Partial<AppConfig>,
-                );
+                baseConfig[key] = this.mergeConfigs(baseConfig[key], envConfig[key]);
             } else {
                 // Only override base value if property exists in envConfig
                 if (key in envConfig) baseConfig[key] = envConfig[key];
             }
         }
+
         return baseConfig;
     }
 

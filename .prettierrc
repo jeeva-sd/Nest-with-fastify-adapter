@@ -1,12 +1,14 @@
 {
-  "trailingComma": "all",
+  "printWidth": 120,
+  "tabWidth": 4,
+  "useTabs": false,
   "semi": true,
   "singleQuote": true,
-  "arrowParens": "always",
-  "breakLongMethodChains": true,
+  "trailingComma": "none",
   "bracketSpacing": true,
-  "maxEmptyLines": 2,
+  "arrowParens": "always",
   "endOfLine": "auto",
-  "tabWidth": 4,
-  "useTabs": false
+  "quoteProps": "consistent",
+  "bracketSameLine": false,
+  "proseWrap": "never"
 }

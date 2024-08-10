@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { randomUUID } from 'crypto';
 
 export class Helper {
@@ -50,11 +51,7 @@ export class Helper {
             return chunks;
         }
 
-        static sortByKey<T>(
-            array: T[],
-            key: keyof T,
-            ascending: boolean = true,
-        ): T[] {
+        static sortByKey<T>(array: T[], key: keyof T, ascending: boolean = true): T[] {
             return array.slice().sort((a, b) => {
                 const valueA = a[key];
                 const valueB = b[key];
@@ -75,10 +72,7 @@ export class Helper {
             for (const obj of objects) {
                 for (const key in obj) {
                     if (Helper.Object.isObject(obj[key])) {
-                        result[key] = Helper.Object.deepMerge(
-                            result[key],
-                            obj[key],
-                        );
+                        result[key] = Helper.Object.deepMerge(result[key], obj[key]);
                     } else {
                         result[key] = obj[key];
                     }
@@ -92,11 +86,7 @@ export class Helper {
         }
 
         static isObject(value: any): boolean {
-            return (
-                typeof value === 'object' &&
-                value !== null &&
-                !Array.isArray(value)
-            );
+            return typeof value === 'object' && value !== null && !Array.isArray(value);
         }
 
         static isFunction(value: any): boolean {
@@ -115,10 +105,7 @@ export class Helper {
             return Object.values(obj);
         }
 
-        static pick<T extends object, K extends keyof T>(
-            obj: T,
-            keys: K[],
-        ): Pick<T, K> {
+        static pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
             const result: Partial<T> = {};
             keys.forEach((key) => {
                 if (key in obj) {
@@ -128,10 +115,7 @@ export class Helper {
             return result as Pick<T, K>;
         }
 
-        static omit<T extends object, K extends keyof T>(
-            obj: T,
-            keys: K[],
-        ): Omit<T, K> {
+        static omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
             const result: Partial<T> = { ...obj };
             keys.forEach((key) => {
                 delete result[key];
@@ -145,14 +129,8 @@ export class Helper {
                 if (Object.prototype.hasOwnProperty.call(obj, key)) {
                     const value = obj[key];
                     const newKey = prefix ? `${prefix}.${key}` : key;
-                    if (
-                        Helper.Object.isObject(value) &&
-                        !Array.isArray(value)
-                    ) {
-                        Object.assign(
-                            result,
-                            Helper.Object.flattenObject(value, newKey),
-                        );
+                    if (Helper.Object.isObject(value) && !Array.isArray(value)) {
+                        Object.assign(result, Helper.Object.flattenObject(value, newKey));
                     } else {
                         result[newKey] = value;
                     }
@@ -166,22 +144,14 @@ export class Helper {
             for (const key in obj) {
                 if (Object.prototype.hasOwnProperty.call(obj, key)) {
                     const value = obj[key];
-                    key.split('.').reduce(
-                        (
-                            acc: any,
-                            part: string,
-                            index: number,
-                            parts: string[],
-                        ) => {
-                            if (index === parts.length - 1) {
-                                acc[part] = value;
-                            } else {
-                                acc[part] = acc[part] || {};
-                            }
-                            return acc[part];
-                        },
-                        result,
-                    );
+                    key.split('.').reduce((acc: any, part: string, index: number, parts: string[]) => {
+                        if (index === parts.length - 1) {
+                            acc[part] = value;
+                        } else {
+                            acc[part] = acc[part] || {};
+                        }
+                        return acc[part];
+                    }, result);
                 }
             }
             return result;
@@ -212,16 +182,12 @@ export class Helper {
 
         static toCamelCase(str: string): string {
             if (!str) return '';
-            return str
-                .trim()
-                .replace(/\s(.)/g, (_, char) => char.toUpperCase());
+            return str.trim().replace(/\s(.)/g, (_, char) => char.toUpperCase());
         }
 
         static truncate(str: string, maxLength: number): string {
             if (!str || maxLength <= 0) return '';
-            return str.length > maxLength
-                ? str.trim().slice(0, maxLength) + '...'
-                : str;
+            return str.length > maxLength ? str.trim().slice(0, maxLength) + '...' : str;
         }
 
         static isEmptyString(str: string): boolean {
@@ -258,29 +224,18 @@ export class Helper {
         }
 
         static getRandomString(length: number): string {
-            const chars =
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let result = '';
             for (let i = 0; i < length; i++) {
-                result += chars.charAt(
-                    Math.floor(Math.random() * chars.length),
-                );
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             return result;
         }
 
-        static padString(
-            str: string,
-            length: number,
-            char: string = ' ',
-        ): string {
+        static padString(str: string, length: number, char: string = ' '): string {
             if (!str || length <= str.length) return str;
             const pad = char.repeat(length - str.length);
-            return (
-                pad.slice(0, Math.floor(pad.length / 2)) +
-                str +
-                pad.slice(Math.floor(pad.length / 2))
-            );
+            return pad.slice(0, Math.floor(pad.length / 2)) + str + pad.slice(Math.floor(pad.length / 2));
         }
     };
 
@@ -288,17 +243,45 @@ export class Helper {
     // Filename and Number Utilities
     // ---------------------------------------
 
-    static Filename = class {
+    static File = class {
         static generateFilename(originalFilename: string): string {
             const uuid = randomUUID();
             const extension = originalFilename.split('.').pop();
-            const timestamp = new Date()
-                .toISOString()
-                .replace(/[-:]/g, '')
-                .replace('T', '-')
-                .replace(/\..+/, '');
+            const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').replace(/\..+/, '');
 
             return `${Helper.String.slugify(originalFilename)}-${timestamp}-${uuid}.${extension}`;
+        }
+
+        static async readFile(filePath: string): Promise<string | Buffer> {
+            try {
+                // Check if the file exists
+                await fs.promises.access(filePath, fs.constants.F_OK);
+
+                // Read the file
+                const data = await fs.promises.readFile(filePath);
+                return data; // Return the content as a Buffer
+            } catch (error) {
+                if (error.code === 'ENOENT') {
+                    console.error(`File does not exist at ${filePath}`);
+                } else {
+                    console.error(`Failed to read file at ${filePath}: ${error.message}`);
+                }
+                throw error;
+            }
+        }
+
+        static convertBytes(bytes: number, unit: 'B' | 'KB' | 'MB' | 'GB' = 'KB', decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+
+            const units = {
+                B: 1,
+                KB: 1024,
+                MB: 1024 * 1024,
+                GB: 1024 * 1024 * 1024
+            };
+
+            const value = bytes / units[unit];
+            return Number(value.toFixed(decimals));
         }
     };
 
@@ -319,8 +302,7 @@ export class Helper {
 
         static formatLargeNumber(num: number): string {
             if (isNaN(num)) return '0';
-            if (num >= 1_000_000_000)
-                return (num / 1_000_000_000).toFixed(1) + 'B';
+            if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + 'B';
             if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
             if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
             return num.toString();

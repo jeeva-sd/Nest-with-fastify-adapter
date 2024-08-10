@@ -1,12 +1,13 @@
 export enum MessageStatus {
     success = 'success',
     failure = 'failure',
-    error = 'error',
+    error = 'error'
 }
 
 export interface MessageData {
     message: string;
-    status: string;
+    status: MessageStatus;
+    error?: string;
 }
 
 export interface Messages {

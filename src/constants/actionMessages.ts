@@ -1,7 +1,6 @@
-/* eslint-disable prettier/prettier */
-import { MessageData, MessageStatus } from './types';
+import { MessageStatus } from './types';
 
-export const actionMessages: { [key: number]: MessageData } = {
+export const actionMessages = {
     // Successful
     200: { message: 'Request completed successfully', status: MessageStatus.success },
     201: { message: 'Resource successfully created', status: MessageStatus.success },
@@ -43,7 +42,7 @@ export const actionMessages: { [key: number]: MessageData } = {
     // Custom
     1000: { message: 'Data found', status: MessageStatus.success },
     1001: { message: 'Data not found', status: MessageStatus.success },
-    1003: { message: 'Validation Errors', status: MessageStatus.error },
+    1003: { message: 'Validation Error', status: MessageStatus.error },
     1004: { message: 'Unexpected error', status: MessageStatus.error },
     1005: { message: 'Something went wrong', status: MessageStatus.error },
     1006: { message: 'Request timed out', status: MessageStatus.error },
@@ -57,5 +56,7 @@ export const actionMessages: { [key: number]: MessageData } = {
     // User
     1200: { message: 'User successfully created', status: MessageStatus.success },
     1201: { message: 'User successfully updated', status: MessageStatus.success },
-    1202: { message: 'User successfully deleted', status: MessageStatus.success },
+    1202: { message: 'User successfully deleted', status: MessageStatus.success }
 };
+
+export type ActionMessageCodes = keyof typeof actionMessages;

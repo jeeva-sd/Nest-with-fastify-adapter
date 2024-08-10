@@ -7,6 +7,16 @@
     "ignoreTrailingSlash": true,
     "ignoreDuplicateSlashes": true
   },
+  "auth": {
+    "jwt": {
+      "secret": "jwt_secret_here",
+      "expiresIn": "7d"
+    }
+  },
+  "static": {
+    "folder": "public",
+    "prefix": "/static/"
+  },
   "payloadValidation": {
     "abortEarly": true,
     "stripUnknown": true,

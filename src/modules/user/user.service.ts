@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { NewUserPayload } from './user.rule';
 
 @Injectable()
 export class UserService {
-    findAll() {
-        return `This action returns all user`;
+    async findAll(newUserPayload: NewUserPayload) {
+        return newUserPayload;
     }
 
     findOne(id: number) {
