@@ -1,6 +1,3 @@
-Certainly! Here's the README file in code format:
-
-```markdown
 # NestJS Fastify Application
 
 ## Overview
@@ -55,4 +52,3 @@ Set the `NODE_ENV` environment variable to control which configuration file is l
    ```bash
    npm run start:prod
    ```
-```
