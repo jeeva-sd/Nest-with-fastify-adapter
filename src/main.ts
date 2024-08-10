@@ -1,18 +1,18 @@
+import { join } from 'path';
 import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
 import multiPart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import { NestFactory } from '@nestjs/core';
-import { Logger, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { appConfig } from './config';
-import { HttpExceptionFilter, readError } from './utils';
-import { join } from 'path';
+import { Chalk, HttpExceptionFilter } from './utils';
 
 class Bootstrap {
-    private logger: Logger;
+    private chalk: Chalk;
 
     constructor() {
-        this.logger = new Logger('Bootstrap');
+        this.chalk = new Chalk(Bootstrap.name);
     }
 
     async start() {
@@ -24,14 +24,16 @@ class Bootstrap {
 
             await this.listen(app);
         } catch (error) {
-            this.logger.error(`Failed to bootstrap application: ${readError(error)}`);
+            this.chalk.exception(error);
             process.exit(1);
         }
     }
 
     private async createApp(): Promise<Application> {
         const appAdapter = new AppAdapter(appConfig.get('server'));
-        return await NestFactory.create<Application>(AppModule, appAdapter);
+        return await NestFactory.create<Application>(AppModule, appAdapter, {
+            logger: new Chalk()
+        });
     }
 
     private async registerPluginsAndFilters(app: Application) {
@@ -51,7 +53,7 @@ class Bootstrap {
 
     private async listen(app: Application) {
         await app.listen(appConfig.get('appPort'));
-        this.logger.log(`Listening on port ${appConfig.get('appPort')}`);
+        this.chalk.info(`Listening on port ${appConfig.get('appPort')}`);
     }
 }
 

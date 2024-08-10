@@ -1,16 +1,17 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger } from '@nestjs/common';
 import { AppConfig, AppConfigRule } from './config.rule';
+import { readError } from 'src/utils';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require('chalk');
 
 export class ConfigReader {
     private static instance: ConfigReader;
     public config: AppConfig;
-    public readonly logger = new Logger(ConfigReader.name);
 
     private constructor() {
         const env = process.env.NODE_ENV || 'development';
-        this.logger.debug(`Loading ${env} environment`);
+        console.log(chalk.yellow(`Loading ${env} environment...\n`));
 
         // Construct absolute paths to the JSON configuration files
         const basePath = path.resolve(__dirname, '../../envs/base.json');
@@ -35,8 +36,11 @@ export class ConfigReader {
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
             return AppConfigRule.validateSync(mergedConfigs, { abortEarly: false });
-        } catch (error) {
-            this.logger.error('Configuration validation error:', error);
+        } catch (e) {
+            const error = e?.errors?.length
+                ? e.errors.map((error, index) => `${index + 1}. ${error}`).join(' \n')
+                : (readError(e) ?? 'Config validation failed');
+            console.log(chalk.red(`ENV Configuration validation error: \n${error}`));
             process.exit(1);
         }
     }
