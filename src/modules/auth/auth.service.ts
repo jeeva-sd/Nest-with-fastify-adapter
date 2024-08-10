@@ -20,7 +20,7 @@ export class AuthService {
     constructor(private jwtService: JwtService) {}
 
     async validateUser(username: string, pass: string): Promise<any> {
-        return users.find((u) => u.username === username && u.password === pass);
+        return users.find(u => u.username === username && u.password === pass);
     }
 
     async login(user: any) {
