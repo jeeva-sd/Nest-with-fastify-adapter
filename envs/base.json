@@ -22,7 +22,7 @@
     "stripUnknown": true,
     "recursive": true
   },
-  "multipart": {
+  "multiPart": {
     "limits": {
       "fileSize": 5242880,
       "fieldSize": 1048576,
