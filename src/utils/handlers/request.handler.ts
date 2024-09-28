@@ -3,52 +3,66 @@ import * as path from 'path';
 import { FastifyRequest } from 'fastify';
 import { applyDecorators, SetMetadata, UseInterceptors, CallHandler, ExecutionContext } from '@nestjs/common';
 import * as yup from 'yup';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { appConfig } from 'src/config';
+import { ALL_FILE_TYPES } from 'src/constants';
 import { Exception, readError } from './error.handler';
 import { Helper } from '../helper';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { ALL_FILE_TYPES } from 'src/constants';
 
 export interface RequestX extends FastifyRequest {
-    user?: any;
-    payload: any;
-    sanitized: boolean;
+    user: any;
+    payload?: any;
+    userRole?: UserPermissions;
+    sanitized?: boolean;
+}
+
+export interface UserPermissions {
+    isSuperAdmin: boolean;
+    isAdmin: boolean;
 }
 
 export interface FileSchemaOverrides {
     allowedMimeTypes?: string[];
     minFileSize?: number; // Minimum file size in MB
     maxFileSize?: number; // Maximum file size in MB
+    required?: boolean;
 }
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
     return applyDecorators(SetMetadata('validationSchema', schema), UseInterceptors(new ValidationInterceptor(schema)));
 };
 
+const MB_TO_KB = 1024;
+
 export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
+    const {
+        allowedMimeTypes = ALL_FILE_TYPES,
+        minFileSize = 0,
+        maxFileSize = 1,
+        required = false // Default to false if not provided
+    } = overrides;
+
+    const fileSchema = yup.object().shape({
+        mimetype: yup.string().oneOf(allowedMimeTypes, 'Invalid file mimetype').required('File type is required'),
+        fileName: yup.string().required('Invalid file name'),
+        filePath: yup.string().required('File path is required'),
+        fileSize: yup
+            .number()
+            .min(minFileSize, `File size must be at least ${minFileSize} MB (${minFileSize * MB_TO_KB} KB)`)
+            .max(maxFileSize, `File size must be less than ${maxFileSize} MB (${maxFileSize * MB_TO_KB} KB)`)
+            .typeError('Invalid file parameters')
+            .required('Invalid file size')
+    });
+
     return yup
         .array()
-        .of(
-            yup.object().shape({
-                mimetype: yup
-                    .string()
-                    .oneOf(overrides.allowedMimeTypes || ALL_FILE_TYPES, 'Invalid request syntax or parameters')
-                    .required('File type is required'),
-                filePath: yup.string().required('File path is required'),
-                fileSize: yup
-                    .number()
-                    .min(overrides.minFileSize || 0, `File size must be at least ${overrides.minFileSize || 0} MB`)
-                    .max(
-                        overrides.maxFileSize || 1,
-                        `File size must be less than or equal to ${overrides.maxFileSize || 1} MB`
-                    )
-                    .typeError('Invalid request syntax or parameters')
-                    .required('File size is required')
-            })
-        )
-        .typeError('Invalid request syntax or parameters')
-        .required('Invalid request syntax');
+        .of(fileSchema)
+        .typeError('Invalid file parameters')
+        .when([], {
+            is: () => required,
+            then: schema => schema.required()
+        });
 };
 
 export class ValidationInterceptor {
@@ -73,16 +87,13 @@ export class ValidationInterceptor {
 
                         for (const file of files) {
                             const uploadDir = path.join('public', 'uploads');
-                            const filename = Helper.File.generateFilename(part.filename);
-                            const filePath = path.join(uploadDir, filename);
+                            const fileName = Helper.File.generateFilename(part.filename);
+                            const filePath = path.join(uploadDir, fileName);
 
-                            await fs.promises.mkdir(uploadDir, {
-                                recursive: true
-                            });
+                            await fs.promises.mkdir(uploadDir, { recursive: true });
                             await fs.promises.writeFile(filePath, file);
 
                             const fileBytes = Buffer.byteLength(await Helper.File.readFile(filePath));
-
                             const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
 
                             // Initialize the field in params if not already
@@ -94,7 +105,8 @@ export class ValidationInterceptor {
                             params[part.fieldname].push({
                                 mimetype: part.mimetype,
                                 filePath,
-                                fileSize: fileSizeInMB
+                                fileSize: fileSizeInMB,
+                                fileName
                             });
 
                             this.uploadedFiles.push(filePath);
@@ -106,7 +118,6 @@ export class ValidationInterceptor {
             }
 
             const validatedPayload = await this.schema.validate(params, appConfig.get('payloadValidation'));
-
             request.payload = validatedPayload;
             request.sanitized = true;
 

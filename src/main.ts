@@ -2,6 +2,8 @@ import { join } from 'path';
 import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
 import multiPart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
+import fastifyCookie from '@fastify/cookie';
+import fastifyCors from '@fastify/cors';
 import { NestFactory } from '@nestjs/core';
 import { VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -40,9 +42,14 @@ class Bootstrap {
         app.useGlobalFilters(new HttpExceptionFilter());
 
         await app.register(multiPart, appConfig.get('multiPart'));
+        await app.register(fastifyCookie);
         await app.register(fastifyStatic, {
             root: join(__dirname, '..', appConfig.get('static').folder),
             prefix: appConfig.get('static').prefix
+        });
+        await app.register(fastifyCors, {
+            origin: appConfig.get('cors').allowedDomains,
+            credentials: appConfig.get('cors').credentials
         });
     }
 

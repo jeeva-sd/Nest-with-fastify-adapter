@@ -18,6 +18,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@fastify/cookie": "^10.0.1",
+    "@fastify/cors": "^10.0.1",
     "@fastify/multipart": "^8.3.0",
     "@fastify/static": "^7.0.4",
     "@nestjs/common": "^10.0.0",
@@ -26,8 +28,10 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-fastify": "^10.3.10",
+    "axios": "^1.7.7",
     "chalk": "4.1.2",
     "moment": "^2.30.1",
+    "node-cache": "^5.1.2",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-jwt": "^4.0.1",

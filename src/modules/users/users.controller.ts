@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { Helper, RequestX, ResponseX, Sanitize, take } from 'src/utils';
-import { newUserRule } from './user.rule';
-import { UserService } from './user.service';
+import { newUserRule } from './users.rule';
+import { UserService } from './users.service';
 import { JwtAuthGuard } from '../auth';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 

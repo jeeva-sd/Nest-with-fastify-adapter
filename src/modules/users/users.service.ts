@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { NewUserPayload } from './user.rule';
+import { NewUserPayload } from './users.rule';
 
 @Injectable()
 export class UserService {
