@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RoleService } from './role.service';
+import { RoleService } from './roles.service';
 import { Exception, RequestX, UserPermissions } from 'src/utils';
 
 export enum User {
