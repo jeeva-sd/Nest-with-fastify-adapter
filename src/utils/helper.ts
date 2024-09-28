@@ -23,10 +23,11 @@ export class Helper {
     // ---------------------------------------
 
     static Array = class {
-        static groupBy(key: string) {
+        static groupBy(key: string, formatter?: (value: any) => string) {
             return (array: any[]) => {
                 return array.reduce((obj: any, item: any) => {
-                    const value = item[key];
+                    let value = item[key];
+                    if (formatter) value = formatter(value); // apply the formatter if provided
                     obj[value] = (obj[value] || []).concat(item);
                     return obj;
                 }, {});
@@ -252,7 +253,7 @@ export class Helper {
             return `${Helper.String.slugify(originalFilename)}-${timestamp}-${uuid}.${extension}`;
         }
 
-        static async readFile(filePath: string): Promise<string | Buffer> {
+        static async readFile(filePath: string): Promise<Buffer> {
             try {
                 // Check if the file exists
                 await fs.promises.access(filePath, fs.constants.F_OK);
