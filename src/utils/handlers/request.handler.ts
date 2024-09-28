@@ -11,8 +11,15 @@ import { Exception, readError } from './error.handler';
 import { Helper } from '../helper';
 
 export interface RequestX extends FastifyRequest {
+    user: any;
     payload?: any;
+    userRole?: UserPermissions;
     sanitized?: boolean;
+}
+
+export interface UserPermissions {
+    isSuperAdmin: boolean;
+    isAdmin: boolean;
 }
 
 export interface FileSchemaOverrides {
