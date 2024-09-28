@@ -1,6 +1,7 @@
 export enum FileTypes {
     IMAGE_PNG = 'image/png',
     IMAGE_JPEG = 'image/jpeg',
+    IMAGE_JPG = 'image/jpg',
     IMAGE_GIF = 'image/gif',
     IMAGE_WEBP = 'image/webp',
     IMAGE_SVG = 'image/svg+xml',

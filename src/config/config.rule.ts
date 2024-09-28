@@ -35,10 +35,16 @@ const staticPathConfigRule = yup.object().shape({
     prefix: yup.string().default('/static/')
 });
 
+const corsConfigRule = yup.object().shape({
+    allowedDomains: yup.array().of(yup.string().trim().required()).required(),
+    credentials: yup.boolean().default(true)
+});
+
 export const AppConfigRule = yup.object().shape({
     appPort: yup.number().required(),
     appPrefix: yup.string().default('api'),
     server: serverConfigRule,
+    cors: corsConfigRule,
     auth: authConfigRule,
     static: staticPathConfigRule,
     payloadValidation: payloadConfigRule,
