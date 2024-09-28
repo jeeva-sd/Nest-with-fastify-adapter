@@ -1,6 +1,8 @@
-import { actionMessages, MessageStatus } from 'src/constants';
+import { FastifyReply } from 'fastify';
+import { ActionMessageCodes, actionMessages, MessageStatus } from 'src/constants';
 import { readError } from './error.handler';
 
+export interface ReplayX extends FastifyReply {}
 export interface ResponseX {
     code: number;
     status: MessageStatus;
@@ -33,9 +35,12 @@ const buildResponseX = (
 };
 
 // Specific functions
-export const take = (code = 200, res?: any, options?: { message?: string; error?: string }): ResponseX => {
-    const data = res?.data ?? res;
-    return buildResponseX(code, data, options);
+export const take = (
+    code: ActionMessageCodes = 200,
+    res?: any,
+    options?: { message?: string; error?: string }
+): ResponseX => {
+    return buildResponseX(code, res, options);
 };
 
 export const takeException = (code = 200, message: string | null = null, error: string | null = null): ResponseX => {
@@ -43,17 +48,16 @@ export const takeException = (code = 200, message: string | null = null, error: 
 };
 
 const dataFound = (res: any): ResponseX => {
-    const data = res.data ?? res;
-    return buildResponseX(1000, data);
+    return buildResponseX(1000, res);
 };
 
 const dataNotFound = (res: any = []): ResponseX => {
-    const data = res.data ?? res;
-    return buildResponseX(1001, data);
+    return buildResponseX(1001, res);
 };
 
 export const dataList = (data: any): ResponseX => {
     if (!data) return dataNotFound();
+    if (data?.hasOwnProperty('total') && data.total === 0) return dataNotFound(data);
     if (Array.isArray(data) && data.length > 0) return dataFound(data);
     if (typeof data === 'object' && Object.keys(data).length > 0) return dataFound(data);
     return dataNotFound();
