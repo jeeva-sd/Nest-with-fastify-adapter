@@ -29,8 +29,8 @@ Set the `NODE_ENV` environment variable to control which configuration file is l
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/jeeva-sd/Nest-GS.git
-   cd Nest-GS
+   git clone https://github.com/jeeva-sd/Nest-with-fastify-adapter.git
+   cd Nest-with-fastify-adapter
    ```
 
 2. **Install Dependencies**
