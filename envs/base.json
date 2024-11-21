@@ -29,5 +29,9 @@
       "fields": 10,
       "files": 1
     }
+  },
+  "cors": {
+    "allowedDomains": [],
+    "credentials": true
   }
 }
