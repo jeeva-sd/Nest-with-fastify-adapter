@@ -1,6 +1,6 @@
 {
     "server": {
-        "appPort": 1314
+        "port": 1314
     },
     "auth": {
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
