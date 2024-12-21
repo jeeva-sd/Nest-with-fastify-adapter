@@ -1,5 +1,5 @@
 import { ResponseX } from '../types';
-import { ReplayCodes, replayMessages } from '../constants';
+import { ReplayCodes, replayMessages } from '../../constants';
 
 // Common function to build a ResponseX
 const buildResponseX = (statusCode: number, data: any = null, message?: string): ResponseX => {
