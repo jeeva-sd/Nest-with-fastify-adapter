@@ -8,12 +8,12 @@ import { Helper, readError } from '../utils';
 import { Exception } from '../filters';
 
 export class PayloadGuard implements CanActivate {
-    private uploadedFiles: string[] = [];
     constructor(private reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        let params: any = {};
+        const uploadedFiles: string[] = [];
+        let params = {};
 
         try {
             const schema = this.reflector.get<yup.ObjectSchema<any>>(
@@ -57,7 +57,7 @@ export class PayloadGuard implements CanActivate {
                                 fileName
                             });
 
-                            this.uploadedFiles.push(filePath);
+                            uploadedFiles.push(filePath);
                         }
                     } else {
                         params[part.fieldname] = part.value;
@@ -67,26 +67,24 @@ export class PayloadGuard implements CanActivate {
 
             const validatedPayload = await schema.validate(params, appConfig.payloadValidation);
             request.payload = validatedPayload;
-            request.uploadedFiles = this.uploadedFiles;
+            request.uploadedFiles = uploadedFiles;
 
             return true;
         } catch (e) {
-            this.cleanupFiles();
+            await this.cleanupFiles(uploadedFiles);
 
             const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
             throw new Exception(1003, message);
         }
     }
 
-    private async cleanupFiles() {
-        for (const filePath of this.uploadedFiles) {
+    private async cleanupFiles(uploadedFiles: string[]) {
+        for (const filePath of uploadedFiles) {
             try {
                 await fs.promises.unlink(filePath);
             } catch (err) {
                 console.error(`Failed to delete file ${filePath}: ${err.message}`);
             }
         }
-
-        this.uploadedFiles = []; // Clear the list of tracked files
     }
 }

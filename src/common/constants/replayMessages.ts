@@ -4,6 +4,8 @@ export interface ReplayMessages {
     };
 }
 
+export type ReplayCodes = keyof typeof replayMessages;
+
 export const replayMessages = {
     // Successful
     200: { message: 'Request completed successfully' },
@@ -58,5 +60,3 @@ export const replayMessages = {
     1056: { message: 'Password reset successful' },
     1058: { message: 'User impersonation successful' }
 };
-
-export type ReplayCodes = keyof typeof replayMessages;

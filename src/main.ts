@@ -5,7 +5,7 @@ import fastifyCors from '@fastify/cors';
 import fastifyCookies from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
-import { Chalk, HttpExceptionFilter, PayloadGuard } from './common';
+import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
 
 class App {
@@ -39,6 +39,10 @@ class App {
         this.app.useGlobalFilters(new HttpExceptionFilter());
     }
 
+    setUpInterceptor() {
+        this.app.useGlobalInterceptors(new FileCleanupInterceptor());
+    }
+
     async startServer() {
         const port = appConfig.server.port;
         await this.app.listen(port);
@@ -51,6 +55,7 @@ class App {
         this.setupVersioning();
         this.setupGuards();
         this.setUpFilters();
+        this.setUpInterceptor();
         await this.startServer();
     }
 }
