@@ -19,7 +19,8 @@
     "payloadValidation": {
         "abortEarly": true,
         "stripUnknown": true,
-        "recursive": true
+        "recursive": true,
+        "decoratorKey": "payloadValidation"
     },
     "multiPart": {
         "limits": {

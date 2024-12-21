@@ -16,7 +16,8 @@ const serverConfigRule = yup.object().shape({
 const payloadConfigRule = yup.object().shape({
     abortEarly: yup.boolean().required(),
     stripUnknown: yup.boolean().required(),
-    recursive: yup.boolean().required()
+    recursive: yup.boolean().required(),
+    decoratorKey: yup.string().required()
 });
 
 const multipartConfigRule = yup.object().shape({

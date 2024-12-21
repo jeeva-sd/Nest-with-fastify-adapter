@@ -1,11 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Logger, VersioningType } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import fastifyCookies from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
-import { Chalk } from './common';
+import { Chalk, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
 
 class App {
@@ -31,6 +31,14 @@ class App {
         this.app.enableVersioning({ type: VersioningType.URI, defaultVersion: appConfig.server.version });
     }
 
+    setupGuards() {
+        this.app.useGlobalGuards(new PayloadGuard(new Reflector()));
+    }
+
+    setUpFilters() {
+        this.app.useGlobalFilters(new HttpExceptionFilter());
+    }
+
     async startServer() {
         const port = appConfig.server.port;
         await this.app.listen(port);
@@ -39,8 +47,10 @@ class App {
 
     async bootstrap() {
         await this.createApp();
-        this.setupVersioning();
         await this.setupPlugins();
+        this.setupVersioning();
+        this.setupGuards();
+        this.setUpFilters();
         await this.startServer();
     }
 }
