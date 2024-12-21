@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import path from 'path';
+import * as path from 'path';
 import * as fs from 'fs';
 import * as yup from 'yup';
 import { appConfig } from 'src/configs';
@@ -34,7 +34,7 @@ export class PayloadGuard implements CanActivate {
                         const files = Array.isArray(part.file) ? part.file : [part.file];
 
                         for (const file of files) {
-                            const uploadDir = path.join('public', 'uploads');
+                            const uploadDir = path.resolve('uploads');
                             const fileName = Helper.File.generateFilename(part.filename);
                             const filePath = path.join(uploadDir, fileName);
 
