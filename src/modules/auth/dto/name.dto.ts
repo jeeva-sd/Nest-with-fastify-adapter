@@ -1,5 +1,5 @@
-import { createFileRule, FileTypes } from 'src/common';
 import * as yup from 'yup';
+import { createFileRule, FileTypes } from 'src/common';
 
 const fileRule = createFileRule({
     fieldName: 'file',
@@ -8,5 +8,5 @@ const fileRule = createFileRule({
 });
 
 export const fileSchema = yup.object({
-    name: fileRule
+    file: fileRule
 });

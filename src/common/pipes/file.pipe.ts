@@ -12,8 +12,8 @@ export interface FileSchemaOverrides {
 export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
     const {
         allowedMimeTypes = ALL_FILE_TYPES,
-        minFileSize = 0,
-        maxFileSize = 1,
+        minFileSize = 0.001, // 1 KB
+        maxFileSize = 10,
         required = false,
         fieldName = null
     } = overrides;
