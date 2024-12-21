@@ -1,1 +1,2 @@
-export * from './sanitize.decorators';
+export * from './sanitize.decorator';
+export * from './public.decorator';

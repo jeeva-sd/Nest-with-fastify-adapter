@@ -10,6 +10,7 @@
         "ignoreDuplicateSlashes": true
     },
     "auth": {
+        "publicKey": "cm4yg6uzn00000cjf6sgm90dy",
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
         "jwt": {
             "secret": "cm4l37kx000010cl42l2d3jck",

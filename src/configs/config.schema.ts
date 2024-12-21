@@ -22,18 +22,19 @@ const payloadConfigRule = yup.object().shape({
 
 const multipartConfigRule = yup.object().shape({
     limits: yup.object().shape({
-        fileSize: yup.number().required(), // 5MB
-        fieldSize: yup.number().required(), // 1MB
+        fileSize: yup.number().required(),
+        fieldSize: yup.number().required(),
         fields: yup.number().required(),
         files: yup.number().required()
     })
 });
 
 const authConfigRule = yup.object().shape({
+    publicKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     jwt: yup.object().shape({
         secret: yup.string().required(),
-        expiresIn: yup.string().required() // 7 days
+        expiresIn: yup.string().required()
     })
 });
 
