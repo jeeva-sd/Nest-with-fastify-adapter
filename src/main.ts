@@ -8,7 +8,7 @@ import { AppModule } from './app.module';
 import { Chalk } from './common';
 import { appConfig } from './configs';
 
-class AppBootstrap {
+class App {
     private app: NestFastifyApplication;
 
     async createApp() {
@@ -46,6 +46,6 @@ class AppBootstrap {
 }
 
 (async () => {
-    const bootstrap = new AppBootstrap();
-    await bootstrap.bootstrap();
+    const app = new App();
+    await app.bootstrap();
 })();
