@@ -4,7 +4,8 @@ import path from 'path';
 import * as fs from 'fs';
 import * as yup from 'yup';
 import { appConfig } from 'src/configs';
-import { Helper } from '../utils';
+import { Helper, readError } from '../utils';
+import { Exception } from '../filters';
 
 export class PayloadGuard implements CanActivate {
     private uploadedFiles: string[] = [];
@@ -72,8 +73,8 @@ export class PayloadGuard implements CanActivate {
         } catch (e) {
             this.cleanupFiles();
 
-            // const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
-            // throw new Exception(1003, 'Invalid input payload', message);
+            const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
+            throw new Exception(1003, message);
         }
     }
 

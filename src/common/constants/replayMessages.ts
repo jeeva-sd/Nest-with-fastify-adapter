@@ -1,12 +1,10 @@
-export type ReplayCodes = keyof typeof replayMessages;
-
 export interface ReplayMessages {
     [key: number]: {
         message: string;
     };
 }
 
-export const replayMessages: ReplayMessages = {
+export const replayMessages = {
     // Successful
     200: { message: 'Request completed successfully' },
     201: { message: 'Resource successfully created' },
@@ -60,3 +58,5 @@ export const replayMessages: ReplayMessages = {
     1056: { message: 'Password reset successful' },
     1058: { message: 'User impersonation successful' }
 };
+
+export type ReplayCodes = keyof typeof replayMessages;

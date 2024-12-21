@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
-import { ReplayCodes } from '../constants';
+import { ReplayCodes, replayMessages } from '../constants';
 import { take } from '../interceptors';
 
 @Catch(HttpException)
@@ -16,9 +16,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 : 400;
 
         if (exceptionResponse.prepared) {
+            const message = exceptionResponse?.message ?? replayMessages[exceptionResponse?.statusCode || 400]?.message;
+
             formattedResponse = {
                 statusCode: errorCode,
-                message: exceptionResponse?.message || 'Unexpected error occurred',
+                message: message || '',
                 data: null
             };
         } else {
