@@ -1,16 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
 import { Logger, VersioningType } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import fastifyCookies from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
+import { AppModule } from './app.module';
+import { Chalk } from './common';
 
 class AppBootstrap {
     private app: NestFastifyApplication;
 
     async createApp() {
-        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+            logger: new Chalk()
+        });
     }
 
     async setupPlugins() {
