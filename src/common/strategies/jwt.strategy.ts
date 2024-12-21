@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
                 // If no token found in the header, try extracting it from query params
                 if (!token && req?.payload?.xAccessToken) {
-                    token = req.query.token;
+                    token = req.query.xAccessToken;
                 }
 
                 return token;

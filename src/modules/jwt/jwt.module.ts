@@ -9,7 +9,7 @@ import { appConfig } from 'src/configs';
             useFactory: () => {
                 return new JwtService({
                     secret: appConfig.auth.jwt.secret,
-                    signOptions: { expiresIn: appConfig.auth.jwt.secret }
+                    signOptions: { expiresIn: appConfig.auth.jwt.expiresIn }
                 });
             }
         }
@@ -18,7 +18,7 @@ import { appConfig } from 'src/configs';
         //     useFactory: () => {
         //         return new JwtService({
         //             secret: appConfig.auth.candidateJwt.secret,
-        //             signOptions: { expiresIn: appConfig.auth.candidateJwt.secret }
+        //             signOptions: { expiresIn: appConfig.auth.candidateJwt.expiresIn }
         //         });
         //     }
         // }
