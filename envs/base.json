@@ -1,37 +1,38 @@
 {
-  "appPort": 3000,
-  "server": {
-    "logger": false,
-    "bodyLimit": 1048576,
-    "caseSensitive": false,
-    "ignoreTrailingSlash": true,
-    "ignoreDuplicateSlashes": true
-  },
-  "auth": {
-    "jwt": {
-      "secret": "jwt_secret_here",
-      "expiresIn": "7d"
+    "server": {
+        "port": 5050,
+        "version": "1",
+        "routePrefix": "api",
+        "logger": false,
+        "bodyLimit": 1048576,
+        "caseSensitive": false,
+        "ignoreTrailingSlash": true,
+        "ignoreDuplicateSlashes": true
+    },
+    "auth": {
+        "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
+        "jwt": {
+            "secret": "cm4l37kx000010cl42l2d3jck",
+            "expiresIn": "5h"
+        }
+    },
+    "payloadValidation": {
+        "abortEarly": true,
+        "stripUnknown": true,
+        "recursive": true
+    },
+    "multiPart": {
+        "limits": {
+            "fileSize": 5242880,
+            "fieldSize": 1048576,
+            "fields": 10,
+            "files": 1
+        }
+    },
+    "cors": {
+        "allowedDomains": [
+            "http://localhost:3000"
+        ],
+        "credentials": true
     }
-  },
-  "static": {
-    "folder": "public",
-    "prefix": "/static/"
-  },
-  "payloadValidation": {
-    "abortEarly": true,
-    "stripUnknown": true,
-    "recursive": true
-  },
-  "multiPart": {
-    "limits": {
-      "fileSize": 5242880,
-      "fieldSize": 1048576,
-      "fields": 10,
-      "files": 1
-    }
-  },
-  "cors": {
-    "allowedDomains": [],
-    "credentials": true
-  }
 }

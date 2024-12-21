@@ -6,6 +6,7 @@ import fastifyCookies from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 import { Chalk } from './common';
+import { appConfig } from './configs';
 
 class AppBootstrap {
     private app: NestFastifyApplication;
@@ -17,21 +18,23 @@ class AppBootstrap {
     }
 
     async setupPlugins() {
-        await this.app.register(fastifyCors, { origin: '*' });
         await this.app.register(fastifyCookies);
-        await this.app.register(fastifyMultipart);
+        await this.app.register(fastifyMultipart, appConfig.multiPart);
+        await this.app.register(fastifyCors, {
+            origin: appConfig.cors.allowedDomains,
+            credentials: appConfig.cors.credentials
+        });
     }
 
     setupVersioning() {
-        this.app.setGlobalPrefix('api');
-        this.app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+        this.app.setGlobalPrefix(appConfig.server.routePrefix);
+        this.app.enableVersioning({ type: VersioningType.URI, defaultVersion: appConfig.server.version });
     }
 
     async startServer() {
-        const port = parseInt(process.env.PORT, 10) || 3000;
-        const host = process.env.HOST || '0.0.0.0';
-        await this.app.listen(port, host);
-        Logger.log(`Application is running on: ${await this.app.getUrl()}`, 'AppBootstrap');
+        const port = appConfig.server.port;
+        await this.app.listen(port);
+        Logger.log(`Application is running on: ${await this.app.getUrl()}`);
     }
 
     async bootstrap() {

@@ -1,9 +1,18 @@
 {
-  "appPort": 8000,
-  "auth": {
-    "jwt": {
-      "secret": "jwt_secret_here",
-      "expiresIn": "7d"
+    "server": {
+        "appPort": 1314
+    },
+    "auth": {
+        "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
+        "jwt": {
+            "secret": "cm4l37kx000010cl42l2d3jck",
+            "expiresIn": "5h"
+        }
+    },
+    "cors": {
+        "allowedDomains": [
+            "http://localhost:3000"
+        ],
+        "credentials": true
     }
-  }
 }
