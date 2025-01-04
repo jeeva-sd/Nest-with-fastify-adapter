@@ -23,6 +23,6 @@ import { appConfig } from 'src/configs';
         //     }
         // }
     ],
-    exports: ['UserJwtService'] // Export both services
+    exports: ['UserJwtService']
 })
-export class CustomJwtModule {}
+export class SharedModule {}
