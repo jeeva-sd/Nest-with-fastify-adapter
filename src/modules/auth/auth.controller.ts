@@ -1,7 +1,7 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, Roles, RolesGuard, Sanitize } from 'src/common';
 import { AuthService } from './auth.service';
-import { fileSchema } from './dto';
+import { fileSchema } from './schemas';
 
 @Controller('auth')
 export class AuthController {
