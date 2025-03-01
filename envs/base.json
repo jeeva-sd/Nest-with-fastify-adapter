@@ -10,7 +10,7 @@
         "ignoreDuplicateSlashes": true
     },
     "auth": {
-        "publicKey": "cm4yg6uzn00000cjf6sgm90dy",
+        "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
         "roleKey": "cm4ymtxoy00000cmhhh7d63fr",
         "jwt": {

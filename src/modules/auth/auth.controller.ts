@@ -1,5 +1,5 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, Roles, RolesGuard, Sanitize } from 'src/common';
+import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/common';
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';
 
@@ -21,6 +21,7 @@ export class AuthController {
     @Get('check-login')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admins')
+    @SkipJwtAuth()
     checkLogin() {
         return this.authService.findOne();
     }

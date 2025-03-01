@@ -30,7 +30,7 @@ const multipartConfigRule = yup.object().shape({
 });
 
 const authConfigRule = yup.object().shape({
-    publicKey: yup.string().required(),
+    skipJwtAuthKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     roleKey: yup.string().required(),
     jwt: yup.object().shape({
