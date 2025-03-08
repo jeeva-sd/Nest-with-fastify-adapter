@@ -1,38 +1,28 @@
-import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
-import { RequestX, ResponseX, Sanitize, take } from 'src/utils';
-import { CustomAuthGuard, JwtAuthGuard, LocalAuthGuard } from './guards';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/common';
 import { AuthService } from './auth.service';
-import { loginRule } from './auth.rule';
+import { fileSchema } from './schemas';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {}
 
-    @Post('login')
-    @Sanitize(loginRule)
-    @UseGuards(LocalAuthGuard)
-    async login(@Request() req: RequestX): Promise<ResponseX> {
-        const response = await this.authService.login(req.user);
-        return take(1051, response);
+    @Get()
+    findAll() {
+        return this.authService.signIn();
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    getProfile(@Request() req: RequestX): ResponseX {
-        return take(200, req.user);
+    @Post()
+    @Sanitize(fileSchema)
+    findOne() {
+        return this.authService.signIn();
     }
 
-    @Get('eco-apps')
-    @UseGuards(CustomAuthGuard)
-    getEcoApps(@Request() req: RequestX): ResponseX {
-        const response = {
-            ...req.user,
-            ecoApps: [
-                { id: 1, name: 'EcoApp 1' },
-                { id: 2, name: 'EcoApp 2' }
-            ]
-        };
-
-        return take(200, response);
+    @Get('check-login')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('admins')
+    @SkipJwtAuth()
+    checkLogin() {
+        return this.authService.findOne();
     }
 }

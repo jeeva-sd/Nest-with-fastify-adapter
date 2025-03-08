@@ -1,74 +1,66 @@
-import { join } from 'path';
-import { FastifyAdapter as AppAdapter, NestFastifyApplication as Application } from '@nestjs/platform-fastify';
-import multiPart from '@fastify/multipart';
-import fastifyStatic from '@fastify/static';
-import fastifyCookie from '@fastify/cookie';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Logger, VersioningType } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
-import { NestFactory } from '@nestjs/core';
-import { VersioningType } from '@nestjs/common';
+import fastifyCookies from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
-import { appConfig } from './config';
-import { Chalk, HttpExceptionFilter } from './utils';
+import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
+import { appConfig } from './configs';
 
-class Bootstrap {
-    private chalk: Chalk;
+class App {
+    private app: NestFastifyApplication;
 
-    constructor() {
-        this.chalk = new Chalk(Bootstrap.name);
-    }
-
-    async start() {
-        try {
-            const app: Application = await this.createApp();
-
-            await this.registerPluginsAndFilters(app);
-            await this.enableVersioning(app);
-
-            await this.listen(app);
-        } catch (error) {
-            this.chalk.exception(error);
-            process.exit(1);
-        }
-    }
-
-    private async createApp(): Promise<Application> {
-        const appAdapter = new AppAdapter(appConfig.get('server'));
-        return await NestFactory.create<Application>(AppModule, appAdapter, {
+    async createApp() {
+        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
             logger: new Chalk()
         });
     }
 
-    private async registerPluginsAndFilters(app: Application) {
-        app.useGlobalFilters(new HttpExceptionFilter());
-
-        await app.register(multiPart, appConfig.get('multiPart'));
-        await app.register(fastifyCookie);
-        await app.register(fastifyStatic, {
-            root: join(__dirname, '..', appConfig.get('static').folder),
-            prefix: appConfig.get('static').prefix
-        });
-        await app.register(fastifyCors, {
-            origin: appConfig.get('cors').allowedDomains,
-            credentials: appConfig.get('cors').credentials
+    async setupPlugins() {
+        await this.app.register(fastifyCookies);
+        await this.app.register(fastifyMultipart, appConfig.multiPart);
+        await this.app.register(fastifyCors, {
+            origin: appConfig.cors.allowedDomains,
+            credentials: appConfig.cors.credentials
         });
     }
 
-    private async enableVersioning(app: Application) {
-        app.setGlobalPrefix(appConfig.get('appPrefix'));
-        app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+    setupVersioning() {
+        this.app.setGlobalPrefix(appConfig.server.routePrefix);
+        this.app.enableVersioning({ type: VersioningType.URI, defaultVersion: appConfig.server.version });
     }
 
-    private async listen(app: Application) {
-        await app.listen(appConfig.get('appPort'));
-        this.chalk.info(`Listening on port ${appConfig.get('appPort')}`);
+    setupGuards() {
+        this.app.useGlobalGuards(new PayloadGuard(new Reflector()));
+    }
+
+    setUpFilters() {
+        this.app.useGlobalFilters(new HttpExceptionFilter());
+    }
+
+    setUpInterceptor() {
+        this.app.useGlobalInterceptors(new FileCleanupInterceptor());
+    }
+
+    async startServer() {
+        const port = appConfig.server.port;
+        await this.app.listen(port);
+        Logger.log(`Application is running on: ${await this.app.getUrl()}`);
+    }
+
+    async bootstrap() {
+        await this.createApp();
+        await this.setupPlugins();
+        this.setupVersioning();
+        this.setupGuards();
+        this.setUpFilters();
+        this.setUpInterceptor();
+        await this.startServer();
     }
 }
 
-// -----------------------------------------------------------------------------------------------------------------
-
-async function startServer() {
-    const app = new Bootstrap();
-    await app.start();
-}
-
-startServer();
+(async () => {
+    const app = new App();
+    await app.bootstrap();
+})();

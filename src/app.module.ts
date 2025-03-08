@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './modules/users/users.module';
+import { JwtAuthGuard, JwtStrategy, LocalAuthGuard, LocalStrategy } from './common';
 import { AuthModule } from './modules/auth/auth.module';
-import { Chalk } from './utils';
 
 @Module({
-    imports: [UserModule, AuthModule],
+    imports: [AuthModule],
     controllers: [],
-    providers: [Chalk],
-    exports: [Chalk]
+    providers: [JwtStrategy, LocalStrategy, LocalAuthGuard, JwtAuthGuard]
 })
 export class AppModule {}
