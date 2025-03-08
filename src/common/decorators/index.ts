@@ -1,3 +1,3 @@
-export * from './sanitize.decorator';
-export * from './public.decorator';
-export * from './roles.decorator';
+export * from './payloadSanitizer.decorator';
+export * from './skipJwtAuth.decorator';
+export * from './setRoles.decorator';
