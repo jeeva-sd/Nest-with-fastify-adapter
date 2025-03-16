@@ -7,7 +7,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
-import { MicroserviceOptions, RmqContext, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, RmqContext, RmqStatus, Transport } from '@nestjs/microservices';
 
 class App {
     private app: NestFastifyApplication;
@@ -45,7 +45,7 @@ class App {
     }
 
     async setUpMicroservices() {
-         this.app.connectMicroservice<MicroserviceOptions>({
+         const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
             transport: Transport.RMQ,
             options: {
               urls: ['amqp://localhost'],
@@ -56,6 +56,10 @@ class App {
           });
 
           await this.app.startAllMicroservices();
+
+          rmqServer.status.subscribe((status: RmqStatus) => {
+            Logger.log(`Rmq server status: ${status}`)
+          });
     }
 
     async startServer() {
