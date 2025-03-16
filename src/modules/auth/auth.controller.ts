@@ -1,14 +1,19 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/common';
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        @Inject('RABBITMQ_SERVICE') private readonly rabbitMQClient: ClientProxy,
+         private readonly authService: AuthService) {}
 
     @Get()
     findAll() {
+        const user = { userId: Date.now(), points: 10 };
+        this.rabbitMQClient.emit('user.created', user);
         return this.authService.signIn();
     }
 

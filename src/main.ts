@@ -7,6 +7,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
+import { MicroserviceOptions, RmqContext, Transport } from '@nestjs/microservices';
 
 class App {
     private app: NestFastifyApplication;
@@ -43,6 +44,20 @@ class App {
         this.app.useGlobalInterceptors(new FileCleanupInterceptor());
     }
 
+    async setUpMicroservices() {
+         this.app.connectMicroservice<MicroserviceOptions>({
+            transport: Transport.RMQ,
+            options: {
+              urls: ['amqp://localhost'],
+              queue: 'localTestQueue',
+              noAck: false,
+              queueOptions: { durable: true },
+            },
+          });
+
+          await this.app.startAllMicroservices();
+    }
+
     async startServer() {
         const port = appConfig.server.port;
         await this.app.listen(port);
@@ -56,6 +71,7 @@ class App {
         this.setupGuards();
         this.setUpFilters();
         this.setUpInterceptor();
+        await this.setUpMicroservices();
         await this.startServer();
     }
 }
