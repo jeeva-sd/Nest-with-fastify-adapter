@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { appConfig } from 'src/configs';
+import { Helper } from 'src/common';
 import { RabbitMqService } from './rabbit-mq.service';
 import { RabbitMQConsumer } from './rabbit-mq.controller';
-import { appConfig } from 'src/configs';
 
 @Module({
     imports: [
@@ -10,7 +11,7 @@ import { appConfig } from 'src/configs';
             {
                 name: appConfig.rabbitMq.general.name,
                 transport: Transport.RMQ,
-                options: appConfig.rabbitMq.general.options,
+                options: Helper.Object.omit(appConfig.rabbitMq.general.options, ['noAck']),
             },
         ]),
     ],
