@@ -1,13 +1,13 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { Logger, VersioningType } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import fastifyCookies from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
+import { Logger, VersioningType } from '@nestjs/common';
+import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
-import { MicroserviceOptions, RmqContext, RmqStatus, Transport } from '@nestjs/microservices';
 
 class App {
     private app: NestFastifyApplication;

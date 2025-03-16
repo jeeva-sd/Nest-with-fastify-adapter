@@ -2,23 +2,11 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { SharedModule } from '../shared/shared.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RabbitMqModule } from '../rabbit-mq/rabbit-mq.module';
 
 @Module({
-    imports: [SharedModule,
-        ClientsModule.register([
-            {
-              name: 'RABBITMQ_SERVICE', // RabbitMQ client
-              transport: Transport.RMQ,
-              options: {
-                urls: ['amqp://localhost'],
-                queue: 'localTestQueue',
-                queueOptions: { durable: true },
-              },
-            },
-          ]),
-    ],
+    imports: [SharedModule, RabbitMqModule],
     controllers: [AuthController],
     providers: [AuthService]
 })
-export class AuthModule {}
+export class AuthModule { }
