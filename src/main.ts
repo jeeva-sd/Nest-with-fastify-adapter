@@ -45,21 +45,16 @@ class App {
     }
 
     async setUpMicroservices() {
-         const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
+        const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
             transport: Transport.RMQ,
-            options: {
-              urls: ['amqp://localhost'],
-              queue: 'localTestQueue',
-              noAck: false,
-              queueOptions: { durable: true },
-            },
-          });
+            options: appConfig.rabbitMq.general.options,
+        });
 
-          await this.app.startAllMicroservices();
+        await this.app.startAllMicroservices();
 
-          rmqServer.status.subscribe((status: RmqStatus) => {
-            Logger.log(`Rmq server status: ${status}`)
-          });
+        rmqServer.status.subscribe((status: RmqStatus) => {
+            Logger.log(`Rmq server status: ${status}`);
+        });
     }
 
     async startServer() {

@@ -19,6 +19,7 @@ export function AckHandler() {
             try {
                 await originalMethod.apply(this, args);
                 channel.ack(message);
+                // throw new Error('as');
             } catch (error) {
                 logger.error(`❌ Error in ${propertyKey}: ${error.message}`, error.stack);
                 channel.nack(message, false, true);

@@ -37,5 +37,18 @@
             "http://localhost:3000"
         ],
         "credentials": true
+    },
+    "rabbitMq": {
+        "general": {
+        "name": "GENERAL_MQ",
+        "options": {
+            "urls": ["amqp://localhost"],
+            "queue": "localTestQueue",
+            "noAck": false,
+            "queueOptions": {
+                "durable": true
+            }
+        }
+        }
     }
 }
