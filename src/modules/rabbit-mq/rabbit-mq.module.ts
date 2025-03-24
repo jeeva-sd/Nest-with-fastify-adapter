@@ -3,7 +3,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { appConfig } from 'src/configs';
 import { Helper } from 'src/common';
 import { RabbitMqService } from './rabbit-mq.service';
-import { RabbitMQConsumer } from './rabbit-mq.controller';
 
 @Module({
     imports: [
@@ -15,7 +14,6 @@ import { RabbitMQConsumer } from './rabbit-mq.controller';
             },
         ]),
     ],
-    controllers: [RabbitMQConsumer],
     providers: [RabbitMqService],
     exports: [ClientsModule, RabbitMqService],
 })
