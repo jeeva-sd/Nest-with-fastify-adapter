@@ -3,7 +3,7 @@ import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/comm
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';
 import { RabbitMqService } from '../rabbit-mq/rabbit-mq.service';
-import { mqPattern } from 'src/constants/mqtt';
+import { eventPatterns } from 'src/constants/events';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +14,7 @@ export class AuthController {
     @Get()
     async findAll() {
         const user = { userId: Date.now(), points: 10 };
-        const response = await this.rabbitMQService.send(mqPattern.user.created, user);
+        const response = await this.rabbitMQService.send(eventPatterns.user.created, user);
         return response;
     }
 
