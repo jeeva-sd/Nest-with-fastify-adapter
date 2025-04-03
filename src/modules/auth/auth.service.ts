@@ -6,7 +6,7 @@ export class AuthService {
     constructor(@Inject('UserJwtService') private readonly jwtService: JwtService) {}
 
     findOne() {
-        return `This action returns a auth`;
+        return 'This action returns a auth';
     }
 
     async signIn() {

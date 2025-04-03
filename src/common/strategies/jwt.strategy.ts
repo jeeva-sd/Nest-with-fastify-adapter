@@ -7,7 +7,7 @@ import { appConfig } from 'src/configs';
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
-            jwtFromRequest: req => {
+            jwtFromRequest: (req) => {
                 // Try extracting the token from the Authorization header as Bearer token
                 let token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 

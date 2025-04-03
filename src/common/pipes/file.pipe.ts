@@ -44,6 +44,6 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
         .typeError(withFieldName('Invalid file parameters'))
         .when([], {
             is: () => required,
-            then: schema => schema.required(withFieldName('File attachment is required'))
+            then: (schema) => schema.required(withFieldName('File attachment is required'))
         });
 };

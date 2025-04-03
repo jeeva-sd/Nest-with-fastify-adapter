@@ -1,5 +1,5 @@
 {
-  "server": {
-    "appPort": 5050
-  }
+    "server": {
+        "appPort": 5050
+    }
 }

@@ -12,6 +12,7 @@
     "auth": {
         "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
+        "publicAuthKey": "cm8n1jewx000k0cl2drme2exe",
         "roleKey": "cm4ymtxoy00000cmhhh7d63fr",
         "jwt": {
             "secret": "cm4l37kx000010cl42l2d3jck",
@@ -33,9 +34,20 @@
         }
     },
     "cors": {
-        "allowedDomains": [
-            "http://localhost:3000"
-        ],
+        "allowedDomains": ["http://localhost:3000"],
         "credentials": true
+    },
+    "rabbitMq": {
+        "general": {
+            "name": "GENERAL_MQ",
+            "options": {
+                "urls": ["amqp://localhost"],
+                "queue": "localTestQueue",
+                "noAck": false,
+                "queueOptions": {
+                    "durable": true
+                }
+            }
+        }
     }
 }

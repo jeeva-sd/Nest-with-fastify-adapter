@@ -30,6 +30,7 @@ const multipartConfigRule = yup.object().shape({
 });
 
 const authConfigRule = yup.object().shape({
+    publicAuthKey: yup.string().required(),
     skipJwtAuthKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     roleKey: yup.string().required(),
@@ -46,12 +47,35 @@ const corsConfigRule = yup.object().shape({
 
 // ----------------------------------------------------------------------------------------------------------
 
+export const rabbitMQSchema = yup.object({
+    general: yup
+        .object({
+            name: yup.string().required(),
+            options: yup
+                .object({
+                    urls: yup.array().of(yup.string().required()).min(1).required(),
+                    queue: yup.string().required(),
+                    noAck: yup.boolean().required(),
+                    queueOptions: yup
+                        .object({
+                            durable: yup.boolean().required()
+                        })
+                        .required()
+                })
+                .required()
+        })
+        .required()
+});
+
+// ----------------------------------------------------------------------------------------------------------
+
 export const AppConfigRule = yup.object().shape({
     server: serverConfigRule,
     cors: corsConfigRule,
     auth: authConfigRule,
     payloadValidation: payloadConfigRule,
-    multiPart: multipartConfigRule
+    multiPart: multipartConfigRule,
+    rabbitMq: rabbitMQSchema
 });
 
 // ------------------------------------------------------------------------------------------------------------------

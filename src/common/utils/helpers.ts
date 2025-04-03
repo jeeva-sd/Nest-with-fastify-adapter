@@ -1,5 +1,5 @@
-import * as fs from 'fs';
 import { randomUUID } from 'crypto';
+import * as fs from 'fs';
 import * as CryptoJS from 'crypto-js';
 import { appConfig } from 'src/configs';
 
@@ -9,7 +9,7 @@ export class Helper {
     // ---------------------------------------
 
     static wait(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     static parseJSON(str: string): any {
@@ -132,7 +132,7 @@ export class Helper {
 
         static pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
             const result: Partial<T> = {};
-            keys.forEach(key => {
+            keys.forEach((key) => {
                 if (key in obj) {
                     result[key] = obj[key];
                 }
@@ -142,7 +142,7 @@ export class Helper {
 
         static omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
             const result: Partial<T> = { ...obj };
-            keys.forEach(key => {
+            keys.forEach((key) => {
                 delete result[key];
             });
             return result as Omit<T, K>;
@@ -193,7 +193,7 @@ export class Helper {
             return str
                 .trim()
                 .toLowerCase()
-                .replace(/\b\w/g, char => char.toUpperCase());
+                .replace(/\b\w/g, (char) => char.toUpperCase());
         }
 
         static toTitleCase(str: string): string {
@@ -202,7 +202,7 @@ export class Helper {
                 .trim()
                 .toLowerCase()
                 .replace(/([a-z])([A-Z])/g, '$1 $2')
-                .replace(/\b\w/g, c => c.toUpperCase());
+                .replace(/\b\w/g, (c) => c.toUpperCase());
         }
 
         static toCamelCase(str: string): string {
@@ -226,7 +226,7 @@ export class Helper {
 
         static countWords(str: string): number {
             if (!str) return 0;
-            const words = str.split(/\s+/).filter(word => word.length > 0);
+            const words = str.split(/\s+/).filter((word) => word.length > 0);
             return words.length;
         }
 

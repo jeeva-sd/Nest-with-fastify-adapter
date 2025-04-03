@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { AppConfig, AppConfigRule } from './config.schema';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as chalk from 'chalk';
 import { readError } from 'src/common';
+import { AppConfig, AppConfigRule } from './config.schema';
 
 export class ConfigReader {
     private static instance: ConfigReader;

@@ -18,7 +18,7 @@ export const httpMethods = {
 class ApiService {
     private axiosInstance: AxiosInstance;
 
-    constructor(baseURL: string, timeout: number = 20000, headers?: Record<string, string>) {
+    constructor(baseURL: string, timeout = 20000, headers?: Record<string, string>) {
         this.axiosInstance = axios.create({
             baseURL,
             timeout,
@@ -33,7 +33,7 @@ class ApiService {
             (config: InternalAxiosRequestConfig) => {
                 return config;
             },
-            error => {
+            (error) => {
                 return Promise.reject(error);
             }
         );
@@ -43,7 +43,7 @@ class ApiService {
             (response: AxiosResponse) => {
                 return response;
             },
-            error => {
+            (error) => {
                 return Promise.reject(error);
             }
         );

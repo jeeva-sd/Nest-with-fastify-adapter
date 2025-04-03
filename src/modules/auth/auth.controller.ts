@@ -1,15 +1,21 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/common';
+import { JwtAuthGuard, Roles, RolesGuard, Sanitize, eventPatterns } from 'src/common';
+import { RabbitMqService } from '../rabbit-mq/rabbit-mq.service';
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly rabbitMQService: RabbitMqService,
+        private readonly authService: AuthService
+    ) {}
 
     @Get()
-    findAll() {
-        return this.authService.signIn();
+    async findAll() {
+        const user = { userId: Date.now(), points: 10 };
+        const response = await this.rabbitMQService.send(eventPatterns.user.created, user);
+        return response;
     }
 
     @Post()
@@ -21,7 +27,6 @@ export class AuthController {
     @Get('check-login')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admins')
-    @SkipJwtAuth()
     checkLogin() {
         return this.authService.findOne();
     }
