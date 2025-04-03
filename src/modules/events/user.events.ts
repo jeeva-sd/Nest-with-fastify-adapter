@@ -1,7 +1,6 @@
 import { Controller, Injectable } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-import { AckHandler } from 'src/common';
-import { eventPatterns } from 'src/constants/events';
+import { AckHandler, eventPatterns } from 'src/common';
 import { userCreatedMessage } from './schemas';
 
 @Controller()

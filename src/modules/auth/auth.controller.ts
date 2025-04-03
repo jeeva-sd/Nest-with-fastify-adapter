@@ -1,9 +1,8 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, Roles, RolesGuard, Sanitize, SkipJwtAuth } from 'src/common';
+import { eventPatterns, JwtAuthGuard, Roles, RolesGuard, Sanitize } from 'src/common';
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';
 import { RabbitMqService } from '../rabbit-mq/rabbit-mq.service';
-import { eventPatterns } from 'src/constants/events';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +26,6 @@ export class AuthController {
     @Get('check-login')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admins')
-    @SkipJwtAuth()
     checkLogin() {
         return this.authService.findOne();
     }

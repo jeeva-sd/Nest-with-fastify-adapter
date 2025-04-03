@@ -10,7 +10,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
     }
 
     canActivate(context: ExecutionContext) {
-        const isPublic = this.reflector.getAllAndOverride<boolean>(appConfig.auth.skipJwtAuthKey, [
+        const isPublic = this.reflector.getAllAndOverride<boolean>(appConfig.auth.publicAuthKey, [
             context.getHandler(),
             context.getClass()
         ]);

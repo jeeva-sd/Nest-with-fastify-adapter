@@ -10,12 +10,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     canActivate(context: ExecutionContext) {
-        const isPublic = this.reflector.getAllAndOverride<boolean>(appConfig.auth.skipJwtAuthKey, [
+        const isPublic = this.reflector.getAllAndOverride<boolean>(appConfig.auth.publicAuthKey, [
             context.getHandler(),
             context.getClass()
         ]);
 
-        if (isPublic) return true; // Allow access to public routes without JWT validation
+        const skipJwt = this.reflector.getAllAndOverride<boolean>(appConfig.auth.skipJwtAuthKey, [
+            context.getHandler(),
+            context.getClass()
+        ]);
+
+        if (isPublic || skipJwt) return true; // Allow access to public routes without JWT validation
         return super.canActivate(context);
     }
 }
