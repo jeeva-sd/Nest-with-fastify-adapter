@@ -33,7 +33,7 @@ class ApiService {
             (config: InternalAxiosRequestConfig) => {
                 return config;
             },
-            error => {
+            (error) => {
                 return Promise.reject(error);
             }
         );
@@ -43,7 +43,7 @@ class ApiService {
             (response: AxiosResponse) => {
                 return response;
             },
-            error => {
+            (error) => {
                 return Promise.reject(error);
             }
         );

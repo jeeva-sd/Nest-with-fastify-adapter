@@ -48,17 +48,23 @@ const corsConfigRule = yup.object().shape({
 // ----------------------------------------------------------------------------------------------------------
 
 export const rabbitMQSchema = yup.object({
-    general: yup.object({
-        name: yup.string().required(),
-        options: yup.object({
-            urls: yup.array().of(yup.string().required()).min(1).required(),
-            queue: yup.string().required(),
-            noAck: yup.boolean().required(),
-            queueOptions: yup.object({
-                durable: yup.boolean().required()
-            }).required()
-        }).required()
-    }).required()
+    general: yup
+        .object({
+            name: yup.string().required(),
+            options: yup
+                .object({
+                    urls: yup.array().of(yup.string().required()).min(1).required(),
+                    queue: yup.string().required(),
+                    noAck: yup.boolean().required(),
+                    queueOptions: yup
+                        .object({
+                            durable: yup.boolean().required()
+                        })
+                        .required()
+                })
+                .required()
+        })
+        .required()
 });
 
 // ----------------------------------------------------------------------------------------------------------

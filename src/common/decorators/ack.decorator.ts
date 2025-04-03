@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
-import { AnySchema } from 'yup';
-import { badMessage } from 'src/constants/events';
 import { appConfig } from 'src/configs';
+import { badMessage } from 'src/constants/events';
+import { AnySchema } from 'yup';
 
 const logger = new Logger('RabbitMQDecorator');
 
@@ -11,7 +11,7 @@ export function AckHandler(schema?: AnySchema) {
         const originalMethod = descriptor.value;
 
         descriptor.value = async function (...args: any[]) {
-            const context: RmqContext = args.find(arg => arg instanceof RmqContext);
+            const context: RmqContext = args.find((arg) => arg instanceof RmqContext);
             if (!context) {
                 throw new Error('RmqContext not found in arguments.');
             }
@@ -20,7 +20,7 @@ export function AckHandler(schema?: AnySchema) {
             const message = context.getMessage();
 
             try {
-                const payload = args.find(arg => typeof arg === 'object' && !Array.isArray(arg));
+                const payload = args.find((arg) => typeof arg === 'object' && !Array.isArray(arg));
 
                 // Validate message payload if schema is provided
                 if (schema) {

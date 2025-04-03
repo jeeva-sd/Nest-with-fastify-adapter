@@ -2,4 +2,4 @@ export * from './replayMessages';
 export * from './fileTypes';
 export * from './units';
 export * from './replayMessages';
-export * from './events'
+export * from './events';

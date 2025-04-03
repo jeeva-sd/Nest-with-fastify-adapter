@@ -10,9 +10,7 @@
         }
     },
     "cors": {
-        "allowedDomains": [
-            "http://localhost:3000"
-        ],
+        "allowedDomains": ["http://localhost:3000"],
         "credentials": true
     }
 }

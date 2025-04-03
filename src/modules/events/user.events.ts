@@ -9,8 +9,6 @@ export class UserEvents {
     @AckHandler(userCreatedMessage)
     async handleUserCreated(@Payload() data: any, @Ctx() _context: RmqContext) {
         console.log('📥 Received user.created event:', data);
-        return "hurray";
+        return 'hurray';
     }
 }
-
-

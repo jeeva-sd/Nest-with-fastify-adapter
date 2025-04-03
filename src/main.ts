@@ -1,10 +1,10 @@
-import { NestFactory, Reflector } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import fastifyCors from '@fastify/cors';
 import fastifyCookies from '@fastify/cookie';
+import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import { Logger, VersioningType } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
@@ -47,7 +47,7 @@ class App {
     async setUpMicroservices() {
         const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
             transport: Transport.RMQ,
-            options: appConfig.rabbitMq.general.options,
+            options: appConfig.rabbitMq.general.options
         });
 
         await this.app.startAllMicroservices();
