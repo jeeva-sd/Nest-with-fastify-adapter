@@ -7,7 +7,7 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "ignore": ["dist"]
+        "ignore": ["dist", "common"]
     },
     "formatter": {
         "enabled": true,
@@ -19,9 +19,28 @@
         "enabled": true
     },
     "linter": {
-        "enabled": false,
+        "enabled": true,
         "rules": {
-            "recommended": true
+            "recommended": true,
+            "complexity": {
+                "useLiteralKeys": "off",
+                "noUselessConstructor": "off",
+                "noExtraBooleanCast": "warn"
+            },
+            "style": {
+                "useImportType": "off",
+                "noVar": "warn",
+                "useConst": "warn"
+            },
+            "correctness": {
+                "noUnusedVariables": "warn",
+                "noUnusedImports": "warn",
+                "noUnsafeFinally": "warn"
+            },
+            "suspicious": {
+                "noAsyncPromiseExecutor": "warn",
+                "noDebugger": "warn"
+            }
         }
     },
     "javascript": {

@@ -18,7 +18,7 @@ export const httpMethods = {
 class ApiService {
     private axiosInstance: AxiosInstance;
 
-    constructor(baseURL: string, timeout: number = 20000, headers?: Record<string, string>) {
+    constructor(baseURL: string, timeout = 20000, headers?: Record<string, string>) {
         this.axiosInstance = axios.create({
             baseURL,
             timeout,

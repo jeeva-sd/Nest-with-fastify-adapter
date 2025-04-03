@@ -7,7 +7,7 @@ import { AnySchema } from 'yup';
 const logger = new Logger('RabbitMQDecorator');
 
 export function AckHandler(schema?: AnySchema) {
-    return function (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+    return (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
         const originalMethod = descriptor.value;
 
         descriptor.value = async function (...args: any[]) {
@@ -39,10 +39,9 @@ export function AckHandler(schema?: AnySchema) {
                     logger.warn(`🚨 Discarding message in ${propertyKey}`);
                     channel.nack(message, false, false); // Discard the message permanently
                     return null;
-                } else {
-                    channel.ack(message);
                 }
 
+                channel.ack(message);
                 return result;
             } catch (error) {
                 logger.error(`❌ Error in ${propertyKey}: ${error.message}`, error.stack);

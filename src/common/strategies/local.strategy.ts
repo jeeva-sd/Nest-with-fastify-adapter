@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import { Exception } from '../filters';
+import { appConfig } from './../../configs/index';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -9,7 +10,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         super();
     }
 
-    async validate(request: Request): Promise<any> {
+    async validate(request: Request) {
         // Check headers
         const authHeader = request.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Basic ')) {
