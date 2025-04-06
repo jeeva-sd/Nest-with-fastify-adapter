@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { Helper } from 'src/common';
-import { appConfig } from 'src/configs';
+import { Helper } from '~/common';
+import { appConfig } from '~/configs';
 import { RabbitMqService } from './rabbit-mq.service';
 
 @Module({

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 
 @Injectable()
 export class RabbitMqService {

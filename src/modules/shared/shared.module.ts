@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 
 @Module({
     providers: [

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, Roles, RolesGuard, Sanitize, eventPatterns } from 'src/common';
+import { JwtAuthGuard, Roles, RolesGuard, Sanitize, eventPatterns } from '~/common';
 import { RabbitMqService } from '../rabbit-mq/rabbit-mq.service';
 import { AuthService } from './auth.service';
 import { fileSchema } from './schemas';

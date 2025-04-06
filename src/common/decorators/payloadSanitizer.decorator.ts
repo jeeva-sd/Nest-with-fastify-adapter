@@ -1,5 +1,5 @@
 import { SetMetadata, applyDecorators } from '@nestjs/common';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 import * as yup from 'yup';
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {

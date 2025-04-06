@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import * as CryptoJS from 'crypto-js';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 
 export class Helper {
     // ---------------------------------------

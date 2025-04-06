@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 import * as yup from 'yup';
 import { Exception } from '../filters';
 import { Helper, readError } from '../utils';
