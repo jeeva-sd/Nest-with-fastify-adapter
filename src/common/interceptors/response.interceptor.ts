@@ -1,4 +1,4 @@
-import { ReplayCodes, replayMessages } from '../../constants';
+import { ReplayCodes, replayMessages } from '~/constants';
 import { ResponseX } from '../types';
 
 // Common function to build a ResponseX

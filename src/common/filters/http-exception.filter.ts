@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
-import { ReplayCodes, replayMessages } from '../../constants';
+import { ReplayCodes, replayMessages } from '~/constants';
 import { take } from '../interceptors';
 
 @Catch(HttpException)
