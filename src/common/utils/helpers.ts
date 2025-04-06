@@ -3,11 +3,15 @@ import { appConfig } from '~/configs';
 import { ArrayUtils } from './array.utils';
 import { ObjectUtils } from './object.utils';
 import { StringUtils } from './string.utils';
+import { FileUtils } from './file.utils';
+import { NumberUtils } from './number.utils';
 
 export class Helper {
     static Array = ArrayUtils;
     static Object = ObjectUtils;
     static String = StringUtils;
+    static File = FileUtils;
+    static Number = NumberUtils;
 
     // ---------------------------------------
     // General Utility Functions
