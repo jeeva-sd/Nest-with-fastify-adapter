@@ -5,8 +5,8 @@ import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from '~/common';
 import { AppModule } from './app.module';
-import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from './common';
 import { appConfig } from './configs';
 
 class App {

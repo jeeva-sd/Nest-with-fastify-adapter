@@ -34,7 +34,8 @@ const authConfigRule = yup.object().shape({
     skipJwtAuthKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     roleKey: yup.string().required(),
-    jwt: yup.object().shape({
+    basicJWT: yup.object().shape({
+        name: yup.string().required(),
         secret: yup.string().required(),
         expiresIn: yup.string().required()
     })

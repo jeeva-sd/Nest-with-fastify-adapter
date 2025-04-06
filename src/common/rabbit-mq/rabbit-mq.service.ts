@@ -5,13 +5,13 @@ import { appConfig } from '~/configs';
 
 @Injectable()
 export class RabbitMqService {
-    constructor(@Inject(appConfig.rabbitMq.general.name) private readonly rabbitMQClient: ClientProxy) {}
+    constructor(@Inject(appConfig.rabbitMq.general.name) private readonly rabbitMQGeneralClient: ClientProxy) {}
 
     emit(pattern: string, data: unknown) {
-        return this.rabbitMQClient.emit(pattern, data);
+        return this.rabbitMQGeneralClient.emit(pattern, data);
     }
 
     async send(pattern: string, data: unknown) {
-        return await firstValueFrom(this.rabbitMQClient.send(pattern, data));
+        return await firstValueFrom(this.rabbitMQGeneralClient.send(pattern, data));
     }
 }

@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
                 return token;
             },
-            secretOrKey: appConfig.auth.jwt.secret,
+            secretOrKey: appConfig.auth.basicJWT.secret,
             ignoreExpiration: false,
             passReqToCallback: true // Pass req to validate method
         });
