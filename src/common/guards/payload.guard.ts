@@ -8,7 +8,7 @@ import { Exception } from '../filters';
 import { Helper, readError } from '../utils';
 
 export class PayloadGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
+    constructor(private reflector: Reflector) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();

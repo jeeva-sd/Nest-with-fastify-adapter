@@ -6,7 +6,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('sign-in')
-    findOne() {
+    signIn() {
         return this.authService.signIn();
     }
 }
