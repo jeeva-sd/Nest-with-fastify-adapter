@@ -1,6 +1,8 @@
+import { join } from 'node:path';
 import fastifyCookies from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
+import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
@@ -12,12 +14,14 @@ import { appConfig } from './configs';
 class App {
     private app: NestFastifyApplication;
 
+    // Create the NestJS app using the Fastify adapter
     async createApp() {
         this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
             logger: new Chalk()
         });
     }
 
+    // Register Fastify plugins: cookies, multipart, CORS
     async setupPlugins() {
         await this.app.register(fastifyCookies);
         await this.app.register(fastifyMultipart, appConfig.multiPart);
@@ -27,23 +31,31 @@ class App {
         });
     }
 
+    // Enable URI-based versioning
     setupVersioning() {
         this.app.setGlobalPrefix(appConfig.server.routePrefix);
-        this.app.enableVersioning({ type: VersioningType.URI, defaultVersion: appConfig.server.version });
+        this.app.enableVersioning({
+            type: VersioningType.URI,
+            defaultVersion: appConfig.server.version
+        });
     }
 
+    // Set up global guards
     setupGuards() {
         this.app.useGlobalGuards(new PayloadGuard(new Reflector()));
     }
 
+    // Set up global error filters
     setUpFilters() {
         this.app.useGlobalFilters(new HttpExceptionFilter());
     }
 
+    // Set up global interceptors
     setUpInterceptor() {
         this.app.useGlobalInterceptors(new FileCleanupInterceptor());
     }
 
+    // Register microservices (e.g. RabbitMQ)
     async setUpMicroservices() {
         const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
             transport: Transport.RMQ,
@@ -57,12 +69,36 @@ class App {
         });
     }
 
+    // Start listening on the configured port
     async startServer() {
         const port = appConfig.server.port;
         await this.app.listen(port);
         Logger.log(`Application is running on: ${await this.app.getUrl()}`);
     }
 
+    // enable shutdown hooks for cleanup
+    async enableShutdownHooks() {
+        this.app.enableShutdownHooks();
+    }
+
+    // serve static assets from public directory
+    async setupStaticAssets() {
+        await this.app.register(fastifyStatic, {
+            root: join(__dirname, '..', 'public'),
+            prefix: '/static/'
+        });
+    }
+
+    setupViewEngine() {
+        this.app.setViewEngine({
+            engine: {
+                handlebars: require('handlebars')
+            },
+            templates: join(__dirname, '..', 'src/views')
+        });
+    }
+
+    // Bootstrap sequence
     async bootstrap() {
         await this.createApp();
         await this.setupPlugins();
@@ -70,7 +106,10 @@ class App {
         this.setupGuards();
         this.setUpFilters();
         this.setUpInterceptor();
+        this.setupViewEngine();
+        await this.setupStaticAssets();
         await this.setUpMicroservices();
+        await this.enableShutdownHooks();
         await this.startServer();
     }
 }

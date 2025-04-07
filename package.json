@@ -36,6 +36,7 @@
         "cross-env": "^7.0.3",
         "crypto-js": "^4.2.0",
         "file-type": "^20.4.0",
+        "handlebars": "^4.7.8",
         "passport": "^0.7.0",
         "passport-custom": "^1.1.1",
         "passport-jwt": "^4.0.1",

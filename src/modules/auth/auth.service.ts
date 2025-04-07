@@ -6,10 +6,6 @@ import { appConfig } from '~/configs';
 export class AuthService {
     constructor(@Inject(appConfig.auth.basicJWT.name) private readonly jwtService: JwtService) {}
 
-    findOne() {
-        return 'This action returns a auth';
-    }
-
     async signIn() {
         const payload = { username: 'John', sub: '123' };
         return {
