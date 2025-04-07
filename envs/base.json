@@ -38,6 +38,14 @@
         "allowedDomains": ["http://localhost:3000"],
         "credentials": true
     },
+    "staticFiles": {
+        "staticRoot": "public",
+        "staticPrefix": "/static/"
+    },
+    "views": {
+        "engine": "handlebars",
+        "templatesDir": "src/views"
+    },
     "rabbitMq": {
         "general": {
             "name": "GENERAL_MQ",

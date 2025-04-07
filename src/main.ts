@@ -29,6 +29,10 @@ class App {
             origin: appConfig.cors.allowedDomains,
             credentials: appConfig.cors.credentials
         });
+        await this.app.register(fastifyStatic, {
+            root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
+            prefix: appConfig.staticFiles.staticPrefix
+        });
     }
 
     // Enable URI-based versioning
@@ -81,20 +85,12 @@ class App {
         this.app.enableShutdownHooks();
     }
 
-    // serve static assets from public directory
-    async setupStaticAssets() {
-        await this.app.register(fastifyStatic, {
-            root: join(__dirname, '..', 'public'),
-            prefix: '/static/'
-        });
-    }
-
     setupViewEngine() {
         this.app.setViewEngine({
             engine: {
-                handlebars: require('handlebars')
+                [appConfig.views.engine]: require(appConfig.views.engine)
             },
-            templates: join(__dirname, '..', 'src/views')
+            templates: join(__dirname, '..', appConfig.views.templatesDir)
         });
     }
 
@@ -107,7 +103,6 @@ class App {
         this.setUpFilters();
         this.setUpInterceptor();
         this.setupViewEngine();
-        await this.setupStaticAssets();
         await this.setUpMicroservices();
         await this.enableShutdownHooks();
         await this.startServer();
