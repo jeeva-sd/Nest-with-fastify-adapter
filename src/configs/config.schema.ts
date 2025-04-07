@@ -56,7 +56,7 @@ export const viewEngineSchema = yup.object({
     templatesDir: yup.string().required()
 });
 
-// ----------------------------------------------------------------------------------------------------------
+// -------------------------------------------- RabbitMQ --------------------------------------------
 
 export const rabbitMQSchema = yup.object({
     general: yup

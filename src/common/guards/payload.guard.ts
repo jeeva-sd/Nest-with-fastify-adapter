@@ -29,40 +29,54 @@ export class PayloadGuard implements CanActivate {
             // Process multipart data
             if (request.isMultipart()) {
                 const parts = await request.parts();
+                const fileWritePromises = []; // Array to store promises for file writes
+
                 for await (const part of parts) {
                     if (part.file) {
-                        const files = Array.isArray(part.file) ? part.file : [part.file];
+                        const uploadDir = path.resolve('uploads');
+                        await fs.promises.mkdir(uploadDir, { recursive: true });
 
+                        const files = Array.isArray(part.file) ? part.file : [part.file];
                         for (const file of files) {
-                            const uploadDir = path.resolve('uploads');
                             const fileName = Helper.File.generateFilename(part.filename);
                             const filePath = path.join(uploadDir, fileName);
 
-                            await fs.promises.mkdir(uploadDir, { recursive: true });
-                            await fs.promises.writeFile(filePath, file);
-
-                            const fileBytes = Buffer.byteLength(await Helper.File.readFile(filePath));
-                            const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
-
-                            // Initialize the field in params if not already
-                            if (!params[part.fieldname]) {
-                                params[part.fieldname] = [];
-                            }
-
-                            // Add file details to the field array
-                            params[part.fieldname].push({
-                                mimetype: part.mimetype,
-                                filePath,
-                                fileSize: fileSizeInMB,
-                                fileName
-                            });
-
+                            // Push the file write promise to the array
+                            fileWritePromises.push(
+                                fs.promises.writeFile(filePath, file).then(async () => {
+                                    const { size: fileBytes } = await fs.promises.stat(filePath);
+                                    const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
+                                    return {
+                                        mimetype: part.mimetype,
+                                        filePath,
+                                        fileSize: fileSizeInMB,
+                                        fileName,
+                                        fieldname: part.fieldname,
+                                    };
+                                })
+                            );
                             uploadedFiles.push(filePath);
                         }
                     } else {
                         params[part.fieldname] = part.value;
                     }
                 }
+
+                // Wait for all file writes to complete
+                const fileDetails = await Promise.all(fileWritePromises);
+
+                // Process file details and add them to params
+                fileDetails.forEach(detail => {
+                    if (!params[detail.fieldname]) {
+                        params[detail.fieldname] = [];
+                    }
+                    params[detail.fieldname].push({
+                        mimetype: detail.mimetype,
+                        filePath: detail.filePath,
+                        fileSize: detail.fileSize,
+                        fileName: detail.fileName
+                    });
+                });
             }
 
             const validatedPayload = await schema.validate(params, appConfig.payloadValidation);
@@ -72,19 +86,18 @@ export class PayloadGuard implements CanActivate {
             return true;
         } catch (e) {
             await this.cleanupFiles(uploadedFiles);
-
-            const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
+            const message =
+                e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
             throw new Exception(1003, message);
         }
     }
 
+    // Cleanup files concurrently using Promise.all
     private async cleanupFiles(uploadedFiles: string[]) {
-        for (const filePath of uploadedFiles) {
-            try {
-                await fs.promises.unlink(filePath);
-            } catch (err) {
-                console.error(`Failed to delete file ${filePath}: ${err.message}`);
-            }
-        }
+        await Promise.all(
+            uploadedFiles.map((filePath) =>
+                fs.promises.unlink(filePath).catch(() => { })
+            )
+        );
     }
 }
