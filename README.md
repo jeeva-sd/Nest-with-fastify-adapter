@@ -1,73 +1,61 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# NestJS with Fastify Adapter
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a simple NestJS application. It uses the Fastify adapter for improved performance.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+##  Features
 
-## Description
+* Utilizes the Fastify adapter instead of the default Express.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+##  Prerequisites
 
-## Installation
+* Node.js
+* npm or yarn
 
-```bash
-$ npm install
-```
+##  Installation
 
-## Running the app
+1.  Clone the repository:
 
-```bash
-# development
-$ npm run start
+    ```bash
+    git clone https://github.com/jeeva-sd/Nest-with-fastify-adapter.git
+    ```
 
-# watch mode
-$ npm run start:dev
+2.  Navigate to the project directory:
 
-# production mode
-$ npm run start:prod
-```
+    ```bash
+    cd Nest-with-fastify-adapter
+    ```
 
-## Test
+3.  Install dependencies:
 
-```bash
-# unit tests
-$ npm run test
+    ```bash
+    npm install  # or yarn install
+    ```
 
-# e2e tests
-$ npm run test:e2e
+##  Running the Application
 
-# test coverage
-$ npm run test:cov
-```
+1.  Start the development server:
 
-## Support
+    ```bash
+    npm run start:dev # or yarn start:dev
+    ```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+2.  The application will be accessible at `http://localhost:5050`.
 
-## Stay in touch
+##  Build for Production
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1.  Build the application:
 
-## License
+    ```bash
+    npm run build # or yarn build
+    ```
 
-Nest is [MIT licensed](LICENSE).
+##  Further Information
+
+* For NestJS documentation, visit [https://nestjs.com/](https://nestjs.com/)
+* For Fastify documentation, visit [https://www.fastify.io/](https://www.fastify.io/)
+
+##  Author
+
+[Jeeva SD](https://github.com/jeeva-sd)
+
+---
