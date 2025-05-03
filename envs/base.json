@@ -26,6 +26,13 @@
         "recursive": true,
         "decoratorKey": "cm4yia5rb00090cl5hqk2hii6"
     },
+    "interceptors": {
+        "response": {
+            "format": true,
+            "formatKey": "cma80fcss00020cjsflrtd006",
+            "skipFormatKey": "cma81qmo700070cif5pop4mov"
+        }
+    },
     "multiPart": {
         "limits": {
             "fileSize": 5242880,

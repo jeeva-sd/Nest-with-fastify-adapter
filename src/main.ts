@@ -7,7 +7,13 @@ import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { Chalk, FileCleanupInterceptor, HttpExceptionFilter, PayloadGuard } from '~/common';
+import {
+    Chalk,
+    FileCleanupInterceptor,
+    HttpExceptionFilter,
+    PayloadGuard,
+    ResponseTransformInterceptor
+} from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
 
@@ -59,7 +65,8 @@ class App {
 
     // Set up global interceptors
     setUpInterceptor() {
-        this.app.useGlobalInterceptors(new FileCleanupInterceptor());
+        const reflector = this.app.get(Reflector);
+        this.app.useGlobalInterceptors(new FileCleanupInterceptor(), new ResponseTransformInterceptor(reflector));
     }
 
     // Register microservices (e.g. RabbitMQ)

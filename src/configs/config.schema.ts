@@ -10,7 +10,8 @@ const serverConfigSchema = yup.object().shape({
     ignoreDuplicateSlashes: yup.boolean().required(),
     port: yup.number().required(),
     routePrefix: yup.string().required(),
-    version: yup.string().required()
+    version: yup.string().required(),
+    mode: yup.string().oneOf(['development', 'production']).required()
 });
 
 const payloadConfigSchema = yup.object().shape({
@@ -56,6 +57,16 @@ export const viewEngineSchema = yup.object({
     templatesDir: yup.string().required()
 });
 
+export const interceptorSchema = yup.object({
+    response: yup
+        .object({
+            format: yup.boolean().required(),
+            formatKey: yup.string().required(),
+            skipFormatKey: yup.string().required()
+        })
+        .required()
+});
+
 // -------------------------------------------- RabbitMQ --------------------------------------------
 
 export const rabbitMQSchema = yup.object({
@@ -85,6 +96,7 @@ export const AppConfigRule = yup.object().shape({
     cors: corsConfigSchema,
     auth: authConfigSchema,
     payloadValidation: payloadConfigSchema,
+    interceptors: interceptorSchema,
     staticFiles: staticConfigSchema,
     views: viewEngineSchema,
     multiPart: multipartConfigSchema,

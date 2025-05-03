@@ -1,17 +1,19 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { Logger } from '@nestjs/common';
+import * as chalk from 'chalk';
 import { merge } from 'lodash';
-import { Chalk, readError } from '~/common';
+import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './config.schema';
 
 export class ConfigReader {
     private static instance: ConfigReader;
-    private readonly logger = new Chalk(ConfigReader.name);
+    private readonly logger = new Logger(ConfigReader.name);
     public config: AppConfig;
 
     private constructor() {
         const env = process.env.NODE_ENV || 'development';
-        this.logger.notice(`Loading ${env} environment...\n`);
+        console.log(chalk.yellow(`Loading ${env} environment...\n`));
 
         try {
             // Construct absolute paths to the JSON configuration files
