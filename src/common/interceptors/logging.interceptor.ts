@@ -1,8 +1,7 @@
 import { LoggerService } from '@nestjs/common';
 import * as chalk from 'chalk';
-import { readError } from '../utils';
 
-// Define colors
+// Simplified color map
 const colors = {
     red: chalk.red,
     green: chalk.green,
@@ -10,15 +9,29 @@ const colors = {
     yellow: chalk.yellow,
     orange: chalk.hex('#FFA500'),
     teal: chalk.hex('#008080'),
-    coral: chalk.hex('#FF7F50'),
     indigo: chalk.hex('#4B0082'),
     olive: chalk.hex('#808000'),
     plum: chalk.hex('#DDA0DD'),
     navy: chalk.hex('#000080'),
     fuchsia: chalk.hex('#FF00FF'),
     salmon: chalk.hex('#FA8072'),
-    turquoise: chalk.hex('#40E0D0')
+    turquoise: chalk.hex('#40E0D0'),
+    gray: chalk.gray,
+    cyan: chalk.cyan,
+    magenta: chalk.magenta,
+    white: chalk.white,
+    black: chalk.black,
 };
+
+function normalizeError(error: any): string {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    try {
+        return JSON.stringify(error, null, 2);
+    } catch {
+        return String(error);
+    }
+}
 
 export class Chalk implements LoggerService {
     private context?: string;
@@ -27,83 +40,105 @@ export class Chalk implements LoggerService {
         if (context) this.context = context;
     }
 
-    setContext(context: string) {
+    setContext(context: string): this {
         this.context = context;
+        return this;
     }
 
     private getTimestamp(): string {
         const now = new Date();
+        const isDev = process.env.NODE_ENV === 'development';
 
-        const options: Intl.DateTimeFormatOptions = {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-
-        if (process.env.NODE_ENV === 'development') {
-            // Time only format for development
-            return now.toLocaleTimeString('en-US', options);
-        } else {
-            // Full date and time format for other environments
-            const fullOptions: Intl.DateTimeFormatOptions = {
+        const options: Intl.DateTimeFormatOptions = isDev
+            ? {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+            }
+            : {
                 month: '2-digit',
                 day: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true
+                hour12: true,
             };
-            return now.toLocaleString('en-US', fullOptions);
-        }
+
+        return isDev
+            ? now.toLocaleTimeString('en-US', options)
+            : now.toLocaleString('en-US', options);
     }
 
-    private formatMessage(level: string | undefined, message: string, color: (text: string) => string): string {
+    private formatMessage(level: string, message: string, colorFn: (text: string) => string): string {
         const timestamp = this.getTimestamp();
-        const contextPart = this.context ? ` ${colors.yellow(`[${this.context}]`)}` : '';
-        const levelInfo = level ? ` ${color(level)}` : '';
-        return `${timestamp}${contextPart}${levelInfo} ${color(message)}`;
+        const ctx = this.context ? ` ${colors.yellow(`[${this.context}]`)}` : '';
+        return `${timestamp}${ctx} ${colorFn(level)} ${colorFn(message)}`;
     }
 
     log(message: string) {
-        console.log(this.formatMessage(undefined, message, colors.green));
+        console.log(this.formatMessage('LOG:', message, colors.green));
     }
 
     error(message: string, trace?: string) {
-        const level = colors.red('ERROR:');
         console.error(
-            this.formatMessage(level, readError(message), colors.red),
+            this.formatMessage('ERROR:', normalizeError(message), colors.red),
             trace ? colors.red(`\nStack Trace: ${trace}`) : ''
         );
     }
 
     warn(message: string) {
-        const level = colors.orange('WARN:');
-        console.warn(this.formatMessage(level, message, colors.orange));
+        console.warn(this.formatMessage('WARN:', message, colors.orange));
     }
 
     debug(message: string) {
-        console.debug(this.formatMessage(undefined, message, chalk.gray));
+        console.debug(this.formatMessage('DEBUG:', message, colors.gray));
     }
 
     verbose(message: string) {
-        console.log(this.formatMessage(undefined, message, chalk.cyan));
+        console.log(this.formatMessage('VERBOSE:', message, colors.cyan));
     }
 
     info(message: string) {
-        console.debug(this.formatMessage(undefined, message, colors.blue));
+        console.info(this.formatMessage('INFO:', message, colors.blue));
+    }
+
+    notice(message: string) {
+        console.info(this.formatMessage('NOTICE:', message, colors.yellow));
+    }
+
+    success(message: string) {
+        console.log(this.formatMessage('SUCCESS:', message, colors.green));
+    }
+
+    critical(message: string) {
+        console.error(this.formatMessage('CRITICAL:', message, colors.magenta));
+    }
+
+    fatal(message: string, trace?: string) {
+        console.error(
+            this.formatMessage('FATAL:', message, chalk.red.bold),
+            trace ? chalk.red.bold(`\nStack Trace: ${trace}`) : ''
+        );
+        process.exit(1);
     }
 
     exception(error: any) {
-        const level = colors.red('EXCEPTION:');
         const trace = error instanceof Error ? error.stack : undefined;
-
-        console.log('\n');
         console.error(
-            this.formatMessage(level, readError(error), colors.red),
+            this.formatMessage('EXCEPTION:', normalizeError(error), colors.red),
             trace ? colors.red(`\nStack Trace: ${trace}`) : ''
         );
-        console.log('\n');
+    }
+
+    logObject(obj: any, level: string = 'OBJECT:') {
+        console.log(this.formatMessage(level, JSON.stringify(obj, null, 2), colors.teal));
+    }
+
+    // Log a message with a dynamic color
+    custom(message: string, color: keyof typeof colors, level = 'CUSTOM') {
+        const colorFn = colors[color] || chalk.white;
+        console.log(this.formatMessage(`${level.toUpperCase()}:`, message, colorFn));
     }
 }

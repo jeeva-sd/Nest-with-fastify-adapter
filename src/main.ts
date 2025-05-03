@@ -23,16 +23,18 @@ class App {
 
     // Register Fastify plugins: cookies, multipart, CORS
     async setupPlugins() {
-        await this.app.register(fastifyCookies);
-        await this.app.register(fastifyMultipart, appConfig.multiPart);
-        await this.app.register(fastifyCors, {
-            origin: appConfig.cors.allowedDomains,
-            credentials: appConfig.cors.credentials
-        });
-        await this.app.register(fastifyStatic, {
-            root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
-            prefix: appConfig.staticFiles.staticPrefix
-        });
+        await Promise.all([
+            this.app.register(fastifyCookies),
+            this.app.register(fastifyMultipart, appConfig.multiPart),
+            this.app.register(fastifyCors, {
+                origin: appConfig.cors.allowedDomains,
+                credentials: appConfig.cors.credentials
+            }),
+            this.app.register(fastifyStatic, {
+                root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
+                prefix: appConfig.staticFiles.staticPrefix
+            })
+        ]);
     }
 
     // Enable URI-based versioning
@@ -46,7 +48,8 @@ class App {
 
     // Set up global guards
     setupGuards() {
-        this.app.useGlobalGuards(new PayloadGuard(new Reflector()));
+        const reflector = this.app.get(Reflector);
+        this.app.useGlobalGuards(new PayloadGuard(reflector));
     }
 
     // Set up global error filters
