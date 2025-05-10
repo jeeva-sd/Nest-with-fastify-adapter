@@ -3,6 +3,8 @@ import fastifyCookies from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import { fastifyStatic } from '@fastify/static';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyCsrf from '@fastify/csrf-protection';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
@@ -28,7 +30,7 @@ class App {
         });
     }
 
-    // Register Fastify plugins: cookies, multipart, CORS
+    // Register Fastify plugins: cookies, multipart, CORS, Helmet, CSRF
     async setupPlugins() {
         await Promise.all([
             this.app.register(fastifyCookies),
@@ -40,7 +42,9 @@ class App {
             this.app.register(fastifyStatic, {
                 root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
                 prefix: appConfig.staticFiles.staticPrefix
-            })
+            }),
+            this.app.register(fastifyHelmet),
+            this.app.register(fastifyCsrf)
         ]);
     }
 
@@ -91,7 +95,7 @@ class App {
         Logger.log(chalk.cyan(`Application is running on: ${await this.app.getUrl()}`));
     }
 
-    // enable shutdown hooks for cleanup
+    // Enable shutdown hooks for cleanup
     async enableShutdownHooks() {
         this.app.enableShutdownHooks();
     }
