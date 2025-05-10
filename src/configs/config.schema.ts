@@ -35,6 +35,7 @@ const authConfigSchema = yup.object().shape({
     skipJwtAuthKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     roleKey: yup.string().required(),
+    permissionKey: yup.string().required(),
     basicJWT: yup.object().shape({
         name: yup.string().required(),
         secret: yup.string().required(),

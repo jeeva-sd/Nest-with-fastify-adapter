@@ -3,6 +3,8 @@ export interface TokenUser {
     sub: string;
     iat: number;
     exp: number;
+    permissions: string[];
+    roles: string[];
 }
 
 export interface RequestX extends Request {

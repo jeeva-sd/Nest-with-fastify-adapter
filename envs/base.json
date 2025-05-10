@@ -14,6 +14,7 @@
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
         "publicAuthKey": "cm8n1jewx000k0cl2drme2exe",
         "roleKey": "cm4ymtxoy00000cmhhh7d63fr",
+        "permissionKey": "cm4ymt0x00000cmh7j8v2g3r5",
         "basicJWT": {
             "name": "basicJWT",
             "secret": "cm4l37kx000010cl42l2d3jck",
