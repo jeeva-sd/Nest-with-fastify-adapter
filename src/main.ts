@@ -1,10 +1,10 @@
 import { join } from 'node:path';
 import fastifyCookies from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
+import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyHelmet from '@fastify/helmet';
 import fastifyMultipart from '@fastify/multipart';
 import { fastifyStatic } from '@fastify/static';
-import fastifyHelmet from '@fastify/helmet';
-import fastifyCsrf from '@fastify/csrf-protection';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
