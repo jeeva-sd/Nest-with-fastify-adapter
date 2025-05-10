@@ -14,7 +14,8 @@
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
         "publicAuthKey": "cm8n1jewx000k0cl2drme2exe",
         "roleKey": "cm4ymtxoy00000cmhhh7d63fr",
-        "jwt": {
+        "basicJWT": {
+            "name": "basicJWT",
             "secret": "cm4l37kx000010cl42l2d3jck",
             "expiresIn": "5h"
         }
@@ -24,6 +25,13 @@
         "stripUnknown": true,
         "recursive": true,
         "decoratorKey": "cm4yia5rb00090cl5hqk2hii6"
+    },
+    "interceptors": {
+        "response": {
+            "format": true,
+            "formatKey": "cma80fcss00020cjsflrtd006",
+            "skipFormatKey": "cma81qmo700070cif5pop4mov"
+        }
     },
     "multiPart": {
         "limits": {
@@ -36,6 +44,14 @@
     "cors": {
         "allowedDomains": ["http://localhost:3000"],
         "credentials": true
+    },
+    "staticFiles": {
+        "staticRoot": "public",
+        "staticPrefix": "/static/"
+    },
+    "views": {
+        "engine": "handlebars",
+        "templatesDir": "src/views"
     },
     "rabbitMq": {
         "general": {

@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { ALL_FILE_TYPES, oneKb } from '../../constants';
+import { ALL_FILE_TYPES, oneKb } from '~/constants';
 
 export interface FileSchemaOverrides {
     allowedMimeTypes?: string[];

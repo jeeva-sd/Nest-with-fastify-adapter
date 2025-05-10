@@ -2,13 +2,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { appConfig } from 'src/configs';
+import { appConfig } from '~/configs';
 import * as yup from 'yup';
 import { Exception } from '../filters';
 import { Helper, readError } from '../utils';
 
+// WeakMap to cache metadata for handlers
+export const metadataCache = new WeakMap<Function, yup.ObjectSchema<any>>();
+
 export class PayloadGuard implements CanActivate {
-    constructor(private reflector: Reflector) {}
+    constructor(private readonly reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -16,75 +19,105 @@ export class PayloadGuard implements CanActivate {
         let params = {};
 
         try {
-            const schema = this.reflector.get<yup.ObjectSchema<any>>(
-                appConfig.payloadValidation.decoratorKey,
-                context.getHandler()
-            );
-            if (!schema) return true;
+            const handler = context.getHandler();
 
-            if (request.body) params = { ...params, ...request.body };
-            if (request.params) params = { ...params, ...request.params };
-            if (request.query) params = { ...params, ...request.query };
+            // Attempt to retrieve schema from WeakMap
+            let schema = metadataCache.get(handler);
 
-            // Process multipart data
-            if (request.isMultipart()) {
-                const parts = await request.parts();
-                for await (const part of parts) {
-                    if (part.file) {
-                        const files = Array.isArray(part.file) ? part.file : [part.file];
+            // Fallback to Reflector if schema is not in WeakMap
+            if (!schema) {
+                schema = this.reflector.get<yup.ObjectSchema<any>>(
+                    appConfig.payloadValidation.decoratorKey,
+                    handler
+                );
 
-                        for (const file of files) {
-                            const uploadDir = path.resolve('uploads');
-                            const fileName = Helper.File.generateFilename(part.filename);
-                            const filePath = path.join(uploadDir, fileName);
-
-                            await fs.promises.mkdir(uploadDir, { recursive: true });
-                            await fs.promises.writeFile(filePath, file);
-
-                            const fileBytes = Buffer.byteLength(await Helper.File.readFile(filePath));
-                            const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
-
-                            // Initialize the field in params if not already
-                            if (!params[part.fieldname]) {
-                                params[part.fieldname] = [];
-                            }
-
-                            // Add file details to the field array
-                            params[part.fieldname].push({
-                                mimetype: part.mimetype,
-                                filePath,
-                                fileSize: fileSizeInMB,
-                                fileName
-                            });
-
-                            uploadedFiles.push(filePath);
-                        }
-                    } else {
-                        params[part.fieldname] = part.value;
-                    }
+                // Cache the schema in WeakMap for future use
+                if (schema) {
+                    metadataCache.set(handler, schema);
                 }
             }
 
+            // If no schema is found, skip validation
+            if (!schema) return true;
+
+            // Merge request body, params, and query into a single object
+            params = { ...request.body, ...request.params, ...request.query };
+
+            // Handle multipart data if applicable
+            if (request.isMultipart()) {
+                const parts = await request.parts();
+                const fileDetails = await this.processMultipart(parts, uploadedFiles);
+                params = { ...params, ...fileDetails };
+            }
+
+            // Validate the payload using the schema
             const validatedPayload = await schema.validate(params, appConfig.payloadValidation);
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
 
             return true;
         } catch (e) {
+            // Cleanup uploaded files on error
             await this.cleanupFiles(uploadedFiles);
-
-            const message = e?.errors?.length ? e.errors[0] : (readError(e) ?? 'Payload validation failed');
+            const message = e?.errors?.[0] || readError(e) || 'Payload validation failed';
             throw new Exception(1003, message);
         }
     }
 
-    private async cleanupFiles(uploadedFiles: string[]) {
-        for (const filePath of uploadedFiles) {
-            try {
-                await fs.promises.unlink(filePath);
-            } catch (err) {
-                console.error(`Failed to delete file ${filePath}: ${err.message}`);
+    // Process multipart data and return file details
+    private async processMultipart(parts: AsyncIterableIterator<any>, uploadedFiles: string[]) {
+        const fileWritePromises = [];
+        const fileDetails = {};
+
+        for await (const part of parts) {
+            if (part.file) {
+                const uploadDir = path.resolve('uploads');
+                await fs.promises.mkdir(uploadDir, { recursive: true });
+
+                const fileName = Helper.File.generateFilename(part.filename);
+                const filePath = path.join(uploadDir, fileName);
+
+                // Write file and store its details
+                fileWritePromises.push(
+                    fs.promises.writeFile(filePath, part.file).then(async () => {
+                        const { size: fileBytes } = await fs.promises.stat(filePath);
+                        const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
+                        const fileDetail = {
+                            mimetype: part.mimetype,
+                            filePath,
+                            fileSize: fileSizeInMB,
+                            fileName,
+                            fieldname: part.fieldname,
+                        };
+
+                        // Add file details to the corresponding field
+                        if (!fileDetails[part.fieldname]) {
+                            fileDetails[part.fieldname] = [];
+                        }
+                        fileDetails[part.fieldname].push(fileDetail);
+
+                        uploadedFiles.push(filePath);
+                    })
+                );
+            } else {
+                // Add non-file fields to params
+                fileDetails[part.fieldname] = part.value;
             }
         }
+
+        // Wait for all file writes to complete
+        await Promise.all(fileWritePromises);
+        return fileDetails;
+    }
+
+    // Cleanup files concurrently using Promise.all
+    private async cleanupFiles(uploadedFiles: string[]) {
+        await Promise.all(
+            uploadedFiles.map((filePath) =>
+                fs.promises.unlink(filePath).catch(() => {
+                    // Ignore errors during cleanup
+                })
+            )
+        );
     }
 }

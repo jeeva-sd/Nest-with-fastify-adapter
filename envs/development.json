@@ -1,5 +1,6 @@
 {
     "server": {
-        "appPort": 5050
+        "appPort": 5050,
+        "mode": "development"
     }
 }

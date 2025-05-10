@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { JwtAuthGuard, JwtStrategy, LocalAuthGuard, LocalStrategy } from './common';
+import { JwtAuthGuard, LocalAuthGuard, StrategyModule } from '~/common';
 import { AuthModule } from './modules/auth/auth.module';
+import { DemoModule } from './modules/demo/demo.module';
 import { EventsModule } from './modules/events/events.module';
-import { RabbitMqModule } from './modules/rabbit-mq/rabbit-mq.module';
 
 @Module({
-    imports: [AuthModule, RabbitMqModule, EventsModule],
+    imports: [AuthModule, EventsModule, DemoModule, StrategyModule],
     controllers: [],
-    providers: [JwtStrategy, LocalStrategy, LocalAuthGuard, JwtAuthGuard]
+    providers: [LocalAuthGuard, JwtAuthGuard]
 })
 export class AppModule {}

@@ -34,8 +34,8 @@
             },
             "correctness": {
                 "noUnusedVariables": "warn",
-                "noUnusedImports": "warn",
-                "noUnsafeFinally": "warn"
+                "noUnsafeFinally": "warn",
+                "noUnusedImports": "warn"
             },
             "suspicious": {
                 "noAsyncPromiseExecutor": "warn",

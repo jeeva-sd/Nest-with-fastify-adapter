@@ -1,5 +1,5 @@
-import { FileTypes, createFileRule } from 'src/common';
 import * as yup from 'yup';
+import { FileTypes, createFileRule } from '~/common';
 
 const fileRule = createFileRule({
     fieldName: 'file',

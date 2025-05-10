@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
-import { appConfig } from 'src/configs';
-import { badMessage } from 'src/constants/events';
+import { appConfig } from '~/configs';
+import { badMessage } from '~/constants/events';
 import { AnySchema } from 'yup';
 
 const logger = new Logger('RabbitMQDecorator');

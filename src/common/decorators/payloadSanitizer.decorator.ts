@@ -1,7 +1,18 @@
-import { SetMetadata, applyDecorators } from '@nestjs/common';
-import { appConfig } from 'src/configs';
+import { SetMetadata } from '@nestjs/common';
+import { appConfig } from '~/configs';
 import * as yup from 'yup';
+import { metadataCache } from '../guards/payload.guard'; // Import the WeakMap
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
-    return applyDecorators(SetMetadata(appConfig.payloadValidation.decoratorKey, schema));
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+        // Register the schema in the WeakMap using the handler function as the key
+        metadataCache.set(descriptor.value, schema);
+
+        // Apply NestJS metadata for fallback (optional)
+        SetMetadata(appConfig.payloadValidation.decoratorKey, schema)(
+            target,
+            propertyKey,
+            descriptor
+        );
+    };
 };

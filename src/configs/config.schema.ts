@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 // ------------------------------------------- server -----------------------------------------------------
 
-const serverConfigRule = yup.object().shape({
+const serverConfigSchema = yup.object().shape({
     logger: yup.boolean().required(),
     bodyLimit: yup.number().required(),
     caseSensitive: yup.boolean().required(),
@@ -10,17 +10,18 @@ const serverConfigRule = yup.object().shape({
     ignoreDuplicateSlashes: yup.boolean().required(),
     port: yup.number().required(),
     routePrefix: yup.string().required(),
-    version: yup.string().required()
+    version: yup.string().required(),
+    mode: yup.string().oneOf(['development', 'production']).required()
 });
 
-const payloadConfigRule = yup.object().shape({
+const payloadConfigSchema = yup.object().shape({
     abortEarly: yup.boolean().required(),
     stripUnknown: yup.boolean().required(),
     recursive: yup.boolean().required(),
     decoratorKey: yup.string().required()
 });
 
-const multipartConfigRule = yup.object().shape({
+const multipartConfigSchema = yup.object().shape({
     limits: yup.object().shape({
         fileSize: yup.number().required(),
         fieldSize: yup.number().required(),
@@ -29,23 +30,44 @@ const multipartConfigRule = yup.object().shape({
     })
 });
 
-const authConfigRule = yup.object().shape({
+const authConfigSchema = yup.object().shape({
     publicAuthKey: yup.string().required(),
     skipJwtAuthKey: yup.string().required(),
     encryptionKey: yup.string().required(),
     roleKey: yup.string().required(),
-    jwt: yup.object().shape({
+    basicJWT: yup.object().shape({
+        name: yup.string().required(),
         secret: yup.string().required(),
         expiresIn: yup.string().required()
     })
 });
 
-const corsConfigRule = yup.object().shape({
+const corsConfigSchema = yup.object().shape({
     allowedDomains: yup.array().of(yup.string().trim().required()).required(),
     credentials: yup.boolean().required()
 });
 
-// ----------------------------------------------------------------------------------------------------------
+export const staticConfigSchema = yup.object({
+    staticRoot: yup.string().required(),
+    staticPrefix: yup.string().required()
+});
+
+export const viewEngineSchema = yup.object({
+    engine: yup.string().oneOf(['handlebars', 'ejs', 'pug', 'eta']).required(),
+    templatesDir: yup.string().required()
+});
+
+export const interceptorSchema = yup.object({
+    response: yup
+        .object({
+            format: yup.boolean().required(),
+            formatKey: yup.string().required(),
+            skipFormatKey: yup.string().required()
+        })
+        .required()
+});
+
+// -------------------------------------------- RabbitMQ --------------------------------------------
 
 export const rabbitMQSchema = yup.object({
     general: yup
@@ -70,11 +92,14 @@ export const rabbitMQSchema = yup.object({
 // ----------------------------------------------------------------------------------------------------------
 
 export const AppConfigRule = yup.object().shape({
-    server: serverConfigRule,
-    cors: corsConfigRule,
-    auth: authConfigRule,
-    payloadValidation: payloadConfigRule,
-    multiPart: multipartConfigRule,
+    server: serverConfigSchema,
+    cors: corsConfigSchema,
+    auth: authConfigSchema,
+    payloadValidation: payloadConfigSchema,
+    interceptors: interceptorSchema,
+    staticFiles: staticConfigSchema,
+    views: viewEngineSchema,
+    multiPart: multipartConfigSchema,
     rabbitMq: rabbitMQSchema
 });
 

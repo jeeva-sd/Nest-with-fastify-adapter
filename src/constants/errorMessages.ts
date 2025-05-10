@@ -4,9 +4,9 @@ export interface ReplayMessages {
     };
 }
 
-export type ReplayCodes = keyof typeof replayMessages;
+export type ReplayCodes = keyof typeof errorMessages;
 
-export const replayMessages = {
+export const errorMessages = {
     // Successful
     200: { message: 'Request completed successfully' },
     201: { message: 'Resource successfully created' },
@@ -54,9 +54,5 @@ export const replayMessages = {
     1006: { message: 'Request timed out' },
 
     // Auth
-    1050: { message: 'Invalid credentials' },
-    1051: { message: 'Authentication successful' },
-    1052: { message: 'Logout successful' },
-    1056: { message: 'Password reset successful' },
-    1058: { message: 'User impersonation successful' }
+    1050: { message: 'Invalid credentials' }
 };
