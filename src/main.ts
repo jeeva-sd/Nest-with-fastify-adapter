@@ -7,6 +7,7 @@ import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import * as chalk from 'chalk';
 import {
     Chalk,
     FileCleanupInterceptor,
@@ -87,7 +88,7 @@ class App {
     async startServer() {
         const port = appConfig.server.port;
         await this.app.listen(port);
-        Logger.log(`Application is running on: ${await this.app.getUrl()}`);
+        Logger.log(chalk.cyan(`Application is running on: ${await this.app.getUrl()}`));
     }
 
     // enable shutdown hooks for cleanup

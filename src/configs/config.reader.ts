@@ -71,4 +71,10 @@ export class ConfigReader {
     public get<K extends keyof AppConfig>(key: K): AppConfig[K] {
         return this.config[key];
     }
+
+    public getAll(): AppConfig {
+        return this.config;
+    }
 }
+
+export const appConfig = ConfigReader.getInstance().getAll();
