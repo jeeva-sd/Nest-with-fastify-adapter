@@ -36,10 +36,12 @@
         "amqp-connection-manager": "^4.1.14",
         "amqplib": "^0.10.5",
         "axios": "^1.8.1",
+        "chalk": "^4.1.2",
         "cross-env": "^7.0.3",
         "crypto-js": "^4.2.0",
         "file-type": "^20.4.0",
         "handlebars": "^4.7.8",
+        "lodash": "^4.17.21",
         "passport": "^0.7.0",
         "passport-custom": "^1.1.1",
         "passport-jwt": "^4.0.1",
@@ -47,6 +49,8 @@
         "reflect-metadata": "^0.2.2",
         "rimraf": "^6.0.1",
         "rxjs": "^7.8.2",
+        "ts-loader": "^9.5.2",
+        "tsconfig-paths": "^4.2.0",
         "zod": "^3.24.4"
     },
     "devDependencies": {
@@ -61,19 +65,23 @@
         "source-map-support": "^0.5.21",
         "supertest": "^7.0.0",
         "ts-jest": "^29.2.6",
-        "ts-loader": "^9.5.2",
         "ts-node": "^10.9.2",
-        "tsconfig-paths": "^4.2.0",
         "typescript": "^5.8.2"
     },
     "jest": {
-        "moduleFileExtensions": ["js", "json", "ts"],
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
         "rootDir": "src",
         "testRegex": ".*\\.spec\\.ts$",
         "transform": {
             "^.+\\.(t|j)s$": "ts-jest"
         },
-        "collectCoverageFrom": ["**/*.(t|j)s"],
+        "collectCoverageFrom": [
+            "**/*.(t|j)s"
+        ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"
     }
