@@ -62,10 +62,12 @@ export class ConfigReader {
             return AppConfigRule.parse(mergedConfigs);
         } catch (e) {
             if (e instanceof z.ZodError) {
-                const formattedErrors = e.errors.map((issue, idx) => {
-                    const path = issue.path.length ? `Path: ${issue.path.join('.')}` : 'Path: [root]';
-                    return `${idx + 1}. ${issue.message}\n   ${path}`;
-                }).join('\n\n');
+                const formattedErrors = e.errors
+                    .map((issue, idx) => {
+                        const path = issue.path.length ? `Path: ${issue.path.join('.')}` : 'Path: [root]';
+                        return `${idx + 1}. ${issue.message}\n   ${path}`;
+                    })
+                    .join('\n\n');
 
                 this.logger.error(`ENV Configuration validation error:\n\n${formattedErrors}`);
             } else {

@@ -1,14 +1,16 @@
-import { Controller, Get, Render, UseGuards } from '@nestjs/common';
-import { Access, JwtAuthGuard, RabbitMqService, RolesGuard, eventPatterns } from '~/common';
+import { Controller, Get, Post, Render } from '@nestjs/common';
+import { Access, RabbitMqService, Sanitize, eventPatterns } from '~/common';
 import { ACL } from '~/modules/roles';
+import { nameSchema } from './schema/demo.schema';
 
 @Controller('demo')
-@UseGuards(JwtAuthGuard, RolesGuard)
+// @UseGuards(JwtAuthGuard, RolesGuard)
 export class DemoController {
     constructor(private readonly rabbitMQService: RabbitMqService) {}
 
-    @Get('render')
+    @Post('render')
     @Render('dummy.hbs')
+    @Sanitize(nameSchema)
     @Access(ACL.AdminOnly)
     getFile() {
         return { message: 'Hello world!' };
