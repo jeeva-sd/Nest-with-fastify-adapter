@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
 import { merge } from 'lodash';
+import { z } from 'zod';
 import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './config.schema';
 
@@ -58,12 +59,18 @@ export class ConfigReader {
 
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
-            return AppConfigRule.validateSync(mergedConfigs, { abortEarly: false });
+            return AppConfigRule.parse(mergedConfigs);
         } catch (e) {
-            const errors = e?.errors?.length
-                ? e.errors.map((error, index) => `${index + 1}. ${error}`).join('\n')
-                : readError(e) || 'Config validation failed';
-            this.logger.error(`ENV Configuration validation error:\n${errors}`);
+            if (e instanceof z.ZodError) {
+                const formattedErrors = e.errors.map((issue, idx) => {
+                    const path = issue.path.length ? `Path: ${issue.path.join('.')}` : 'Path: [root]';
+                    return `${idx + 1}. ${issue.message}\n   ${path}`;
+                }).join('\n\n');
+
+                this.logger.error(`ENV Configuration validation error:\n\n${formattedErrors}`);
+            } else {
+                this.logger.error('ENV Configuration validation error:\nConfig validation failed');
+            }
             process.exit(1);
         }
     }
