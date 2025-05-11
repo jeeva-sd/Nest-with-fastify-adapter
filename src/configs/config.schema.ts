@@ -64,6 +64,18 @@ export const interceptorSchema = z.object({
     })
 });
 
+// -------------------------------------------- Compression --------------------------------------------
+
+export const compressionConfigSchema = z.object({
+    encodings: z.array(z.enum(['gzip', 'deflate', 'br'])), // Validate supported encodings
+    threshold: z.number().min(0), // Minimum threshold for compression
+    brotliOptions: z.object({
+        params: z.object({
+            BROTLI_PARAM_QUALITY: z.number().min(0).max(11) // Brotli quality range: 0-11
+        })
+    })
+});
+
 // -------------------------------------------- RabbitMQ --------------------------------------------
 
 export const rabbitMQSchema = z.object({
@@ -91,6 +103,7 @@ export const AppConfigRule = z.object({
     staticFiles: staticConfigSchema,
     views: viewEngineSchema,
     multiPart: multipartConfigSchema,
+    compression: compressionConfigSchema,
     rabbitMq: rabbitMQSchema
 });
 

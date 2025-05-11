@@ -1,4 +1,6 @@
 import { join } from 'node:path';
+import { constants } from 'node:zlib';
+import compression from '@fastify/compress';
 import fastifyCookies from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyCsrf from '@fastify/csrf-protection';
@@ -25,7 +27,7 @@ class App {
 
     // Create the NestJS app using the Fastify adapter
     async createApp() {
-        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({}), {
             logger: new Chalk()
         });
     }
@@ -44,7 +46,17 @@ class App {
                 prefix: appConfig.staticFiles.staticPrefix
             }),
             this.app.register(fastifyHelmet),
-            this.app.register(fastifyCsrf)
+            this.app.register(fastifyCsrf),
+            this.app.register(compression, {
+                encodings: appConfig.compression.encodings,
+                threshold: appConfig.compression.threshold,
+                brotliOptions: {
+                    params: {
+                        [constants.BROTLI_PARAM_QUALITY]:
+                            appConfig.compression.brotliOptions.params.BROTLI_PARAM_QUALITY
+                    }
+                }
+            })
         ]);
     }
 

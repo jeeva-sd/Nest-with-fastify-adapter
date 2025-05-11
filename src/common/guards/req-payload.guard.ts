@@ -50,12 +50,10 @@ export class PayloadGuard implements CanActivate {
                 params = { ...params, ...fileDetails };
             }
 
-            console.log(params, 'params');
             // Validate the payload using the schema
             const validatedPayload = await schema.parse(params);
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
-            console.log(validatedPayload, 'validatedPayload');
 
             return true;
         } catch (e) {
@@ -65,7 +63,6 @@ export class PayloadGuard implements CanActivate {
             let message: string;
 
             if (e instanceof z.ZodError) {
-                console.log(e);
                 // Format Zod validation errors (only the first error will be present)
                 const firstError: any = e.errors[0];
                 if (firstError.inclusive) {

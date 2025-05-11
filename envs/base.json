@@ -54,6 +54,15 @@
         "engine": "handlebars",
         "templatesDir": "src/views"
     },
+    "compression": {
+        "encodings": ["gzip", "deflate", "br"],
+        "threshold": 1024,
+        "brotliOptions": {
+            "params": {
+                "BROTLI_PARAM_QUALITY": 4
+            }
+        }
+    },
     "rabbitMq": {
         "general": {
             "name": "GENERAL_MQ",
