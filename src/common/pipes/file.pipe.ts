@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import { z } from 'zod';
 import { ALL_FILE_TYPES, oneKb } from '~/constants';
 
 export interface FileSchemaOverrides {
@@ -20,30 +20,41 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
 
     const withFieldName = (message: string) => (fieldName ? `${fieldName}: ${message}` : message);
 
-    const fileSchema = yup.object().shape({
-        mimetype: yup
+    // Define the file schema
+    const fileSchema = z.object({
+        mimetype: z
             .string()
-            .oneOf(allowedMimeTypes, withFieldName('Invalid file mimetype'))
-            .required(withFieldName('File type is required')),
-        fileName: yup.string().required(withFieldName('Invalid file name')),
-        filePath: yup.string().required(withFieldName('File path is required')),
-        fileSize: yup
+            .refine((value) => allowedMimeTypes.includes(value), {
+                message: withFieldName('Invalid file mimetype'),
+            }),
+        fileName: z.string().nonempty(withFieldName('Invalid file name')),
+        filePath: z.string().nonempty(withFieldName('File path is required')),
+        fileSize: z
             .number()
-            .min(minFileSize, withFieldName(`File size must be at least ${minFileSize} MB (${minFileSize * oneKb} KB)`))
-            .max(
-                maxFileSize,
-                withFieldName(`File size must be less than ${maxFileSize} MB (${maxFileSize * oneKb} KB)`)
-            )
-            .typeError(withFieldName('Invalid file parameters'))
-            .required(withFieldName('Invalid file size'))
+            .min(minFileSize, {
+                message: withFieldName(`File size must be at least ${minFileSize} MB (${minFileSize * oneKb} KB)`),
+            })
+            .max(maxFileSize, {
+                message: withFieldName(`File size must be less than ${maxFileSize} MB (${maxFileSize * oneKb} KB)`),
+            })
+            .refine((value) => !isNaN(value), {
+                message: withFieldName('Invalid file parameters'),
+            }),
     });
 
-    return yup
-        .array()
-        .of(fileSchema)
-        .typeError(withFieldName('Invalid file parameters'))
-        .when([], {
-            is: () => required,
-            then: (schema) => schema.required(withFieldName('File attachment is required'))
+    // Define the array schema
+    const fileArraySchema = z
+        .array(fileSchema, {
+            invalid_type_error: withFieldName('Invalid file parameters'),
+        })
+        .superRefine((files, ctx) => {
+            if (required && files.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: withFieldName('File attachment is required'),
+                });
+            }
         });
+
+    return fileArraySchema;
 };

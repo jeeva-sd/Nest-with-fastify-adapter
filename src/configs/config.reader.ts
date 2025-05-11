@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
-import { merge } from 'lodash';
+import { z } from 'zod';
 import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './config.schema';
 
@@ -25,7 +25,7 @@ export class ConfigReader {
             const envConfig = this.readConfigFile(envPath);
 
             // Merge the base and environment configurations
-            const mergedConfigs = merge(baseConfig, envConfig);
+            const mergedConfigs = this.mergeConfigs(baseConfig, envConfig);
 
             // Validate and initialize the configuration
             this.config = this.applyValidation(mergedConfigs);
@@ -56,14 +56,36 @@ export class ConfigReader {
         }
     }
 
+    private mergeConfigs(baseConfig: AppConfig, envConfig: Partial<AppConfig>): AppConfig {
+        for (const key of Object.keys(envConfig)) {
+            if (typeof envConfig[key] === 'object' && envConfig[key] !== null && !Array.isArray(envConfig[key])) {
+                if (!(key in baseConfig)) baseConfig[key] = {};
+                baseConfig[key] = this.mergeConfigs(baseConfig[key], envConfig[key]);
+            } else {
+                // Only override base value if property exists in envConfig
+                if (key in envConfig) baseConfig[key] = envConfig[key];
+            }
+        }
+
+        return baseConfig;
+    }
+
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
         try {
-            return AppConfigRule.validateSync(mergedConfigs, { abortEarly: false });
+            return AppConfigRule.parse(mergedConfigs);
         } catch (e) {
-            const errors = e?.errors?.length
-                ? e.errors.map((error, index) => `${index + 1}. ${error}`).join('\n')
-                : readError(e) || 'Config validation failed';
-            this.logger.error(`ENV Configuration validation error:\n${errors}`);
+            if (e instanceof z.ZodError) {
+                const formattedErrors = e.errors
+                    .map((issue, idx) => {
+                        const path = issue.path.length ? `Path: ${issue.path.join('.')}` : 'Path: [root]';
+                        return `${idx + 1}. ${issue.message}\n   ${path}`;
+                    })
+                    .join('\n\n');
+
+                this.logger.error(`ENV Configuration validation error:\n\n${formattedErrors}`);
+            } else {
+                this.logger.error('ENV Configuration validation error:\nConfig validation failed');
+            }
             process.exit(1);
         }
     }

@@ -2,11 +2,11 @@ import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
 import { appConfig } from '~/configs';
 import { badMessage } from '~/constants/events';
-import { AnySchema } from 'yup';
+import { z, ZodSchema } from 'zod';
 
 const logger = new Logger('RabbitMQDecorator');
 
-export function AckHandler(schema?: AnySchema) {
+export function AckHandler(schema?: ZodSchema<any>) {
     return (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
         const originalMethod = descriptor.value;
 
@@ -25,9 +25,9 @@ export function AckHandler(schema?: AnySchema) {
                 // Validate message payload if schema is provided
                 if (schema) {
                     try {
-                        await schema.validate(payload, appConfig.payloadValidation);
+                        schema.parse(payload);
                     } catch (validationError) {
-                        logger.warn(`🚨 Validation failed in ${propertyKey}: ${validationError.message}`);
+                        logger.warn(`🚨 Validation failed in ${propertyKey}: ${validationError.errors?.[0]?.message || validationError.message}`);
                         channel.nack(message, false, false); // Discard message permanently
                         return null;
                     }

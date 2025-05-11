@@ -30,7 +30,7 @@ export class RolesGuard implements CanActivate {
 
         if (roleMeta?.roles?.length) {
             const hasRoles = this.match(user.roles || [], roleMeta.roles, roleMeta.matchAll);
-            if (!hasRoles) throw new ForbiddenException(`Insufficient roles`);
+            if (!hasRoles) throw new ForbiddenException(`Insufficient role permissions`);
         }
 
         // Permissions

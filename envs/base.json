@@ -1,13 +1,14 @@
 {
     "server": {
-        "port": 5050,
+        "port": 5051,
         "version": "1",
         "routePrefix": "api",
         "logger": false,
         "bodyLimit": 1048576,
         "caseSensitive": false,
         "ignoreTrailingSlash": true,
-        "ignoreDuplicateSlashes": true
+        "ignoreDuplicateSlashes": true,
+        "allowExceptionLogs": false
     },
     "auth": {
         "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
@@ -53,6 +54,15 @@
     "views": {
         "engine": "handlebars",
         "templatesDir": "src/views"
+    },
+    "compression": {
+        "encodings": ["gzip", "deflate", "br"],
+        "threshold": 1024,
+        "brotliOptions": {
+            "params": {
+                "BROTLI_PARAM_QUALITY": 4
+            }
+        }
     },
     "rabbitMq": {
         "general": {

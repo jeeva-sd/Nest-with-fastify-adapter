@@ -1,1 +1,1 @@
-export { AccessPolicies } from './access-policies';
+export { ACL } from './access-policies';

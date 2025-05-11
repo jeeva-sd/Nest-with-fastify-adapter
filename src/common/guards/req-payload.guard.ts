@@ -3,15 +3,15 @@ import * as path from 'path';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { appConfig } from '~/configs';
-import * as yup from 'yup';
+import * as z from 'zod';
 import { Exception } from '../filters';
 import { Helper, readError } from '../utils';
 
 // WeakMap to cache metadata for handlers
-export const metadataCache = new WeakMap<Function, yup.ObjectSchema<any>>();
+export const metadataCache = new WeakMap<Function, z.ZodTypeAny>();
 
 export class PayloadGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {}
+    constructor(private readonly reflector: Reflector) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -22,11 +22,11 @@ export class PayloadGuard implements CanActivate {
             const handler = context.getHandler();
 
             // Attempt to retrieve schema from WeakMap
-            let schema = metadataCache.get(handler);
+            let schema: z.ZodTypeAny = metadataCache.get(handler);
 
             // Fallback to Reflector if schema is not in WeakMap
             if (!schema) {
-                schema = this.reflector.get<yup.ObjectSchema<any>>(
+                schema = this.reflector.get<z.ZodSchema>(
                     appConfig.payloadValidation.decoratorKey,
                     handler
                 );
@@ -51,7 +51,7 @@ export class PayloadGuard implements CanActivate {
             }
 
             // Validate the payload using the schema
-            const validatedPayload = await schema.validate(params, appConfig.payloadValidation);
+            const validatedPayload = await schema.parse(params);
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
 
@@ -59,7 +59,25 @@ export class PayloadGuard implements CanActivate {
         } catch (e) {
             // Cleanup uploaded files on error
             await this.cleanupFiles(uploadedFiles);
-            const message = e?.errors?.[0] || readError(e) || 'Payload validation failed';
+
+            let message: string;
+
+            if (e instanceof z.ZodError) {
+                // Format Zod validation errors (only the first error will be present)
+                const firstError: any = e.errors[0];
+                if (firstError.inclusive) {
+                    message = firstError.message;
+                }
+                else {
+                    const path = firstError.path.length ? firstError.path.join('.') : '[root]';
+                    message = `Field '${path}' ${firstError.message}`;
+                }
+            } else {
+                // Handle non-Zod errors
+                message = readError(e) || 'Payload validation failed';
+            }
+
+            // Throw the formatted error message
             throw new Exception(1003, message);
         }
     }

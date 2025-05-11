@@ -1,6 +1,6 @@
-import { AccessOptions } from "~/common";
+import { AccessOptions } from '~/common';
 
-export const AccessPolicies: Record<string, AccessOptions> = {
+export const ACL: Record<string, AccessOptions> = {
     AdminOnly: {
         roles: ['admin'],
         matchAllRoles: true
