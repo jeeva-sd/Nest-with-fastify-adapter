@@ -50,7 +50,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             }
 
             // Log the exception for debugging
-            if (appConfig.server.mode === 'development') {
+            if (appConfig.server.allowExceptionLogs) {
                 this.logger.exception(exception);
             }
             // Send the formatted response

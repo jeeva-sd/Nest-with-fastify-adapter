@@ -9,7 +9,8 @@ const serverConfigSchema = z.object({
     port: z.number(),
     routePrefix: z.string(),
     version: z.string(),
-    mode: z.enum(['development', 'production'])
+    mode: z.enum(['development', 'production']),
+    allowExceptionLogs: z.boolean()
 });
 
 const payloadConfigSchema = z.object({

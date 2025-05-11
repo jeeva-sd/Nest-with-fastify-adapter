@@ -1,6 +1,7 @@
 {
     "server": {
-        "appPort": 5050,
-        "mode": "development"
+        "port": 5050,
+        "mode": "development",
+        "allowExceptionLogs": true
     }
 }

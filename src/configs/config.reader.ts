@@ -2,7 +2,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
-import { merge } from 'lodash';
 import { z } from 'zod';
 import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './config.schema';
@@ -26,7 +25,7 @@ export class ConfigReader {
             const envConfig = this.readConfigFile(envPath);
 
             // Merge the base and environment configurations
-            const mergedConfigs = merge(baseConfig, envConfig);
+            const mergedConfigs = this.mergeConfigs(baseConfig, envConfig);
 
             // Validate and initialize the configuration
             this.config = this.applyValidation(mergedConfigs);
@@ -55,6 +54,20 @@ export class ConfigReader {
             this.logger.error(`Error reading configuration file: ${filePath}`);
             throw error;
         }
+    }
+
+    private mergeConfigs(baseConfig: AppConfig, envConfig: Partial<AppConfig>): AppConfig {
+        for (const key of Object.keys(envConfig)) {
+            if (typeof envConfig[key] === 'object' && envConfig[key] !== null && !Array.isArray(envConfig[key])) {
+                if (!(key in baseConfig)) baseConfig[key] = {};
+                baseConfig[key] = this.mergeConfigs(baseConfig[key], envConfig[key]);
+            } else {
+                // Only override base value if property exists in envConfig
+                if (key in envConfig) baseConfig[key] = envConfig[key];
+            }
+        }
+
+        return baseConfig;
     }
 
     private applyValidation(mergedConfigs: AppConfig): AppConfig {
