@@ -1,7 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 import { appConfig } from '~/configs';
 import * as yup from 'yup';
-import { metadataCache } from '../guards/payload.guard'; // Import the WeakMap
+import { metadataCache } from '../guards/req-payload.guard'; // Import the WeakMap
 
 export const Sanitize = (schema: yup.ObjectSchema<any>) => {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {

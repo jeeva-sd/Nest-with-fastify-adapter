@@ -49,14 +49,14 @@ export class ResponseTransformInterceptor implements NestInterceptor {
     constructor(private reflector: Reflector) { }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const skipTransform = this.reflector.get<boolean>(
+        const skipResponseTransform = this.reflector.get<boolean>(
             appConfig.interceptors.response.skipFormatKey,
             context.getHandler()
         ) ||
             !appConfig.interceptors.response.format;
 
 
-        if (skipTransform) {
+        if (skipResponseTransform) {
             return next.handle();
         }
 
