@@ -19,4 +19,4 @@ export const ACL: Record<string, AccessOptions> = {
         matchAllRoles: true,
         matchAllPermissions: false
     }
-};
+} as const;
