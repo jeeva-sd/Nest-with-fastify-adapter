@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Render, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Render } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
-import { Access, JwtAuthGuard, RolesGuard, Sanitize, Store } from '~/common';
+import { Access, Sanitize, Store } from '~/common';
 import { ACL } from '~/configs';
+import { rabbitMQRoutes } from '~/services';
+import { EventsEmitter } from '~/services/rabbit-mq/producer';
 import { nameSchema } from './schema/demo.schema';
 
 @Controller('demo')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class DemoController {
-    constructor(private readonly cls: ClsService<Store>) {}
+    constructor(
+        private readonly cls: ClsService<Store>,
+        private readonly events: EventsEmitter
+    ) {}
 
     @Post('render')
     @Render('dummy.hbs')
@@ -21,7 +25,9 @@ export class DemoController {
 
     @Get('mq')
     async sendMessage() {
-        const _user = { userId: Date.now(), points: 10 };
+        const user = { userId: Date.now(), points: 10 };
+        const a = await this.events.emit(rabbitMQRoutes.general.userCreated.routingKey, { msg: user });
+        console.log(a, 'a');
         return 'response from sendMessage';
     }
 }

@@ -106,10 +106,13 @@ const rabbitMQSchema = z.object({
             })
         })
     }),
-    channelOne: z.object({
+    generalConnection: z.object({
         name: z.string().nonempty('Channel name is required'),
-        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1'),
-        default: z.boolean()
+        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1')
+    }),
+    connectionTwo: z.object({
+        name: z.string().nonempty('Channel name is required'),
+        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1')
     }),
     generalQueue: z.object({
         name: z.string().nonempty('Queue name is required'),

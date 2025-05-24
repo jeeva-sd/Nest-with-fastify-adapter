@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
 import { JwtAuthGuard, LocalAuthGuard, StrategyModule } from '~/common';
 import { AuthModule } from './modules/auth/auth.module';
+import { DemoModule } from './modules/demo/demo.module';
 import { RoleModule } from './modules/roles/roles.module';
+import { RabbitExampleModule } from './services/rabbit-mq/rabbitmq.module';
 
 @Module({
     imports: [
@@ -12,7 +14,9 @@ import { RoleModule } from './modules/roles/roles.module';
             global: true,
             middleware: { mount: true }
         }),
-        RoleModule
+        RoleModule,
+        RabbitExampleModule,
+        DemoModule
     ],
     controllers: [],
     providers: [LocalAuthGuard, JwtAuthGuard]

@@ -27,10 +27,13 @@
                 }
             }
         },
-        "channelOne": {
-            "name": "channel-1",
-            "prefetchCount": 15,
-            "default": true
+        "generalConnection": {
+            "name": "generalConnection",
+            "prefetchCount": 15
+        },
+        "connectionTwo": {
+            "name": "connection-2",
+            "prefetchCount": 1
         },
         "generalQueue": {
             "name": "jobs-qs-sp-dev-general",
