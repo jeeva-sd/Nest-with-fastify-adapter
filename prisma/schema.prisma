@@ -1,0 +1,103 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Users {
+    id             String   @id @default(cuid())
+    fname          String   @db.VarChar(50)
+    lname          String   @db.VarChar(50)
+    email          String   @unique @db.VarChar(255)
+    organizationId String
+    roleId         String?
+    bio            String?  @db.VarChar(300)
+    phone          String?  @db.VarChar(20)
+    status         Int?
+    country        String?  @db.VarChar(100)
+    timezone       String   @default("UTC-05:00") @db.VarChar(50)
+    profileImage   Boolean  @default(false)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    role               Roles?                @relation(fields: [roleId], references: [id], onDelete: SetNull)
+    departments        UserDepartments[]
+    userDepSupervisors UserDeptSupervisors[]
+
+    @@index([fname])
+    @@index([lname])
+    @@index([email])
+    @@index([organizationId])
+    @@index([roleId])
+    @@map("users")
+}
+
+model UserDepartments {
+    id           String  @id @default(cuid())
+    userId       String
+    departmentId Int
+    title        String? @db.VarChar(255)
+
+    user        Users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    supervisors UserDeptSupervisors[]
+
+    @@index([userId])
+    @@index([departmentId])
+    @@map("user_departments")
+}
+
+model UserDeptSupervisors {
+    id               String  @id @default(cuid())
+    userDepartmentId String
+    supervisorId     String?
+
+    userDepartment UserDepartments @relation(fields: [userDepartmentId], references: [id], onDelete: Cascade)
+    supervisor     Users?          @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
+
+    @@index([userDepartmentId])
+    @@index([supervisorId])
+    @@map("user_department_supervisors")
+}
+
+model Roles {
+    id          String   @id @default(cuid())
+    name        String   @unique @db.VarChar(100)
+    description String?  @db.VarChar(255)
+    isCustom    Boolean  @default(true)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    users           Users[]
+    rolePermissions RolePermissions[]
+
+    @@index([name])
+    @@map("roles")
+}
+
+model Permissions {
+    id          String   @id @default(cuid())
+    name        String   @unique @db.VarChar(100)
+    description String?  @db.VarChar(255)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    rolePermissions RolePermissions[]
+
+    @@index([name])
+    @@map("permissions")
+}
+
+model RolePermissions {
+    roleId       String
+    permissionId String
+    createdAt    DateTime @default(now())
+
+    role       Roles       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    permission Permissions @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+    @@id([roleId, permissionId])
+    @@map("role_permissions")
+}

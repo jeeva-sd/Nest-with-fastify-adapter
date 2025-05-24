@@ -9,8 +9,9 @@ const serverConfigSchema = z.object({
     port: z.number(),
     routePrefix: z.string(),
     version: z.string(),
-    mode: z.enum(['development', 'production']),
-    allowExceptionLogs: z.boolean()
+    mode: z.enum(['development', 'staging', 'production']),
+    allowExceptionLogs: z.boolean(),
+    commitHashKeyName: z.string()
 });
 
 const payloadConfigSchema = z.object({
@@ -77,20 +78,48 @@ export const compressionConfigSchema = z.object({
     })
 });
 
+// -------------------------------------------- Database --------------------------------------------
+
+const sqlRule = z.object({
+    host: z.string(),
+    port: z.number().min(1).max(65535),
+    username: z.string().min(1),
+    password: z.string().min(1),
+    database: z.string().min(1),
+    connectionLimit: z.number(),
+    allowSeed: z.boolean()
+});
+
+const databaseRule = z.object({ sql: sqlRule });
+
 // -------------------------------------------- RabbitMQ --------------------------------------------
 
-export const rabbitMQSchema = z.object({
-    general: z.object({
-        name: z.string(),
+const rabbitMQSchema = z.object({
+    uri: z.string().nonempty('RabbitMQ URI is required'),
+    exchange: z.object({
+        name: z.string().nonempty('Exchange name is required'),
+        type: z.string().nonempty('Exchange type is required'),
+        createExchangeIfNotExists: z.boolean(),
         options: z.object({
-            urls: z.array(z.string()).min(1),
-            queue: z.string(),
-            noAck: z.boolean(),
-            queueOptions: z.object({
-                durable: z.boolean()
+            arguments: z.object({
+                'x-delayed-type': z.string().nonempty('x-delayed-type is required')
             })
         })
-    })
+    }),
+    channelOne: z.object({
+        name: z.string().nonempty('Channel name is required'),
+        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1'),
+        default: z.boolean()
+    }),
+    generalQueue: z.object({
+        name: z.string().nonempty('Queue name is required'),
+        durable: z.boolean(),
+        createQueueIfNotExists: z.boolean()
+    }),
+    connectionInitOptions: z.object({
+        wait: z.boolean()
+    }),
+    enableControllerDiscovery: z.boolean()
 });
 
 // ----------------------------------------------------------------------------------------------------------
@@ -105,7 +134,8 @@ export const AppConfigRule = z.object({
     views: viewEngineSchema,
     multiPart: multipartConfigSchema,
     compression: compressionConfigSchema,
-    rabbitMq: rabbitMQSchema
+    rabbitMq: rabbitMQSchema,
+    database: databaseRule
 });
 
 // ------------------------------------------------------------------------------------------------------------------

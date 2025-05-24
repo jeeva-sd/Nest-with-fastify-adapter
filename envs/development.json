@@ -1,7 +1,45 @@
 {
     "server": {
-        "port": 5050,
+        "port": 5040,
         "mode": "development",
         "allowExceptionLogs": true
+    },
+    "database": {
+        "sql": {
+            "connectionLimit": 15,
+            "host": "localhost",
+            "port": 3306,
+            "username": "demoUser",
+            "password": "QwertyuI@123",
+            "database": "boilerPlate",
+            "allowSeed": false
+        }
+    },
+    "rabbitMq": {
+        "uri": "amqp://localhost/",
+        "exchange": {
+            "name": "ex_delay",
+            "type": "x-delayed-message",
+            "createExchangeIfNotExists": true,
+            "options": {
+                "arguments": {
+                    "x-delayed-type": "direct"
+                }
+            }
+        },
+        "channelOne": {
+            "name": "channel-1",
+            "prefetchCount": 15,
+            "default": true
+        },
+        "generalQueue": {
+            "name": "jobs-qs-sp-dev-general",
+            "durable": true,
+            "createQueueIfNotExists": false
+        },
+        "connectionInitOptions": {
+            "wait": false
+        },
+        "enableControllerDiscovery": false
     }
 }

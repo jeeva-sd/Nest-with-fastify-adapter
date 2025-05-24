@@ -15,7 +15,7 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
         minFileSize = 0.001, // 1 KB
         maxFileSize = 10,
         required = false,
-        fieldName = null
+        fieldName = null,
     } = overrides;
 
     const withFieldName = (message: string) => (fieldName ? `${fieldName}: ${message}` : message);
@@ -43,18 +43,25 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
     });
 
     // Define the array schema
-    const fileArraySchema = z
-        .array(fileSchema, {
-            invalid_type_error: withFieldName('Invalid file parameters'),
-        })
-        .superRefine((files, ctx) => {
-            if (required && files.length === 0) {
+    let fileArraySchema: any = z.array(fileSchema, {
+        invalid_type_error: withFieldName('Invalid file parameters'),
+    });
+
+    // Conditionally apply the `superRefine` logic only if `required` is true
+    if (required) {
+        fileArraySchema = fileArraySchema.superRefine((files, ctx) => {
+            if (files.length === 0) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: withFieldName('File attachment is required'),
                 });
             }
         });
+    } else {
+        // If not required, make the array optional
+        fileArraySchema = fileArraySchema.optional();
+    }
 
+    // Return the schema without casting to ZodArray
     return fileArraySchema;
 };

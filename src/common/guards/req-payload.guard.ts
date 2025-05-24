@@ -1,10 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { appConfig } from '~/configs';
 import * as z from 'zod';
-import { Exception } from '../filters';
 import { Helper, readError } from '../utils';
 
 // WeakMap to cache metadata for handlers
@@ -78,7 +77,7 @@ export class PayloadGuard implements CanActivate {
             }
 
             // Throw the formatted error message
-            throw new Exception(1003, message);
+            throw new BadRequestException(message);
         }
     }
 

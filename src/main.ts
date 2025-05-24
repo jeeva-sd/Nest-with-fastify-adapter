@@ -9,10 +9,16 @@ import fastifyMultipart from '@fastify/multipart';
 import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { MicroserviceOptions, RmqStatus, Transport } from '@nestjs/microservices';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import * as chalk from 'chalk';
-import { Chalk, HttpExceptionFilter, PayloadGuard, ResponseTransformInterceptor } from '~/common';
+import {
+    Chalk,
+    HttpExceptionFilter,
+    PayloadGuard,
+    ResponseTransformInterceptor,
+    appendCommitHash,
+    fileCleaner
+} from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
 
@@ -21,9 +27,16 @@ class App {
 
     // Create the NestJS app using the Fastify adapter
     async createApp() {
-        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({}), {
+        this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
             logger: new Chalk()
         });
+    }
+
+    // Set up Fastify hooks
+    setupHooks() {
+        const appInstance = this.app.getHttpAdapter().getInstance();
+        appInstance.addHook('onSend', async (_request, reply, payload) => appendCommitHash(_request, reply, payload)); // Hook to set a commit hash in header
+        appInstance.addHook('onResponse', async request => fileCleaner(request)); // Hook to clean up uploaded files after the response is sent
     }
 
     // Register Fastify plugins: cookies, multipart, CORS, Helmet, CSRF
@@ -80,20 +93,6 @@ class App {
         this.app.useGlobalInterceptors(new ResponseTransformInterceptor(reflector));
     }
 
-    // Register microservices (e.g. RabbitMQ)
-    async setUpMicroservices() {
-        const rmqServer = this.app.connectMicroservice<MicroserviceOptions>({
-            transport: Transport.RMQ,
-            options: appConfig.rabbitMq.general.options
-        });
-
-        await this.app.startAllMicroservices();
-
-        rmqServer.status.subscribe((status: RmqStatus) => {
-            Logger.log(`Rmq server status: ${status}`);
-        });
-    }
-
     // Start listening on the configured port
     async startServer() {
         const port = appConfig.server.port;
@@ -111,20 +110,20 @@ class App {
             engine: {
                 [appConfig.views.engine]: require(appConfig.views.engine)
             },
-            templates: join(__dirname, '..', appConfig.views.templatesDir)
+            templates: join(__dirname, '../..', appConfig.views.templatesDir)
         });
     }
 
     // Bootstrap sequence
     async bootstrap() {
         await this.createApp();
+        this.setupHooks();
         await this.setupPlugins();
         this.setupVersioning();
         this.setupGuards();
         this.setUpFilters();
         this.setUpInterceptor();
         this.setupViewEngine();
-        await this.setUpMicroservices();
         await this.enableShutdownHooks();
         await this.startServer();
     }

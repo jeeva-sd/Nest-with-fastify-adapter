@@ -1,7 +1,7 @@
 {
     "server": {
-        "port": 1314,
-        "mode": "development"
+        "port": 3030,
+        "mode": "production"
     },
     "auth": {
         "encryptionKey": "cm4ybfhbd00000cmkbov75r84",

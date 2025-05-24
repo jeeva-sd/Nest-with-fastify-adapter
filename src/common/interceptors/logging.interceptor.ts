@@ -124,8 +124,9 @@ export class Chalk implements LoggerService {
         process.exit(1);
     }
 
-    exception(error: any) {
+    exception(error: any, traceId?: string | undefined) {
         const trace = error instanceof Error ? error.stack : undefined;
+        console.error('👇 traceId ', traceId, '👇');
         console.error(
             this.formatMessage('EXCEPTION:', normalizeError(error), colors.red),
             trace ? colors.red(`\nStack Trace: ${trace}`) : ''

@@ -7,7 +7,7 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "ignore": ["dist", "common"]
+        "ignore": ["dist", "common", "scripts"]
     },
     "formatter": {
         "enabled": true,
@@ -51,7 +51,7 @@
             "quoteStyle": "single",
             "semicolons": "always",
             "trailingCommas": "none",
-            "arrowParentheses": "always",
+            "arrowParentheses": "asNeeded",
             "bracketSameLine": false
         }
     },

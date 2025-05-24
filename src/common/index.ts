@@ -7,5 +7,6 @@ export * from './filters';
 export * from '../constants';
 export * from './strategies';
 export * from './pipes';
-export * from './rabbit-mq';
-export * from './store';
+export * from '../store';
+export * from './hooks';
+export * from './http-agent';

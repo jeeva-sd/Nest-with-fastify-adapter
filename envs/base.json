@@ -1,6 +1,6 @@
 {
     "server": {
-        "port": 5051,
+        "port": 3010,
         "version": "1",
         "routePrefix": "api",
         "logger": false,
@@ -8,7 +8,8 @@
         "caseSensitive": false,
         "ignoreTrailingSlash": true,
         "ignoreDuplicateSlashes": true,
-        "allowExceptionLogs": false
+        "allowExceptionLogs": false,
+        "commitHashKeyName": "X-MA-VERSION"
     },
     "auth": {
         "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
@@ -61,19 +62,6 @@
         "brotliOptions": {
             "params": {
                 "BROTLI_PARAM_QUALITY": 4
-            }
-        }
-    },
-    "rabbitMq": {
-        "general": {
-            "name": "GENERAL_MQ",
-            "options": {
-                "urls": ["amqp://localhost"],
-                "queue": "localTestQueue",
-                "noAck": false,
-                "queueOptions": {
-                    "durable": true
-                }
             }
         }
     }

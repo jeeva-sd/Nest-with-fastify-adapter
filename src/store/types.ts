@@ -1,5 +1,5 @@
-import { ClsStore } from "nestjs-cls";
-import { TokenUser } from "../types";
+import { ClsStore } from 'nestjs-cls';
+import { TokenUser } from '../common/types';
 
 export interface Store extends ClsStore {
     tenantId: string;

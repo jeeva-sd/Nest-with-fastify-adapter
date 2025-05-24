@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
-import { appConfig } from '~/configs';
 import { badMessage } from '~/constants/events';
 import { z, ZodSchema } from 'zod';
 

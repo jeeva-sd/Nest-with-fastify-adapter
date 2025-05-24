@@ -76,7 +76,7 @@ export class ObjectUtils {
      * Omits specific keys from an object and returns a new object without those keys.
      */
     static omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
-        const result: Partial<T> = { ...obj };
+        const result: Partial<T> = JSON.parse(JSON.stringify(obj));
         keys.forEach((key) => {
             delete result[key];
         });

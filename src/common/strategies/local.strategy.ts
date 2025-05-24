@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
-import { Exception } from '../filters';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -13,7 +12,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         // Check headers
         const authHeader = request.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Basic ')) {
-            throw new Exception(401);
+            throw new UnauthorizedException(401);
         }
 
         // Validate credentials
@@ -22,12 +21,12 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         const [username, password] = credentials.split(':');
 
         if (!username || !password) {
-            throw new Exception(401);
+            throw new UnauthorizedException(401);
         }
 
         return true;
     }
     catch() {
-        throw new Exception(401);
+        throw new UnauthorizedException(401);
     }
 }

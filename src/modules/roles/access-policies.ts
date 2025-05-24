@@ -1,22 +1,17 @@
 import { AccessOptions } from '~/common';
+import { permissions } from '~/configs';
 
-export const ACL: Record<string, AccessOptions> = {
-    AdminOnly: {
-        roles: ['admin'],
-        matchAllRoles: true
-    },
-    ManagerOrAdmin: {
-        roles: ['admin', 'manager'],
-        matchAllRoles: false
-    },
-    UserWithPermissionToEdit: {
-        permissions: ['edit:profile'],
+export const ACL = {
+    superAdminOnly: {
+        permissions: [permissions.SWITCH_ORGS.name, permissions.MANAGE_USERS.name],
         matchAllPermissions: true
     },
-    FullAccess: {
-        roles: ['admin'],
-        permissions: ['*'],
-        matchAllRoles: true,
-        matchAllPermissions: false
+    switchOrgs: {
+        permissions: [permissions.SWITCH_ORGS.name],
+        matchAllPermissions: true
+    },
+    manageUsers: {
+        permissions: [permissions.MANAGE_USERS.name],
+        matchAllPermissions: true
     }
-} as const;
+} as const satisfies Record<string, AccessOptions>;

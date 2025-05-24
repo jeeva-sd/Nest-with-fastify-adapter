@@ -1,22 +1,26 @@
 {
-    "name": "nest-fastify",
+    "name": "success-planning-server",
     "version": "3.0.0",
     "description": "",
-    "author": "github.com/jeeva-sd",
+    "author": "",
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
+        "cleanCommitHash": "rimraf src/constants/commit-hash.ts",
+        "prebuild": "ts-node scripts/write-commit-hash.ts",
         "build": "nest build",
         "debug": "nest start --debug --watch",
+        "predev": "rimraf node_modules/.prisma && npx prisma generate",
         "dev": "cross-env NODE_ENV=development nest start --watch",
+        "preStaging": "rimraf node_modules/.prisma && npx prisma generate",
+        "staging": "cross-env NODE_ENV=staging nest start",
         "prod": "cross-env NODE_ENV=production node dist/main",
         "format": "biome check --write --no-errors-on-unmatched",
         "deepFormat": "biome check --write --unsafe --no-errors-on-unmatched",
-        "test": "jest",
-        "test:watch": "jest --watch",
-        "test:cov": "jest --coverage",
-        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "db:generate": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register scripts/run-prisma.ts generate && ts-node -r tsconfig-paths/register scripts/run-prisma.ts migrate dev --create-only",
+        "db:update": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts migrate dev",
+        "db:push": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts db push",
+        "db:pushToStaging": "cross-env NODE_ENV=staging ts-node scripts/run-prisma.ts db push"
     },
     "dependencies": {
         "@fastify/compress": "^8.0.1",
@@ -33,6 +37,7 @@
         "@nestjs/microservices": "^11.0.11",
         "@nestjs/passport": "^11.0.5",
         "@nestjs/platform-fastify": "^11.0.11",
+        "@prisma/client": "^6.8.2",
         "amqp-connection-manager": "^4.1.14",
         "amqplib": "^0.10.5",
         "axios": "^1.8.1",
@@ -50,8 +55,9 @@
         "rimraf": "^6.0.1",
         "rxjs": "^7.8.2",
         "ts-loader": "^9.5.2",
+        "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
-        "zod": "^3.24.4"
+        "zod": "^3.25.20"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
@@ -62,10 +68,10 @@
         "@types/node": "^22.13.8",
         "@types/supertest": "^6.0.2",
         "jest": "^29.7.0",
+        "prisma": "^6.8.2",
         "source-map-support": "^0.5.21",
         "supertest": "^7.0.0",
         "ts-jest": "^29.2.6",
-        "ts-node": "^10.9.2",
         "typescript": "^5.8.2"
     },
     "jest": {
