@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
 import { z } from 'zod';
 import { readError } from '~/common';
-import { AppConfig, AppConfigRule } from './config.schema';
+import { AppConfig, AppConfigRule } from './environment.schema';
 
 export class ConfigReader {
     private static instance: ConfigReader;

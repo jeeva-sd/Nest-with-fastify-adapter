@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Render, UseGuards } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { Access, JwtAuthGuard, RolesGuard, Sanitize, Store } from '~/common';
-import { ACL } from '../roles';
+import { ACL } from '~/configs';
 import { nameSchema } from './schema/demo.schema';
 
 @Controller('demo')

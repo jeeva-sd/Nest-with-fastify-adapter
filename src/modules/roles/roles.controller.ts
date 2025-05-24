@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Patch, Post, Req } from '@nestjs/common';
 import { Access, RequestX, Sanitize } from '~/common';
-import { ACL } from './access-policies';
+import { ACL } from '~/configs';
 import { RoleService } from './roles.service';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
 

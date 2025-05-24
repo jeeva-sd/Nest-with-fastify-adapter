@@ -1,2 +1,2 @@
-export * from './fileClean.hook';
-export * from './commitHash.hook';
+export * from './file-clean.hook';
+export * from './commit-hash.hook';
