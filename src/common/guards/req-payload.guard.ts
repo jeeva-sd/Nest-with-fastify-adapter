@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { z, ZodSchema } from 'zod/v4';
+import { z, ZodType } from 'zod/v4';
 import { appConfig } from '~/configs';
 import { Helper, readError } from '../utils';
 
@@ -31,7 +31,7 @@ interface FileDetail {
 }
 
 // WeakMap to cache metadata for handlers
-export const metadataCache = new WeakMap<object, ZodSchema<unknown>>();
+export const metadataCache = new WeakMap<object, ZodType<unknown>>();
 
 export class PayloadGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
@@ -45,11 +45,11 @@ export class PayloadGuard implements CanActivate {
             const handler = context.getHandler();
 
             // Attempt to retrieve schema from WeakMap
-            let schema: ZodSchema<unknown> = metadataCache.get(handler);
+            let schema: ZodType<unknown> = metadataCache.get(handler);
 
             // Fallback to Reflector if schema is not in WeakMap
             if (!schema) {
-                schema = this.reflector.get<z.ZodSchema>(appConfig.payloadValidation.decoratorKey, handler);
+                schema = this.reflector.get<ZodType<unknown>>(appConfig.payloadValidation.decoratorKey, handler);
 
                 // Cache the schema in WeakMap for future use
                 if (schema) {
@@ -71,7 +71,7 @@ export class PayloadGuard implements CanActivate {
             }
 
             // Validate the payload using the schema
-            const validatedPayload = await schema.parseAsync(params); // Use `parseAsync` for async validation
+            const validatedPayload = schema.parse(params);
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
 

@@ -1,11 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
-import { ZodSchema } from 'zod/v4';
+import { ZodType } from 'zod/v4';
 import { badMessage } from '~/constants/events';
 
 const logger = new Logger('RabbitMQDecorator');
 
-export function AckHandler(schema?: ZodSchema<unknown>) {
+export function AckHandler(schema?: ZodType<unknown>) {
     return (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
         const originalMethod = descriptor.value;
 
