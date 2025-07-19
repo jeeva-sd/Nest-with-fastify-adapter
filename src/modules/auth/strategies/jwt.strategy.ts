@@ -2,23 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ClsService } from 'nestjs-cls';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { RequestX } from '~/common';
 import { appConfig } from '~/configs';
-import { Store } from '../../store';
-import { RequestX } from '../types';
+import { Store } from '~/store';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly cls: ClsService<Store>) {
         super({
-            jwtFromRequest: req => {
-                // Try extracting the token from the Authorization header as Bearer token
-                let token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-
-                // If no token found in the header, try extracting it from query params
-                if (!token && req?.query?.xAccessToken) {
-                    token = req.query.xAccessToken;
-                }
-
+            jwtFromRequest: (req: RequestX) => {
+                const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
                 return token;
             },
             secretOrKey: appConfig.auth.basicJWT.secret,
@@ -30,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     async validate(_req: RequestX, user) {
         // Store requested user info in global store
         this.cls.set('reqUser', user);
-
         return user; // Return the validated user data
     }
 }

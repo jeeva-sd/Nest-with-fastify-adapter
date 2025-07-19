@@ -7,13 +7,6 @@ export const generalEvents = {
     ecoApps: {
         departmentSync: 'ecoApps.department.sync'
     },
-    leaveRequest: {
-        init: 'leaveRequest.init',
-        statusChanged: 'leaveRequest.statusChanged'
-    },
-    leaveBalance: {
-        updated: 'leaveBalance.updated'
-    }
 } as const;
 
 export const singleConsumerEvents = {
