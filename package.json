@@ -6,19 +6,17 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
-        "cleanCommitHash": "rimraf src/constants/commit-hash.ts",
-        "prebuild": "ts-node scripts/write-commit-hash.ts",
         "build": "nest build",
         "debug": "nest start --debug --watch",
-        "predev": "rimraf node_modules/.prisma && npx prisma generate",
+        "predev": "npx prisma generate",
         "dev": "cross-env NODE_ENV=development nest start --watch",
         "prod": "cross-env NODE_ENV=production node dist/main",
         "format": "biome check --write --no-errors-on-unmatched",
         "deepFormat": "biome check --write --unsafe --no-errors-on-unmatched",
-        "db:generate": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register scripts/run-prisma.ts generate && ts-node -r tsconfig-paths/register scripts/run-prisma.ts migrate dev --create-only",
+        "db:generate": "npx prisma generate && cross-env NODE_ENV=development ts-node scripts/run-prisma.ts migrate dev --create-only",
         "db:update": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts migrate dev",
         "db:push": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts db push",
-        "db:pushToStaging": "cross-env NODE_ENV=staging ts-node scripts/run-prisma.ts db push"
+        "db:pushToProd": "cross-env NODE_ENV=production ts-node scripts/run-prisma.ts db push"
     },
     "dependencies": {
         "@fastify/compress": "^8.0.1",
