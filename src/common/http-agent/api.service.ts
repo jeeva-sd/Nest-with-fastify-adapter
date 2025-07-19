@@ -1,68 +1,71 @@
-import axios, { AxiosInstance, AxiosRequestConfig, Method } from 'axios';
+import axios, { AxiosInstance, Method } from 'axios';
 
 export class ApiService {
     private axiosInstance: AxiosInstance;
 
-    constructor(baseURL: string, defaultAuth: string | null = null, headers?: any) {
+    constructor(baseURL: string, defaultAuth: string | null = null, headers?: Record<string, string | boolean>) {
         this.axiosInstance = axios.create({
             baseURL,
-            headers: {}
+            headers: {
+                'Content-Type': 'application/json',
+                ...(defaultAuth && { Authorization: defaultAuth }),
+                ...headers
+            }
         });
-
-        if (defaultAuth) this.setAuth(defaultAuth);
-        if (headers) this.setHeaders(headers);
     }
 
-    setAuth(auth: string): void {
-        this.axiosInstance.defaults.headers.common['Authorization'] = auth;
+    // Method to set authorization header
+    setAuth(token: string): void {
+        this.axiosInstance.defaults.headers.common['Authorization'] = token;
     }
 
+    // Method to remove authorization header
     removeAuth(): void {
         this.axiosInstance.defaults.headers.common['Authorization'] = undefined;
     }
 
     // Method to set or update headers dynamically
     setHeaders(headers: Record<string, string | boolean>): void {
-        Object.entries(headers).forEach(([key, value]) => {
+        for (const [key, value] of Object.entries(headers)) {
             this.axiosInstance.defaults.headers.common[key] = value;
-        });
+        }
     }
 
-    request(
+    // Generic request method
+    private async request(
         method: Method,
         url: string,
-        data: any = {},
-        params: Record<string, any> = {},
+        data: unknown = {},
+        params: Record<string, unknown> = {},
         customHeaders: Record<string, string | boolean> = {}
     ) {
-        const isAbsoluteURL = /^(?:[a-z]+:)?\/\//i.test(url);
-        const config: AxiosRequestConfig = {
+        const response = await this.axiosInstance({
             method,
-            url: isAbsoluteURL ? url : this.axiosInstance.defaults.baseURL + url,
+            url,
             data,
             params,
-            headers: { ...this.axiosInstance.defaults.headers.common, ...customHeaders }
-        };
-        return this.axiosInstance.request(config).then(response => response.data);
+            headers: customHeaders
+        });
+        return response.data;
     }
 
-    get(url: string, params: Record<string, any> = {}, customHeaders: Record<string, string | boolean> = {}) {
+    get(url: string, params: Record<string, unknown> = {}, customHeaders: Record<string, string | boolean> = {}) {
         return this.request('GET', url, {}, params, customHeaders);
     }
 
-    post(url: string, data: any = {}, customHeaders: Record<string, string | boolean> = {}) {
+    post(url: string, data: unknown = {}, customHeaders: Record<string, string | boolean> = {}) {
         return this.request('POST', url, data, {}, customHeaders);
     }
 
-    put(url: string, data: any = {}, customHeaders: Record<string, string | boolean> = {}) {
+    put(url: string, data: unknown = {}, customHeaders: Record<string, string | boolean> = {}) {
         return this.request('PUT', url, data, {}, customHeaders);
     }
 
-    patch(url: string, data: any = {}, customHeaders: Record<string, string | boolean> = {}) {
+    patch(url: string, data: unknown = {}, customHeaders: Record<string, string | boolean> = {}) {
         return this.request('PATCH', url, data, {}, customHeaders);
     }
 
-    delete(url: string, params: Record<string, any> = {}, customHeaders: Record<string, string | boolean> = {}) {
+    delete(url: string, params: Record<string, unknown> = {}, customHeaders: Record<string, string | boolean> = {}) {
         return this.request('DELETE', url, {}, params, customHeaders);
     }
 }

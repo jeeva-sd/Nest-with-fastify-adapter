@@ -24,14 +24,13 @@ const colors = {
     black: chalk.black
 };
 
-function normalizeError(error: any): string {
+function normalizeError(error: unknown): string {
     if (error instanceof Error) return error.message;
     if (typeof error === 'string') return error;
-    try {
-        return JSON.stringify(error, null, 2);
-    } catch {
-        return String(error);
+    if (error && typeof error === 'object') {
+        return JSON.stringify(error);
     }
+    return 'Unknown error';
 }
 
 export class Chalk implements LoggerService {
@@ -52,20 +51,20 @@ export class Chalk implements LoggerService {
 
         const options: Intl.DateTimeFormatOptions = isDev
             ? {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            }
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true
+              }
             : {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            };
+                  month: '2-digit',
+                  day: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true
+              };
 
         return isDev ? now.toLocaleTimeString('en-US', options) : now.toLocaleString('en-US', options);
     }
@@ -123,12 +122,10 @@ export class Chalk implements LoggerService {
         process.exit(1);
     }
 
-    exception(error: any, traceId?: string | undefined) {
+    exception(error: unknown, traceId?: string | undefined) {
         const trace = error instanceof Error ? error.stack : undefined;
         console.error('👇 traceId ', traceId, '👇');
-        console.error(
-            this.formatMessage('EXCEPTION:', normalizeError(error), colors.red),
-            trace ? colors.red(`\nStack Trace: ${trace}`) : ''
-        );
+        console.error('EXCEPTION STACK TRACE:\n', trace);
+        console.error('👆 traceId ', traceId, '👆');
     }
 }

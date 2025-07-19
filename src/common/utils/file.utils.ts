@@ -43,7 +43,7 @@ export class FileUtils {
      * Defaults to KB and 2 decimal places.
      */
     static convertBytes(bytes: number, unit: 'B' | 'KB' | 'MB' | 'GB' = 'KB', decimals = 2) {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0) return 0;
 
         const units = {
             B: 1,

@@ -1,9 +1,9 @@
 import { SetMetadata } from '@nestjs/common';
-import * as z from 'zod/v4';
 import { appConfig } from '~/configs';
-import { metadataCache } from '../guards/req-payload.guard'; // Import the WeakMap
+import { metadataCache } from '../guards/req-payload.guard'; // WeakMap
+import { ZodSchema } from 'zod/v4';
 
-export const Sanitize = (schema: z.ZodTypeAny) => {
+export const Sanitize = (schema: ZodSchema<unknown>) => {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         // Register the schema in the WeakMap using the handler function as the key
         metadataCache.set(descriptor.value, schema);

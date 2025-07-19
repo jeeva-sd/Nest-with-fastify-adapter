@@ -2,12 +2,36 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { z } from 'zod/v4';
+import { z, ZodSchema } from 'zod/v4';
 import { appConfig } from '~/configs';
 import { Helper, readError } from '../utils';
 
+// Define types for multipart parts
+interface MultipartFile {
+    file: AsyncIterable<Buffer>;
+    filename: string;
+    mimetype: string;
+    fieldname: string;
+}
+
+interface MultipartField {
+    fieldname: string;
+    value: string;
+}
+
+type MultipartPart = MultipartFile | MultipartField;
+
+interface FileDetail {
+    mimetype: string;
+    filePath: string;
+    fileSize: number;
+    fileName: string;
+    fieldname: string;
+    buffer: Buffer;
+}
+
 // WeakMap to cache metadata for handlers
-export const metadataCache = new WeakMap<Function, z.ZodTypeAny>();
+export const metadataCache = new WeakMap<object, ZodSchema<unknown>>();
 
 export class PayloadGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
@@ -15,13 +39,13 @@ export class PayloadGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
         const uploadedFiles: string[] = [];
-        let params = {};
+        let params: Record<string, unknown> = {};
 
         try {
             const handler = context.getHandler();
 
             // Attempt to retrieve schema from WeakMap
-            let schema: z.ZodTypeAny = metadataCache.get(handler);
+            let schema: ZodSchema<unknown> = metadataCache.get(handler);
 
             // Fallback to Reflector if schema is not in WeakMap
             if (!schema) {
@@ -61,11 +85,11 @@ export class PayloadGuard implements CanActivate {
             if (e instanceof z.ZodError) {
                 // Show only the first error message (field and message)
                 const issue = e.issues[0];
-                const path = issue && issue.path && issue.path.length > 0 ? issue.path.join('.') : 'unknown';
+                const path = issue?.path && issue.path.length > 0 ? issue.path.join('.') : 'unknown';
                 message = issue
-                    ? (issue.code === 'custom'
+                    ? issue.code === 'custom'
                         ? issue.message
-                        : `${issue.message} at ${path}`)
+                        : `${issue.message} at ${path}`
                     : 'Payload validation failed';
             } else {
                 // Handle non-Zod errors
@@ -78,12 +102,16 @@ export class PayloadGuard implements CanActivate {
     }
 
     // Process multipart data and return file details
-    private async processMultipart(parts: AsyncIterableIterator<any>, uploadedFiles: string[]) {
-        const fileWritePromises = [];
-        const fileDetails = {};
+    private async processMultipart(
+        parts: AsyncIterableIterator<MultipartPart>,
+        uploadedFiles: string[]
+    ): Promise<Record<string, unknown>> {
+        const fileWritePromises: Promise<void>[] = [];
+        const fileDetails: Record<string, unknown> = {};
 
         for await (const part of parts) {
-            if (part.file) {
+            if ('file' in part) {
+                // Handle file upload
                 const chunks: Buffer[] = [];
                 for await (const chunk of part.file) {
                     chunks.push(chunk);
@@ -101,7 +129,7 @@ export class PayloadGuard implements CanActivate {
                     fs.promises.writeFile(filePath, buffer).then(async () => {
                         const { size: fileBytes } = await fs.promises.stat(filePath);
                         const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
-                        const fileDetail = {
+                        const fileDetail: FileDetail = {
                             mimetype: part.mimetype,
                             filePath,
                             fileSize: fileSizeInMB,
@@ -114,7 +142,7 @@ export class PayloadGuard implements CanActivate {
                         if (!fileDetails[part.fieldname]) {
                             fileDetails[part.fieldname] = [];
                         }
-                        fileDetails[part.fieldname].push(fileDetail);
+                        (fileDetails[part.fieldname] as FileDetail[]).push(fileDetail);
 
                         uploadedFiles.push(filePath);
                     })

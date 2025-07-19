@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { appConfig } from '~/configs';
-import { JwtAuthGuard, LocalAuthGuard } from '../guards';
 import { JwtStrategy } from './jwt.strategy';
-import { LocalStrategy } from './local.strategy';
 
 @Module({
     imports: [],

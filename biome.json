@@ -25,7 +25,9 @@
             "complexity": {
                 "useLiteralKeys": "off",
                 "noUselessConstructor": "off",
-                "noExtraBooleanCast": "warn"
+                "noExtraBooleanCast": "warn",
+                "noStaticOnlyClass": "off",
+                "noForEach": "off"
             },
             "style": {
                 "useImportType": "off",
@@ -35,11 +37,13 @@
             "correctness": {
                 "noUnusedVariables": "warn",
                 "noUnsafeFinally": "warn",
-                "noUnusedImports": "warn"
+                "noUnusedImports": "warn",
+                "noUnsafeOptionalChaining": "warn"
             },
             "suspicious": {
                 "noAsyncPromiseExecutor": "warn",
-                "noDebugger": "warn"
+                "noDebugger": "warn",
+                "noExplicitAny": "warn"
             }
         }
     },

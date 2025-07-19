@@ -32,15 +32,19 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
         fileSize: z
             .number()
             .min(minFileSize, {
-                message: withFieldName(`The file size must be at least ${minFileSize} MB (${Math.round(minFileSize * oneKb)} KB).`)
+                message: withFieldName(
+                    `The file size must be at least ${minFileSize} MB (${Math.round(minFileSize * oneKb)} KB).`
+                )
             })
             .max(maxFileSize, {
-                message: withFieldName(`The file size must be less than ${maxFileSize} MB (${Math.round(maxFileSize * oneKb)} KB).`)
+                message: withFieldName(
+                    `The file size must be less than ${maxFileSize} MB (${Math.round(maxFileSize * oneKb)} KB).`
+                )
             })
             .refine(value => !Number.isNaN(value), {
                 message: withFieldName('The file size is invalid.')
             }),
-        ...(includeBuffer ? { buffer: z.instanceof(Buffer) } : {})            // Include buffer if requested
+        ...(includeBuffer ? { buffer: z.instanceof(Buffer) } : {}) // Include buffer if requested
     });
 
     // Define the array schema dynamically based on the `required` flag
