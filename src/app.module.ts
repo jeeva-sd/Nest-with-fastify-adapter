@@ -1,24 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
-import { JwtAuthGuard, LocalAuthGuard, StrategyModule } from '~/common';
+import { StrategyModule } from '~/common';
 import { AuthModule } from './modules/auth/auth.module';
-import { DemoModule } from './modules/demo/demo.module';
+import { EventsModule } from './modules/events/events.module';
 import { RoleModule } from './modules/roles/roles.module';
-import { RabbitExampleModule } from './services/rabbit-mq/rabbitmq.module';
+import { MessagesModule } from './services';
 
 @Module({
     imports: [
         AuthModule,
         StrategyModule,
+        RoleModule,
+        MessagesModule,
+        EventsModule,
         ClsModule.forRoot({
             global: true,
             middleware: { mount: true }
-        }),
-        RoleModule,
-        RabbitExampleModule,
-        DemoModule
+        })
     ],
     controllers: [],
-    providers: [LocalAuthGuard, JwtAuthGuard]
+    providers: []
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, Method } from 'axios';
 
-class ApiService {
+export class ApiService {
     private axiosInstance: AxiosInstance;
 
     constructor(baseURL: string, defaultAuth: string | null = null, headers?: any) {
@@ -18,7 +18,7 @@ class ApiService {
     }
 
     removeAuth(): void {
-        delete this.axiosInstance.defaults.headers.common['Authorization'];
+        this.axiosInstance.defaults.headers.common['Authorization'] = undefined;
     }
 
     // Method to set or update headers dynamically
@@ -66,8 +66,6 @@ class ApiService {
         return this.request('DELETE', url, {}, params, customHeaders);
     }
 }
-
-export { ApiService };
 
 // ---------------------------------------------------------------- EXAMPLES ---------------------------------------------------------------
 

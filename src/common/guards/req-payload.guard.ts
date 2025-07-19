@@ -1,16 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { z } from 'zod/v4';
 import { appConfig } from '~/configs';
-import * as z from 'zod';
 import { Helper, readError } from '../utils';
 
 // WeakMap to cache metadata for handlers
 export const metadataCache = new WeakMap<Function, z.ZodTypeAny>();
 
 export class PayloadGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) { }
+    constructor(private readonly reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -25,10 +25,7 @@ export class PayloadGuard implements CanActivate {
 
             // Fallback to Reflector if schema is not in WeakMap
             if (!schema) {
-                schema = this.reflector.get<z.ZodSchema>(
-                    appConfig.payloadValidation.decoratorKey,
-                    handler
-                );
+                schema = this.reflector.get<z.ZodSchema>(appConfig.payloadValidation.decoratorKey, handler);
 
                 // Cache the schema in WeakMap for future use
                 if (schema) {
@@ -40,7 +37,7 @@ export class PayloadGuard implements CanActivate {
             if (!schema) return true;
 
             // Merge request body, params, and query into a single object
-            params = { ...request.body, ...request.params, ...request.query };
+            params = { ...request.params, ...request.query, ...request.body };
 
             // Handle multipart data if applicable
             if (request.isMultipart()) {
@@ -50,7 +47,7 @@ export class PayloadGuard implements CanActivate {
             }
 
             // Validate the payload using the schema
-            const validatedPayload = await schema.parse(params);
+            const validatedPayload = await schema.parseAsync(params); // Use `parseAsync` for async validation
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
 
@@ -62,15 +59,14 @@ export class PayloadGuard implements CanActivate {
             let message: string;
 
             if (e instanceof z.ZodError) {
-                // Format Zod validation errors (only the first error will be present)
-                const firstError: any = e.errors[0];
-                if (firstError.inclusive) {
-                    message = firstError.message;
-                }
-                else {
-                    const path = firstError.path.length ? firstError.path.join('.') : '[root]';
-                    message = `Field '${path}' ${firstError.message}`;
-                }
+                // Show only the first error message (field and message)
+                const issue = e.issues[0];
+                const path = issue && issue.path && issue.path.length > 0 ? issue.path.join('.') : 'unknown';
+                message = issue
+                    ? (issue.code === 'custom'
+                        ? issue.message
+                        : `${issue.message} at ${path}`)
+                    : 'Payload validation failed';
             } else {
                 // Handle non-Zod errors
                 message = readError(e) || 'Payload validation failed';
@@ -88,6 +84,12 @@ export class PayloadGuard implements CanActivate {
 
         for await (const part of parts) {
             if (part.file) {
+                const chunks: Buffer[] = [];
+                for await (const chunk of part.file) {
+                    chunks.push(chunk);
+                }
+                const buffer = Buffer.concat(chunks);
+
                 const uploadDir = path.resolve('uploads');
                 await fs.promises.mkdir(uploadDir, { recursive: true });
 
@@ -96,7 +98,7 @@ export class PayloadGuard implements CanActivate {
 
                 // Write file and store its details
                 fileWritePromises.push(
-                    fs.promises.writeFile(filePath, part.file).then(async () => {
+                    fs.promises.writeFile(filePath, buffer).then(async () => {
                         const { size: fileBytes } = await fs.promises.stat(filePath);
                         const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
                         const fileDetail = {
@@ -105,6 +107,7 @@ export class PayloadGuard implements CanActivate {
                             fileSize: fileSizeInMB,
                             fileName,
                             fieldname: part.fieldname,
+                            buffer
                         };
 
                         // Add file details to the corresponding field
@@ -130,7 +133,7 @@ export class PayloadGuard implements CanActivate {
     // Cleanup files concurrently using Promise.all
     private async cleanupFiles(uploadedFiles: string[]) {
         await Promise.all(
-            uploadedFiles.map((filePath) =>
+            uploadedFiles.map(filePath =>
                 fs.promises.unlink(filePath).catch(() => {
                     // Ignore errors during cleanup
                 })

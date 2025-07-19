@@ -10,7 +10,7 @@ export class RoleService {
     async getRoleById(dto: ViewRoleDto) {
         const { roleId, includePermissions = false } = dto;
 
-        const role = await this.prisma.roles.findUnique({
+        const role = await this.prisma.role.findUnique({
             where: { id: roleId },
             include: includePermissions ? { rolePermissions: { include: { permission: true } } } : undefined
         });
@@ -23,7 +23,6 @@ export class RoleService {
             id: role.id,
             name: role.name,
             description: role.description,
-            isCustom: role.isCustom,
             permissions: includePermissions ? role.rolePermissions.map(rp => rp.permission.name) : undefined
         };
     }
@@ -31,24 +30,23 @@ export class RoleService {
     async listRoles(dto: ListRolesDto) {
         const { searchTerm, sortBy, sortOrder, page, limit, includePermissions = false } = dto;
 
-        const where: Prisma.RolesWhereInput = searchTerm ? { name: { contains: searchTerm } } : {};
+        const where: Prisma.RoleWhereInput = searchTerm ? { name: { contains: searchTerm } } : {};
 
         const [items, total] = await Promise.all([
-            this.prisma.roles.findMany({
+            this.prisma.role.findMany({
                 where,
                 take: limit,
                 skip: (page - 1) * limit,
                 orderBy: { [sortBy]: sortOrder },
                 include: includePermissions ? { rolePermissions: { include: { permission: true } } } : undefined
             }),
-            this.prisma.roles.count({ where })
+            this.prisma.role.count({ where })
         ]);
 
         const roles = items.map(role => ({
             id: role.id,
             name: role.name,
             description: role.description,
-            isCustom: role.isCustom,
             permissions: includePermissions ? role.rolePermissions.map(e => e.permission.name) : undefined
         }));
 
@@ -59,19 +57,19 @@ export class RoleService {
         const { name, description, permissions: permissionNames } = dto;
 
         // Check for duplicate role name
-        const existingRole = await this.prisma.roles.findFirst({ where: { name } });
+        const existingRole = await this.prisma.role.findFirst({ where: { name } });
         if (existingRole) {
             throw new BadRequestException('Role with this name already exists');
         }
 
         // Create the role
-        const newRole = await this.prisma.roles.create({
-            data: { name, description, isCustom: true }
+        const newRole = await this.prisma.role.create({
+            data: { name, description }
         });
 
         // Attach permissions by name (lookup IDs)
         if (permissionNames.length > 0) {
-            const permissions = await this.prisma.permissions.findMany({
+            const permissions = await this.prisma.permission.findMany({
                 where: { name: { in: permissionNames } }
             });
 
@@ -79,7 +77,7 @@ export class RoleService {
                 throw new BadRequestException('One or more permissions are invalid');
             }
 
-            await this.prisma.rolePermissions.createMany({
+            await this.prisma.rolePermission.createMany({
                 data: permissions.map(perm => ({
                     roleId: newRole.id,
                     permissionId: perm.id
@@ -91,7 +89,6 @@ export class RoleService {
             id: newRole.id,
             name: newRole.name,
             description: newRole.description,
-            isCustom: newRole.isCustom,
             permissions: permissionNames
         };
     }
@@ -101,19 +98,15 @@ export class RoleService {
 
         return this.prisma.$transaction(async tx => {
             // Fetch role and ensure it's custom
-            const existingRole = await tx.roles.findUnique({ where: { id } });
+            const existingRole = await tx.role.findUnique({ where: { id } });
 
             if (!existingRole) {
                 throw new NotFoundException('Role not found');
             }
 
-            if (!existingRole.isCustom) {
-                throw new BadRequestException('Only custom roles can be edited');
-            }
-
             // Check for duplicate name if a new one is provided
             if (name && name !== existingRole.name) {
-                const nameTaken = await tx.roles.findFirst({
+                const nameTaken = await tx.role.findFirst({
                     where: { name, id: { not: id } }
                 });
 
@@ -123,7 +116,7 @@ export class RoleService {
             }
 
             // Update the role
-            const updatedRole = await tx.roles.update({
+            const updatedRole = await tx.role.update({
                 where: { id },
                 data: {
                     name: name ?? existingRole.name,
@@ -133,7 +126,7 @@ export class RoleService {
 
             // Update permissions if provided
             if (permissionNames) {
-                const permissions = await tx.permissions.findMany({
+                const permissions = await tx.permission.findMany({
                     where: { name: { in: permissionNames } }
                 });
 
@@ -142,10 +135,10 @@ export class RoleService {
                 }
 
                 // Remove all existing permissions
-                await tx.rolePermissions.deleteMany({ where: { roleId: id } });
+                await tx.rolePermission.deleteMany({ where: { roleId: id } });
 
                 // Add new permissions
-                await tx.rolePermissions.createMany({
+                await tx.rolePermission.createMany({
                     data: permissions.map(perm => ({ roleId: id, permissionId: perm.id }))
                 });
             }
@@ -154,7 +147,6 @@ export class RoleService {
                 id: updatedRole.id,
                 name: updatedRole.name,
                 description: updatedRole.description,
-                isCustom: updatedRole.isCustom,
                 permissions: permissionNames ?? undefined
             };
         });
@@ -163,18 +155,13 @@ export class RoleService {
     async deleteRole({ roleId }: DeleteRolesDto) {
         return this.prisma.$transaction(async tx => {
             // Fetch the role to validate
-            const role = await tx.roles.findUnique({
+            const role = await tx.role.findUnique({
                 where: { id: roleId },
                 include: { users: true } // Include associated users
             });
 
             if (!role) {
                 throw new NotFoundException('Role not found');
-            }
-
-            // Ensure the role is custom
-            if (!role.isCustom) {
-                throw new BadRequestException('Only custom roles can be deleted');
             }
 
             // Check if there are any users associated with the role
@@ -186,7 +173,7 @@ export class RoleService {
             }
 
             // Delete the role
-            await tx.roles.delete({
+            await tx.role.delete({
                 where: { id: roleId }
             });
 
@@ -195,10 +182,17 @@ export class RoleService {
     }
 
     async getAllPermissions() {
-        const permissions = await this.prisma.permissions.findMany({
+        const permissions = await this.prisma.permission.findMany({
             orderBy: { name: 'asc' }
         });
 
         return permissions.map(p => p.name);
+    }
+
+    async getAllPermissionsInfos() {
+        return await this.prisma.permission.findMany({
+            orderBy: { name: 'asc' },
+            select: { name: true, description: true }
+        });
     }
 }

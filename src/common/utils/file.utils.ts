@@ -1,7 +1,7 @@
-import { randomUUID } from "node:crypto";
-import * as fs from 'fs';
-import * as path from 'path';
-import { Helper } from "./helpers";
+import { randomUUID } from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { Helper } from './helpers';
 
 export class FileUtils {
     /**

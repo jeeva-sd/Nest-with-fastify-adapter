@@ -21,7 +21,7 @@ export function readError(error: any): string | null {
         if (error && typeof error === 'object') {
             if (error.response) {
                 // Axios-specific error structure
-                if (error.response.data && error.response.data.message) {
+                if (error.response.data?.message) {
                     return error.response.data.message;
                 }
 

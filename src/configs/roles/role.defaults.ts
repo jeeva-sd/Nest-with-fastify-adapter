@@ -1,46 +1,88 @@
-// Define permission keys as constants
-export enum PermissionKeys {
-    SWITCH_ORGS = 'switch_orgs',
-    MANAGE_USERS = 'manage_users'
+// Permission Keys
+export enum LeavePermissionKeys {
+    SWITCH_ORGANIZATIONS = 'switch_organizations',
+    MANAGE_USERS = 'manage_users',
+
+    LEAVE_REQUEST = 'leave_request',
+    LEAVE_APPROVAL = 'leave_approval',
+    LEAVE_CONFIGS = 'leave_configs'
 }
 
-// Define role keys as constants
-export enum RoleKeys {
+// Role Keys
+export enum LeaveRoleKeys {
     SUPER_ADMIN = 'Super Admin',
-    ADMIN = 'Admin',
-    STANDARD_USER = 'Standard User'
+    ORG_ADMIN = 'Org Admin',
+    MANAGER = 'Manager',
+    EMPLOYEE = 'Employee'
 }
 
-// Define permissions as an object with IDs and names
+// Permissions Object
 export const permissions = {
-    SWITCH_ORGS: { id: 'cmb0t05y100010dlch3cug34v', name: PermissionKeys.SWITCH_ORGS },
-    MANAGE_USERS: { id: 'cmb0t0bus00020dlc4alf2qxt', name: PermissionKeys.MANAGE_USERS }
-} as const;
-
-// Define roles as an object with IDs, names, and descriptions
-export const standardRoles = {
-    SUPER_ADMIN: {
-        id: 'cmb0t1rvc00050dlceis912v8',
-        name: RoleKeys.SUPER_ADMIN,
-        description: 'Administrator with full access',
-        isCustom: false,
-        permissions: [permissions.SWITCH_ORGS, permissions.MANAGE_USERS]
+    SWITCH_ORGANIZATIONS: {
+        id: 'cmboy34mj000007k09o5hau8p',
+        name: LeavePermissionKeys.SWITCH_ORGANIZATIONS,
+        description: 'Allows switching between organizations'
     },
-    ORG_ADMIN: {
-        id: 'cmb0t2fvh000a0dlc0y3zbiho',
-        name: RoleKeys.ADMIN,
-        description: 'Administrator with full access limited to their organization',
-        isCustom: false,
-        permissions: [permissions.MANAGE_USERS]
+    MANAGE_USERS: {
+        id: 'cmboy3ecn000107k0cbql2uzw',
+        name: LeavePermissionKeys.MANAGE_USERS,
+        description: 'Allows managing user accounts'
     },
-    STANDARD_USER: {
-        id: 'cmb0t3ojr000s0dlce0jrehwe',
-        name: RoleKeys.STANDARD_USER,
-        description: 'STANDARD_USER with basic access',
-        isCustom: false,
-        permissions: []
+    LEAVE_REQUEST: {
+        id: 'cmboy3ho1000207k02x8827q7',
+        name: LeavePermissionKeys.LEAVE_REQUEST,
+        description: 'Allows submitting leave requests'
+    },
+    LEAVE_APPROVAL: {
+        id: 'cmboy3leo000307k024sefb5t',
+        name: LeavePermissionKeys.LEAVE_APPROVAL,
+        description: 'Allows approving or rejecting leave requests'
+    },
+    LEAVE_CONFIGS: {
+        id: 'cmboy3oxe000407k0a7wv6xo5',
+        name: LeavePermissionKeys.LEAVE_CONFIGS,
+        description: 'Allows configuring leave policies and settings'
     }
 } as const;
 
-// Extract available permissions as a flat array
-export const standardPermissions = Object.values(permissions).map(p => p.name);
+// Roles with Permissions
+export const standardRoles = {
+    SUPER_ADMIN: {
+        id: 'cmboy3wbr000507k0griygdsa',
+        name: LeaveRoleKeys.SUPER_ADMIN,
+        description: 'System-wide administrator with full access',
+        permissions: [
+            permissions.SWITCH_ORGANIZATIONS,
+            permissions.MANAGE_USERS,
+            permissions.LEAVE_REQUEST,
+            permissions.LEAVE_APPROVAL,
+            permissions.LEAVE_CONFIGS
+        ]
+    },
+    ORG_ADMIN: {
+        id: 'cmboy4f39000707k045ithbpo',
+        name: LeaveRoleKeys.ORG_ADMIN,
+        description: 'Organization-level admin with full leave access',
+        permissions: [
+            permissions.MANAGE_USERS,
+            permissions.LEAVE_REQUEST,
+            permissions.LEAVE_APPROVAL,
+            permissions.LEAVE_CONFIGS
+        ]
+    },
+    MANAGER: {
+        id: 'cmboy4l0b000807k0cfbs7fbm',
+        name: LeaveRoleKeys.MANAGER,
+        description: 'Manager who approves leave requests',
+        permissions: [permissions.LEAVE_REQUEST, permissions.LEAVE_APPROVAL]
+    },
+    EMPLOYEE: {
+        id: 'cmboy4tkd000907k00jes1bye',
+        name: LeaveRoleKeys.EMPLOYEE,
+        description: 'Basic access for submitting and tracking leave',
+        permissions: [permissions.LEAVE_REQUEST]
+    }
+};
+
+// Flat permission names
+export const availableLeavePermissions = Object.values(permissions).map(p => p.name);

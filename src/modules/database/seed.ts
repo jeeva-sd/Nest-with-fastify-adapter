@@ -5,6 +5,6 @@ export async function seedDatabase() {
     const allowSeed = appConfig.database.sql.allowSeed;
 
     if (allowSeed) {
-        await seedRolesAndPermissions();
+        await Promise.all([seedRolesAndPermissions()]);
     }
 }

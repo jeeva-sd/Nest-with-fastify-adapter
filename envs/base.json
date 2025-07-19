@@ -8,8 +8,7 @@
         "caseSensitive": false,
         "ignoreTrailingSlash": true,
         "ignoreDuplicateSlashes": true,
-        "allowExceptionLogs": false,
-        "commitHashKeyName": "X-MA-VERSION"
+        "allowExceptionLogs": false
     },
     "auth": {
         "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
@@ -46,11 +45,13 @@
     },
     "cors": {
         "allowedDomains": ["http://localhost:3000"],
-        "credentials": true
+        "credentials": true,
+        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     },
     "staticFiles": {
         "staticRoot": "public",
-        "staticPrefix": "/static/"
+        "staticPrefix": "/static/",
+        "maxAge": 2592000000
     },
     "views": {
         "engine": "handlebars",
@@ -64,5 +65,11 @@
                 "BROTLI_PARAM_QUALITY": 4
             }
         }
+    },
+    "rateLimit": {
+        "max": 100,
+        "timeWindow": "1 minute",
+        "allowList": ["127.0.0.1"],
+        "ban": 1
     }
 }

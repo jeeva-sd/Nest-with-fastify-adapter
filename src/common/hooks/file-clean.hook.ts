@@ -1,14 +1,14 @@
-import * as fs from 'fs';
-import { RequestX } from "../types";
+import * as fs from 'node:fs';
+import { RequestX } from '../types';
 
-export const fileCleaner = async (request) => {
+export const fileCleaner = async request => {
     const uploadedFiles = (request as RequestX).uploadedFiles || [];
 
     if (uploadedFiles.length > 0) {
         try {
             // Delete files in parallel
             await Promise.all(
-                uploadedFiles.map(async (filePath) => {
+                uploadedFiles.map(async filePath => {
                     try {
                         await fs.promises.unlink(filePath);
                     } catch (err) {
@@ -16,7 +16,6 @@ export const fileCleaner = async (request) => {
                     }
                 })
             );
-        } catch (cleanupError) {
-        }
+        } catch (_cleanupError) {}
     }
 };

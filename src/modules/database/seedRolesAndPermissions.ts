@@ -1,60 +1,88 @@
 import { PrismaClient } from '@prisma/client';
+import { Chalk } from '~/common';
 import { permissions, standardRoles } from '~/configs';
 
 const prisma = new PrismaClient();
+const chalk = new Chalk('seedRolesAndPermissions');
 
 export async function seedRolesAndPermissions() {
-    await prisma.$transaction(async tx => {
-        // Upsert permissions
-        const permissionData = Object.values(permissions).map(permission => ({
-            id: permission.id,
-            name: permission.name
-        }));
+    await prisma.$transaction(
+        async tx => {
+            // 1. Upsert Permissions and Roles in parallel
+            const permissionData = Object.values(permissions).map(permission => ({
+                id: permission.id,
+                name: permission.name,
+                description: permission.description
+            }));
 
-        await tx.permissions.createMany({
-            data: permissionData,
-            skipDuplicates: true // Avoids errors for existing records
-        });
+            const roleData = Object.values(standardRoles).map(role => ({
+                id: role.id,
+                name: role.name,
+                description: role.description
+            }));
 
-        // Upsert roles
-        const roleData = Object.values(standardRoles).map(role => ({
-            id: role.id,
-            name: role.name,
-            description: role.description,
-            isCustom: role.isCustom
-        }));
+            await Promise.all([
+                // Upsert all permissions in parallel
+                Promise.all(
+                    permissionData.map(permission =>
+                        tx.permission.upsert({
+                            where: { id: permission.id },
+                            update: {
+                                name: permission.name,
+                                description: permission.description
+                            },
+                            create: permission
+                        })
+                    )
+                ),
+                // Upsert all roles in parallel
+                Promise.all(
+                    roleData.map(role =>
+                        tx.role.upsert({
+                            where: { id: role.id },
+                            update: {
+                                name: role.name,
+                                description: role.description
+                            },
+                            create: role
+                        })
+                    )
+                )
+            ]);
 
-        await tx.roles.createMany({
-            data: roleData,
-            skipDuplicates: true // Avoids errors for existing records
-        });
-
-        // Fetch all roles and permissions to map IDs
-        const allRoles = await tx.roles.findMany({
-            where: { id: { in: roleData.map(role => role.id) } }
-        });
-
-        const allPermissions = await tx.permissions.findMany({
-            where: { id: { in: permissionData.map(permission => permission.id) } }
-        });
-
-        // Prepare role-permissions data
-        const rolePermissionsData = Object.values(standardRoles).flatMap(role => {
-            const roleRecord = allRoles.find(r => r.id === role.id);
-            return role.permissions
-                .map(permission => {
-                    const permissionRecord = allPermissions.find(p => p.id === permission.id);
-                    return roleRecord && permissionRecord
-                        ? { roleId: roleRecord.id, permissionId: permissionRecord.id }
-                        : null;
+            // 2. Fetch all roles and permissions in parallel (to ensure DB consistency for IDs)
+            const [allRoles, allPermissions] = await Promise.all([
+                tx.role.findMany({
+                    where: { id: { in: roleData.map(role => role.id) } }
+                }),
+                tx.permission.findMany({
+                    where: { id: { in: permissionData.map(p => p.id) } }
                 })
-                .filter(Boolean); // Remove null values
-        });
+            ]);
 
-        // Upsert role-permissions
-        await tx.rolePermissions.createMany({
-            data: rolePermissionsData as { roleId: string; permissionId: string }[],
-            skipDuplicates: true // Avoids errors for existing records
-        });
-    });
+            // 3. Map role-permission relations
+            const rolePermissionsData = Object.values(standardRoles).flatMap(role => {
+                const roleRecord = allRoles.find(r => r.id === role.id);
+                return role.permissions
+                    .map(permission => {
+                        const permissionRecord = allPermissions.find(p => p.id === permission.id);
+                        return roleRecord && permissionRecord
+                            ? { roleId: roleRecord.id, permissionId: permissionRecord.id }
+                            : null;
+                    })
+                    .filter(Boolean);
+            });
+
+            // 4. Insert Role-Permissions
+            await tx.rolePermission.createMany({
+                data: rolePermissionsData as { roleId: string; permissionId: string }[],
+                skipDuplicates: true
+            });
+
+            chalk.success('Seeded roles, permissions, and role-permission mappings.');
+        },
+        {
+            timeout: 30000 // 30 seconds
+        }
+    );
 }

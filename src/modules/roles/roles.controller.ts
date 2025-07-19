@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Patch, Post, Req } from '@nestjs/common';
 import { Access, RequestX, Sanitize } from '~/common';
-import { ACL } from '~/configs';
+import { ACL } from '../../configs/roles/access-policies';
 import { RoleService } from './roles.service';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
 
@@ -43,6 +43,6 @@ export class RolesController {
 
     @Get('permissions')
     async getAllPermissions() {
-        return this.roleService.getAllPermissions();
+        return this.roleService.getAllPermissionsInfos();
     }
 }

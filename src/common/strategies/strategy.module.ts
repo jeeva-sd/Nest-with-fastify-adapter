@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { appConfig } from '~/configs';
-import { LocalStrategy } from './local.strategy';
+import { JwtAuthGuard, LocalAuthGuard } from '../guards';
 import { JwtStrategy } from './jwt.strategy';
+import { LocalStrategy } from './local.strategy';
 
 @Module({
+    imports: [],
     providers: [
-        JwtStrategy, LocalStrategy,
+        JwtStrategy,
         {
             provide: appConfig.auth.basicJWT.name,
             useFactory: () => {
@@ -26,6 +28,6 @@ import { JwtStrategy } from './jwt.strategy';
         //     }
         // }
     ],
-    exports: [appConfig.auth.basicJWT.name, JwtStrategy, LocalStrategy]
+    exports: [appConfig.auth.basicJWT.name]
 })
-export class StrategyModule { }
+export class StrategyModule {}

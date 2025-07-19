@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './environment.schema';
 
@@ -28,7 +28,7 @@ export class ConfigReader {
             const mergedConfigs = this.mergeConfigs(baseConfig, envConfig);
 
             // Validate and initialize the configuration
-            this.config = this.applyValidation(mergedConfigs);
+            this.config = this.applyValidation(mergedConfigs as AppConfig);
         } catch (error) {
             this.logger.error(`Failed to load configuration: ${readError(error)}`);
             process.exit(1);
@@ -56,7 +56,7 @@ export class ConfigReader {
         }
     }
 
-    private mergeConfigs(baseConfig: AppConfig, envConfig: Partial<AppConfig>): AppConfig {
+    private mergeConfigs(baseConfig: Partial<AppConfig>, envConfig: Partial<AppConfig>): Partial<AppConfig> {
         for (const key of Object.keys(envConfig)) {
             if (typeof envConfig[key] === 'object' && envConfig[key] !== null && !Array.isArray(envConfig[key])) {
                 if (!(key in baseConfig)) baseConfig[key] = {};
@@ -74,18 +74,7 @@ export class ConfigReader {
         try {
             return AppConfigRule.parse(mergedConfigs);
         } catch (e) {
-            if (e instanceof z.ZodError) {
-                const formattedErrors = e.errors
-                    .map((issue, idx) => {
-                        const path = issue.path.length ? `Path: ${issue.path.join('.')}` : 'Path: [root]';
-                        return `${idx + 1}. ${issue.message}\n   ${path}`;
-                    })
-                    .join('\n\n');
-
-                this.logger.error(`ENV Configuration validation error:\n\n${formattedErrors}`);
-            } else {
-                this.logger.error('ENV Configuration validation error:\nConfig validation failed');
-            }
+            this.logger.error(`Configuration validation failed:\n${z.prettifyError(e)}`);
             process.exit(1);
         }
     }

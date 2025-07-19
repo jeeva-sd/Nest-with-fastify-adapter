@@ -10,8 +10,7 @@ const serverConfigSchema = z.object({
     routePrefix: z.string(),
     version: z.string(),
     mode: z.enum(['development', 'staging', 'production']),
-    allowExceptionLogs: z.boolean(),
-    commitHashKeyName: z.string()
+    allowExceptionLogs: z.boolean()
 });
 
 const payloadConfigSchema = z.object({
@@ -45,12 +44,14 @@ const authConfigSchema = z.object({
 
 const corsConfigSchema = z.object({
     allowedDomains: z.array(z.string().trim()),
-    credentials: z.boolean()
+    credentials: z.boolean(),
+    methods: z.array(z.string().trim())
 });
 
 export const staticConfigSchema = z.object({
     staticRoot: z.string(),
-    staticPrefix: z.string()
+    staticPrefix: z.string(),
+    maxAge: z.number().min(0, 'Max age must be a non-negative number')
 });
 
 export const viewEngineSchema = z.object({
@@ -92,37 +93,69 @@ const sqlRule = z.object({
 
 const databaseRule = z.object({ sql: sqlRule });
 
+// -------------------------------------------- EcoApps --------------------------------------------
+
+const portalConfigSchema = z.object({
+    auth: z.object({
+        userName: z.string().nonempty('Portal Username is required'),
+        password: z.string().nonempty('Portal Password is required')
+    }),
+    baseUrl: z.string().nonempty('Portal Base URL is required'),
+    tokenCookieName: z.string().nonempty('Token Cookie Name is required'),
+    domainForCookie: z.string().nonempty('Domain for Cookie is required')
+});
+
+export const ecoAppRule = z.object({
+    portal: portalConfigSchema
+});
+
 // -------------------------------------------- RabbitMQ --------------------------------------------
 
-const rabbitMQSchema = z.object({
-    uri: z.string().nonempty('RabbitMQ URI is required'),
+export const rabbitMqConfigSchema = z.object({
+    uri: z
+        .string()
+        .min(1, { message: 'RabbitMQ URI is required' })
+        .regex(/^amqp(s)?:\/\/.+/, { message: 'Invalid AMQP URI format' }),
+
     exchange: z.object({
-        name: z.string().nonempty('Exchange name is required'),
-        type: z.string().nonempty('Exchange type is required'),
-        createExchangeIfNotExists: z.boolean(),
+        name: z.string().min(1, { message: 'Exchange name is required' }),
+        type: z.string().min(1, { message: 'Exchange type is required' }),
         options: z.object({
             arguments: z.object({
-                'x-delayed-type': z.string().nonempty('x-delayed-type is required')
+                'x-delayed-type': z.string().min(1, {
+                    message: 'x-delayed-type is required'
+                })
             })
         })
     }),
-    generalConnection: z.object({
-        name: z.string().nonempty('Channel name is required'),
-        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1')
-    }),
-    connectionTwo: z.object({
-        name: z.string().nonempty('Channel name is required'),
-        prefetchCount: z.number().min(1, 'Prefetch count must be at least 1')
-    }),
-    generalQueue: z.object({
-        name: z.string().nonempty('Queue name is required'),
-        durable: z.boolean(),
-        createQueueIfNotExists: z.boolean()
-    }),
-    connectionInitOptions: z.object({
-        wait: z.boolean()
-    }),
-    enableControllerDiscovery: z.boolean()
+
+    queues: z.object({
+        general: z.object({
+            name: z.string().min(1),
+            prefetchCount: z
+                .number()
+                .int({ message: 'prefetchCount must be an integer' })
+                .positive({ message: 'prefetchCount must be positive' }),
+            durable: z.boolean()
+        }),
+        singleConsumerQueue: z.object({
+            name: z.string().min(1),
+            prefetchCount: z
+                .number()
+                .int({ message: 'prefetchCount must be an integer' })
+                .positive({ message: 'prefetchCount must be positive' }),
+            durable: z.boolean()
+        })
+    })
+});
+
+// -------------------------------------------- Rate Limit --------------------------------------------
+
+export const rateLimitConfigSchema = z.object({
+    max: z.number().int().positive(),
+    timeWindow: z.string(),
+    allowList: z.array(z.string()),
+    ban: z.number().int().nonnegative().optional()
 });
 
 // ----------------------------------------------------------------------------------------------------------
@@ -137,8 +170,9 @@ export const AppConfigRule = z.object({
     views: viewEngineSchema,
     multiPart: multipartConfigSchema,
     compression: compressionConfigSchema,
-    rabbitMq: rabbitMQSchema,
-    database: databaseRule
+    rabbitMq: rabbitMqConfigSchema,
+    database: databaseRule,
+    rateLimit: rateLimitConfigSchema
 });
 
 // ------------------------------------------------------------------------------------------------------------------

@@ -6,65 +6,66 @@ import fastifyCors from '@fastify/cors';
 import fastifyCsrf from '@fastify/csrf-protection';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyMultipart from '@fastify/multipart';
+import fastifyRateLimit from '@fastify/rate-limit';
 import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import * as chalk from 'chalk';
-import {
-    Chalk,
-    HttpExceptionFilter,
-    PayloadGuard,
-    ResponseTransformInterceptor,
-    appendCommitHash,
-    fileCleaner
-} from '~/common';
+import { Chalk, HttpExceptionFilter, PayloadGuard, ResponseTransformInterceptor, fileCleaner } from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
+import { RABBIT_MQ_QUEUE_KEYS, createRmqMicroserviceOptions } from './services';
 
 class App {
     private app: NestFastifyApplication;
 
     // Create the NestJS app using the Fastify adapter
     async createApp() {
+        const chalkLogger = new Chalk();
         this.app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
-            logger: new Chalk()
+            logger: chalkLogger
         });
     }
 
     // Set up Fastify hooks
     setupHooks() {
         const appInstance = this.app.getHttpAdapter().getInstance();
-        appInstance.addHook('onSend', async (_request, reply, payload) => appendCommitHash(_request, reply, payload)); // Hook to set a commit hash in header
         appInstance.addHook('onResponse', async request => fileCleaner(request)); // Hook to clean up uploaded files after the response is sent
     }
 
-    // Register Fastify plugins: cookies, multipart, CORS, Helmet, CSRF
+    // Register Fastify plugins: cookies, multipart, CORS, Helmet, CSRF, RateLimit
     async setupPlugins() {
-        await Promise.all([
-            this.app.register(fastifyCookies),
-            this.app.register(fastifyMultipart, appConfig.multiPart),
-            this.app.register(fastifyCors, {
-                origin: appConfig.cors.allowedDomains,
-                credentials: appConfig.cors.credentials
-            }),
-            this.app.register(fastifyStatic, {
-                root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
-                prefix: appConfig.staticFiles.staticPrefix
-            }),
-            this.app.register(fastifyHelmet),
-            this.app.register(fastifyCsrf),
-            this.app.register(compression, {
-                encodings: appConfig.compression.encodings,
-                threshold: appConfig.compression.threshold,
-                brotliOptions: {
-                    params: {
-                        [constants.BROTLI_PARAM_QUALITY]:
-                            appConfig.compression.brotliOptions.params.BROTLI_PARAM_QUALITY
-                    }
+        await this.app.register(fastifyHelmet); // Helmet first for security
+        await this.app.register(fastifyCors, {
+            origin: appConfig.cors.allowedDomains,
+            credentials: appConfig.cors.credentials,
+            methods: appConfig.cors.methods
+        });
+        await this.app.register(fastifyCookies);
+        await this.app.register(fastifyMultipart, appConfig.multiPart);
+        await this.app.register(fastifyCsrf);
+        await this.app.register(fastifyStatic, {
+            root: join(__dirname, '..', appConfig.staticFiles.staticRoot),
+            prefix: appConfig.staticFiles.staticPrefix,
+            cacheControl: true,
+            maxAge: appConfig.staticFiles.maxAge
+        });
+        await this.app.register(fastifyRateLimit, {
+            max: appConfig.rateLimit.max,
+            timeWindow: appConfig.rateLimit.timeWindow,
+            allowList: appConfig.rateLimit.allowList,
+            ban: appConfig.rateLimit.ban
+        });
+        await this.app.register(compression, {
+            encodings: appConfig.compression.encodings,
+            threshold: appConfig.compression.threshold,
+            brotliOptions: {
+                params: {
+                    [constants.BROTLI_PARAM_QUALITY]: appConfig.compression.brotliOptions.params.BROTLI_PARAM_QUALITY
                 }
-            })
-        ]);
+            }
+        });
     }
 
     // Enable URI-based versioning
@@ -105,6 +106,7 @@ class App {
         this.app.enableShutdownHooks();
     }
 
+    // Set up the view engine
     setupViewEngine() {
         this.app.setViewEngine({
             engine: {
@@ -112,6 +114,13 @@ class App {
             },
             templates: join(__dirname, '../..', appConfig.views.templatesDir)
         });
+    }
+
+    // Set up RabbitMQ microservices
+    async setUpMicroservices() {
+        this.app.connectMicroservice(createRmqMicroserviceOptions(RABBIT_MQ_QUEUE_KEYS.GENERAL));
+        this.app.connectMicroservice(createRmqMicroserviceOptions(RABBIT_MQ_QUEUE_KEYS.SINGLE_CONSUMER));
+        await this.app.startAllMicroservices();
     }
 
     // Bootstrap sequence
@@ -125,6 +134,7 @@ class App {
         this.setUpInterceptor();
         this.setupViewEngine();
         await this.enableShutdownHooks();
+        await this.setUpMicroservices();
         await this.startServer();
     }
 }

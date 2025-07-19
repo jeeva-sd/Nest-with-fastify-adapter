@@ -1,5 +1,6 @@
 import { LoggerService } from '@nestjs/common';
 import * as chalk from 'chalk';
+import { appConfig } from '~/configs';
 
 // Simplified color map
 const colors = {
@@ -20,7 +21,7 @@ const colors = {
     cyan: chalk.cyan,
     magenta: chalk.magenta,
     white: chalk.white,
-    black: chalk.black,
+    black: chalk.black
 };
 
 function normalizeError(error: any): string {
@@ -47,14 +48,14 @@ export class Chalk implements LoggerService {
 
     private getTimestamp(): string {
         const now = new Date();
-        const isDev = process.env.NODE_ENV === 'development';
+        const isDev = appConfig.server.mode === 'development';
 
         const options: Intl.DateTimeFormatOptions = isDev
             ? {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true,
+                hour12: true
             }
             : {
                 month: '2-digit',
@@ -63,12 +64,10 @@ export class Chalk implements LoggerService {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true,
+                hour12: true
             };
 
-        return isDev
-            ? now.toLocaleTimeString('en-US', options)
-            : now.toLocaleString('en-US', options);
+        return isDev ? now.toLocaleTimeString('en-US', options) : now.toLocaleString('en-US', options);
     }
 
     private formatMessage(level: string, message: string, colorFn: (text: string) => string): string {
@@ -89,7 +88,7 @@ export class Chalk implements LoggerService {
     }
 
     warn(message: string) {
-        console.warn(this.formatMessage('WARN:', message, colors.orange));
+        console.warn(this.formatMessage('WARN:', message, colors.yellow));
     }
 
     debug(message: string) {
@@ -131,15 +130,5 @@ export class Chalk implements LoggerService {
             this.formatMessage('EXCEPTION:', normalizeError(error), colors.red),
             trace ? colors.red(`\nStack Trace: ${trace}`) : ''
         );
-    }
-
-    logObject(obj: any, level: string = 'OBJECT:') {
-        console.log(this.formatMessage(level, JSON.stringify(obj, null, 2), colors.teal));
-    }
-
-    // Log a message with a dynamic color
-    custom(message: string, color: keyof typeof colors, level = 'CUSTOM') {
-        const colorFn = colors[color] || chalk.white;
-        console.log(this.formatMessage(`${level.toUpperCase()}:`, message, colorFn));
     }
 }

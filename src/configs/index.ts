@@ -1,4 +1,4 @@
-export { appConfig } from './environment/environment.reader';
+export { appConfig } from './environments/environment.reader';
 export * from './roles/role.defaults';
-export * from './environment';
+export * from './environments';
 export * from './roles';

@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
+import * as z from 'zod/v4';
 import { appConfig } from '~/configs';
-import * as z from 'zod';
 import { metadataCache } from '../guards/req-payload.guard'; // Import the WeakMap
 
 export const Sanitize = (schema: z.ZodTypeAny) => {
@@ -9,10 +9,6 @@ export const Sanitize = (schema: z.ZodTypeAny) => {
         metadataCache.set(descriptor.value, schema);
 
         // Apply NestJS metadata for fallback (optional)
-        SetMetadata(appConfig.payloadValidation.decoratorKey, schema)(
-            target,
-            propertyKey,
-            descriptor
-        );
+        SetMetadata(appConfig.payloadValidation.decoratorKey, schema)(target, propertyKey, descriptor);
     };
 };

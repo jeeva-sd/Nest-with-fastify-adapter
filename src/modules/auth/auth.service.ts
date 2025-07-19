@@ -6,10 +6,8 @@ import { appConfig } from '~/configs';
 export class AuthService {
     constructor(@Inject(appConfig.auth.basicJWT.name) private readonly jwtService: JwtService) {}
 
-    async signIn() {
-        const payload = { username: 'John', sub: '123', roles: ['editor'], permissions: ['user:update'] };
-        return {
-            access_token: this.jwtService.sign(payload)
-        };
+    async login() {
+        const expiresIn = 60 * 60; // 1 hour
+        const _token = this.jwtService.sign({ userId: 1, name: 'John' }, { expiresIn }); // Generate JWT token
     }
 }
