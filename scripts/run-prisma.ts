@@ -31,13 +31,10 @@ async function runPrismaCommand() {
 
         // Extract database configuration
         const dbConfig = appConfig.database?.sql || {};
-        const { username, password, host, port, database, connectionLimit } = dbConfig;
+        const { username, password, host, port, database } = dbConfig;
 
-        const DATABASE_URL = `mysql://${username}:${password}@${host}:${port}/${database}?connection_limit=${connectionLimit || 10}`;
-
-        console.log(
-            `Using DATABASE_URL: mysql://${username}:***@${host}:${port}/${database}?connection_limit=${connectionLimit || 10}`
-        );
+        const DATABASE_URL = `mysql://${username}:${password}@${host}:${port}/${database}?connection_limit=${1}`;
+        console.log(`Using DATABASE_URL: mysql://${username}:***@${host}:${port}/${database}`);
 
         // Run Prisma command with the constructed DATABASE_URL
         const result = spawnSync('npx', ['prisma', ...prismaArgs], {
