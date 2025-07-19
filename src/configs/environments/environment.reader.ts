@@ -3,7 +3,6 @@ import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import * as chalk from 'chalk';
 import { z } from 'zod/v4';
-import { readError } from '~/common';
 import { AppConfig, AppConfigRule } from './environment.schema';
 
 export class ConfigReader {
@@ -30,7 +29,7 @@ export class ConfigReader {
             // Validate and initialize the configuration
             this.config = this.applyValidation(mergedConfigs as AppConfig);
         } catch (error) {
-            this.logger.error(`Failed to load configuration: ${readError(error)}`);
+            this.logger.error(`Failed to load configuration: ${error.message}`);
             process.exit(1);
         }
     }
