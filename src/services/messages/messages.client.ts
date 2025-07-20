@@ -9,7 +9,7 @@ import { extractRoutingKeys } from './messages.config';
 
 @Injectable()
 export class MessagesClient implements OnModuleInit {
-    private readonly config = appConfig.rabbitMq;
+    private readonly config = appConfig.microservices.rabbitmq; // Updated to use consolidated config path
     private readonly logger = new Chalk(MessagesClient.name);
 
     constructor(

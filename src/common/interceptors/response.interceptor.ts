@@ -6,25 +6,34 @@ import { appConfig } from '~/configs';
 
 @Injectable()
 export class ResponseTransformInterceptor implements NestInterceptor {
-    constructor(private reflector: Reflector) {}
+    private readonly shouldFormat: boolean;
+    private readonly skipKey: string;
+
+    constructor(private reflector: Reflector) {
+        // Cache config values to avoid repeated lookups
+        this.shouldFormat = appConfig.interceptors.response.format;
+        this.skipKey = appConfig.interceptors.response.skipFormatKey;
+    }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const skipResponseTransform =
-            this.reflector.get<boolean>(appConfig.interceptors.response.skipFormatKey, context.getHandler()) ||
-            !appConfig.interceptors.response.format;
+        // Early return if formatting is globally disabled
+        if (!this.shouldFormat) {
+            return next.handle();
+        }
+
+        // Check if this specific handler should skip transformation
+        const skipResponseTransform = this.reflector.get<boolean>(this.skipKey, context.getHandler());
 
         if (skipResponseTransform) {
             return next.handle();
         }
 
         return next.handle().pipe(
-            map(data => {
-                return {
-                    statusCode: HttpStatus.OK,
-                    message: 'Request successful',
-                    data
-                };
-            })
+            map(data => ({
+                statusCode: HttpStatus.OK,
+                message: 'Request successful',
+                data
+            }))
         );
     }
 }

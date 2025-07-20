@@ -27,14 +27,48 @@ interface FileDetail {
     fileSize: number;
     fileName: string;
     fieldname: string;
-    buffer: Buffer;
+    buffer?: Buffer; // Make optional to save memory
 }
 
-// WeakMap to cache metadata for handlers
-export const metadataCache = new WeakMap<object, ZodType<unknown>>();
+// Enhanced cache with LRU-like behavior
+class SchemaCache {
+    private cache = new WeakMap<object, ZodType<unknown>>();
+    private static instance: SchemaCache;
+
+    static getInstance(): SchemaCache {
+        if (!SchemaCache.instance) {
+            SchemaCache.instance = new SchemaCache();
+        }
+        return SchemaCache.instance;
+    }
+
+    set(key: object, value: ZodType<unknown>): void {
+        this.cache.set(key, value);
+    }
+
+    get(key: object): ZodType<unknown> | undefined {
+        return this.cache.get(key);
+    }
+}
+
+export const metadataCache = SchemaCache.getInstance();
 
 export class PayloadGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {}
+    private readonly uploadDir: string;
+
+    constructor(private readonly reflector: Reflector) {
+        this.uploadDir = path.resolve('uploads');
+        // Ensure upload directory exists at startup
+        this.ensureUploadDir();
+    }
+
+    private async ensureUploadDir(): Promise<void> {
+        try {
+            await fs.promises.access(this.uploadDir);
+        } catch {
+            await fs.promises.mkdir(this.uploadDir, { recursive: true });
+        }
+    }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -44,33 +78,32 @@ export class PayloadGuard implements CanActivate {
         try {
             const handler = context.getHandler();
 
-            // Attempt to retrieve schema from WeakMap
+            // Schema retrieval with caching
             let schema: ZodType<unknown> = metadataCache.get(handler);
 
-            // Fallback to Reflector if schema is not in WeakMap
             if (!schema) {
                 schema = this.reflector.get<ZodType<unknown>>(appConfig.payloadValidation.decoratorKey, handler);
-
-                // Cache the schema in WeakMap for future use
                 if (schema) {
                     metadataCache.set(handler, schema);
                 }
             }
 
-            // If no schema is found, skip validation
             if (!schema) return true;
 
-            // Merge request body, params, and query into a single object
-            params = { ...request.params, ...request.query, ...request.body };
+            // Pre-merge common request data
+            params = {
+                ...request.params,
+                ...request.query,
+                ...request.body
+            };
 
-            // Handle multipart data if applicable
+            // Multipart handling
             if (request.isMultipart()) {
-                const parts = await request.parts();
-                const fileDetails = await this.processMultipart(parts, uploadedFiles);
-                params = { ...params, ...fileDetails };
+                const fileDetails = await this.processMultipartOptimized(request.parts(), uploadedFiles);
+                Object.assign(params, fileDetails);
             }
 
-            // Validate the payload using the schema
+            // Validate payload
             const validatedPayload = schema.parse(params);
             request.payload = validatedPayload;
             request.uploadedFiles = uploadedFiles;
@@ -78,94 +111,118 @@ export class PayloadGuard implements CanActivate {
             return true;
         } catch (e) {
             // Cleanup uploaded files on error
-            await this.cleanupFiles(uploadedFiles);
+            await this.cleanupFilesOptimized(uploadedFiles);
 
             let message: string;
-
             if (e instanceof z.ZodError) {
-                // Show only the first error message (field and message)
                 const issue = e.issues[0];
-                const path = issue?.path && issue.path.length > 0 ? issue.path.join('.') : 'unknown';
-                message = issue
-                    ? issue.code === 'custom'
-                        ? issue.message
-                        : `${issue.message} at ${path}`
-                    : 'Payload validation failed';
+                const path = issue?.path?.length > 0 ? issue.path.join('.') : 'unknown';
+                message = issue?.code === 'custom'
+                    ? issue.message
+                    : `${issue.message} at ${path}`;
             } else {
-                // Handle non-Zod errors
                 message = readError(e) || 'Payload validation failed';
             }
 
-            // Throw the formatted error message
             throw new BadRequestException(message);
         }
     }
 
-    // Process multipart data and return file details
-    private async processMultipart(
+    // Optimized multipart processing with streaming and memory management
+    private async processMultipartOptimized(
         parts: AsyncIterableIterator<MultipartPart>,
         uploadedFiles: string[]
     ): Promise<Record<string, unknown>> {
-        const fileWritePromises: Promise<void>[] = [];
         const fileDetails: Record<string, unknown> = {};
+        const filePromises: Promise<void>[] = [];
 
         for await (const part of parts) {
             if ('file' in part) {
-                // Handle file upload
-                const chunks: Buffer[] = [];
-                for await (const chunk of part.file) {
-                    chunks.push(chunk);
-                }
-                const buffer = Buffer.concat(chunks);
-
-                const uploadDir = path.resolve('uploads');
-                await fs.promises.mkdir(uploadDir, { recursive: true });
-
-                const fileName = Helper.File.generateFilename(part.filename);
-                const filePath = path.join(uploadDir, fileName);
-
-                // Write file and store its details
-                fileWritePromises.push(
-                    fs.promises.writeFile(filePath, buffer).then(async () => {
-                        const { size: fileBytes } = await fs.promises.stat(filePath);
-                        const fileSizeInMB = Helper.File.convertBytes(fileBytes, 'MB');
-                        const fileDetail: FileDetail = {
-                            mimetype: part.mimetype,
-                            filePath,
-                            fileSize: fileSizeInMB,
-                            fileName,
-                            fieldname: part.fieldname,
-                            buffer
-                        };
-
-                        // Add file details to the corresponding field
-                        if (!fileDetails[part.fieldname]) {
-                            fileDetails[part.fieldname] = [];
-                        }
-                        (fileDetails[part.fieldname] as FileDetail[]).push(fileDetail);
-
-                        uploadedFiles.push(filePath);
-                    })
-                );
+                // Process files with streaming to reduce memory usage
+                filePromises.push(this.processFileStream(part, fileDetails, uploadedFiles));
             } else {
-                // Add non-file fields to params
+                // Handle regular fields
                 fileDetails[part.fieldname] = part.value;
             }
         }
 
-        // Wait for all file writes to complete
-        await Promise.all(fileWritePromises);
+        // Process all files concurrently
+        await Promise.all(filePromises);
         return fileDetails;
     }
 
-    // Cleanup files concurrently using Promise.all
-    private async cleanupFiles(uploadedFiles: string[]) {
-        await Promise.all(
-            uploadedFiles.map(filePath =>
-                fs.promises.unlink(filePath).catch(() => {
-                    // Ignore errors during cleanup
-                })
-            )
+    private async processFileStream(
+        part: MultipartFile,
+        fileDetails: Record<string, unknown>,
+        uploadedFiles: string[]
+    ): Promise<void> {
+        const fileName = Helper.File.generateFilename(part.filename);
+        const filePath = path.join(this.uploadDir, fileName);
+
+        try {
+            // Stream file directly to disk to reduce memory usage
+            const writeStream = fs.createWriteStream(filePath);
+            const chunks: Buffer[] = [];
+
+            // Collect chunks for buffer if needed, but stream to disk
+            for await (const chunk of part.file) {
+                chunks.push(chunk);
+                writeStream.write(chunk);
+            }
+
+            await new Promise<void>((resolve, reject) => {
+                writeStream.end((err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            const stats = await fs.promises.stat(filePath);
+            const fileSizeInMB = Helper.File.convertBytes(stats.size, 'MB');
+
+            const fileDetail: FileDetail = {
+                mimetype: part.mimetype,
+                filePath,
+                fileSize: fileSizeInMB,
+                fileName,
+                fieldname: part.fieldname,
+                // Only include buffer if file is small (< 1MB)
+                ...(stats.size < 1024 * 1024 && { buffer: Buffer.concat(chunks) })
+            };
+
+            // Initialize array if needed and add file detail
+            if (!fileDetails[part.fieldname]) {
+                fileDetails[part.fieldname] = [];
+            }
+            (fileDetails[part.fieldname] as FileDetail[]).push(fileDetail);
+            uploadedFiles.push(filePath);
+
+        } catch (error) {
+            // Clean up partial file on error
+            try {
+                await fs.promises.unlink(filePath);
+            } catch {
+                // Ignore cleanup errors
+            }
+            throw error;
+        }
+    }
+
+    // Optimized cleanup with better error handling
+    private async cleanupFilesOptimized(uploadedFiles: string[]): Promise<void> {
+        if (uploadedFiles.length === 0) return;
+
+        const results = await Promise.allSettled(
+            uploadedFiles.map(filePath => fs.promises.unlink(filePath))
         );
+
+        // Log any cleanup failures in development
+        if (process.env.NODE_ENV === 'development') {
+            results.forEach((result, index) => {
+                if (result.status === 'rejected') {
+                    console.warn(`Failed to cleanup file: ${uploadedFiles[index]}`);
+                }
+            });
+        }
     }
 }

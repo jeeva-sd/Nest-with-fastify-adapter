@@ -6,7 +6,7 @@ export const INPUT_VALIDATOR_KEY = 'INPUT_VALIDATOR_KEY';
 export const generalEvents = {
     ecoApps: {
         departmentSync: 'ecoApps.department.sync'
-    },
+    }
 } as const;
 
 export const singleConsumerEvents = {

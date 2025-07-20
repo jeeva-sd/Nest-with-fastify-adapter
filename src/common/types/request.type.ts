@@ -15,4 +15,5 @@ export interface RequestX extends FastifyRequest {
     uploadedFiles?: string[];
     user: TokenData;
     payload?: any;
+    startTime?: number;
 }
