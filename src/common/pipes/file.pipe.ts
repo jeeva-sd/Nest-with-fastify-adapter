@@ -27,6 +27,7 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
         mimetype: z.string().refine(value => allowedMimeTypes.includes(value), {
             message: withFieldName('The file type is not supported.')
         }),
+        fileId: z.string().nullable().default(null),
         fileName: z.string().nonempty(withFieldName('The file name cannot be empty.')),
         filePath: z.string().nonempty(withFieldName('The file path is required.')),
         fileSize: z

@@ -22,6 +22,7 @@ interface MultipartField {
 type MultipartPart = MultipartFile | MultipartField;
 
 interface FileDetail {
+    fileId: string | null;
     mimetype: string;
     filePath: string;
     fileSize: number;
@@ -156,8 +157,9 @@ export class PayloadGuard implements CanActivate {
         fileDetails: Record<string, unknown>,
         uploadedFiles: string[]
     ): Promise<void> {
-        const fileName = Helper.File.generateFilename(part.filename);
-        const filePath = path.join(this.uploadDir, fileName);
+        const fileName = part.filename;
+        const fileId = Helper.File.generateUploadFilename(fileName);
+        const filePath = path.join(this.uploadDir, fileId);
 
         try {
             // Stream file directly to disk to reduce memory usage
@@ -181,13 +183,13 @@ export class PayloadGuard implements CanActivate {
             const fileSizeInMB = Helper.File.convertBytes(stats.size, 'MB');
 
             const fileDetail: FileDetail = {
+                fileId,
                 mimetype: part.mimetype,
                 filePath,
                 fileSize: fileSizeInMB,
                 fileName,
                 fieldname: part.fieldname,
-                // Only include buffer if file is small (< 1MB)
-                ...(stats.size < 1024 * 1024 && { buffer: Buffer.concat(chunks) })
+                buffer: Buffer.concat(chunks)
             };
 
             // Initialize array if needed and add file detail

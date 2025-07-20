@@ -8,7 +8,7 @@ export class FileUtils {
      * Generates a unique and slugified filename with timestamp and UUID.
      * Useful for saving files without collisions.
      */
-    static generateFilename(originalFilename: string): string {
+    static generateUploadFilename(originalFilename: string): string {
         const uuid = randomUUID();
         const extension = originalFilename.split('.').pop();
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').replace(/\..+/, '');
