@@ -4,3 +4,4 @@ export * from './apply-roles.decorator';
 export * from './ack.decorator';
 export * from './public.decorator';
 export * from './skip-response-transform.decorator';
+export * from './skip-file-cleanup.decorator';

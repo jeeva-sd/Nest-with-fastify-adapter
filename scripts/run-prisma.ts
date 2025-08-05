@@ -26,8 +26,7 @@ async function runPrismaCommand() {
         const { ConfigReader } = await import('~/configs/environments/environment.reader');
 
         // Get the config instance
-        const configReader = ConfigReader.getInstance();
-        const appConfig = configReader.config;
+        const appConfig = ConfigReader.getInstance().config;
 
         // Extract database configuration
         const dbConfig = appConfig.database?.sql || {};

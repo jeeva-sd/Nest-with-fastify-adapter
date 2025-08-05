@@ -1,5 +1,5 @@
 import { z } from 'zod/v4';
-import { createFileRule, FileTypes } from '~/common';
+import { FileTypes, createFileRule } from '~/common';
 
 export const ProfileImageDto = z.object({
     profileImage: createFileRule({
@@ -9,7 +9,7 @@ export const ProfileImageDto = z.object({
         includeBuffer: true,
         maxFileSize: 3, // 5 MB
         minFileSize: 0.1 // 1 MB
-    }),
+    })
 });
 
 export type ProfileImageDto = z.infer<typeof ProfileImageDto>;

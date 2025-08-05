@@ -132,9 +132,20 @@ class App {
             });
         }
 
-        // Configure rate limiting with settings from config
+        // Configure rate limiting with settings from config if enabled
         if (appConfig.plugins.rateLimit.enabled) {
-            const rateLimitConfig: any = {
+            const rateLimitConfig: {
+                max: number;
+                timeWindow: string;
+                allowList: string[];
+                skipOnError: boolean;
+                ban?: number;
+                addHeadersOnExceeding?: {
+                    'x-ratelimit-limit': boolean;
+                    'x-ratelimit-remaining': boolean;
+                    'x-ratelimit-reset': boolean;
+                };
+            } = {
                 max: appConfig.plugins.rateLimit.max, // Maximum requests per time window
                 timeWindow: appConfig.plugins.rateLimit.timeWindow, // Time window for rate limiting
                 allowList: appConfig.plugins.rateLimit.allowList, // IPs exempt from rate limiting
@@ -146,7 +157,7 @@ class App {
                 rateLimitConfig.ban = appConfig.plugins.rateLimit.ban;
             }
 
-            // Add rate limit headers
+            // Add rate limit headers if enabled
             if (appConfig.plugins.rateLimit.addHeaders) {
                 rateLimitConfig.addHeadersOnExceeding = {
                     'x-ratelimit-limit': true,
@@ -299,7 +310,6 @@ class App {
 
             // Start services
             await Promise.all([this.setUpMicroservices(), this.startServer()]);
-
         } catch (error) {
             Logger.error('Failed to bootstrap application:', error);
             process.exit(1);

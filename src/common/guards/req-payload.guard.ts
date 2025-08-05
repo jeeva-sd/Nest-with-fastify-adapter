@@ -21,7 +21,7 @@ interface MultipartField {
 
 type MultipartPart = MultipartFile | MultipartField;
 
-interface FileDetail {
+export interface FileDetail {
     fileId: string | null;
     mimetype: string;
     filePath: string;
@@ -73,7 +73,7 @@ export class PayloadGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        const uploadedFiles: string[] = [];
+        const uploadedFiles: FileDetail[] = [];
         let params: Record<string, unknown> = {};
 
         try {
@@ -132,7 +132,7 @@ export class PayloadGuard implements CanActivate {
     // Optimized multipart processing with streaming and memory management
     private async processMultipartOptimized(
         parts: AsyncIterableIterator<MultipartPart>,
-        uploadedFiles: string[]
+        uploadedFiles: FileDetail[]
     ): Promise<Record<string, unknown>> {
         const fileDetails: Record<string, unknown> = {};
         const filePromises: Promise<void>[] = [];
@@ -155,7 +155,7 @@ export class PayloadGuard implements CanActivate {
     private async processFileStream(
         part: MultipartFile,
         fileDetails: Record<string, unknown>,
-        uploadedFiles: string[]
+        uploadedFiles: FileDetail[]
     ): Promise<void> {
         const fileName = part.filename;
         const fileId = Helper.File.generateUploadFilename(fileName);
@@ -197,7 +197,7 @@ export class PayloadGuard implements CanActivate {
                 fileDetails[part.fieldname] = [];
             }
             (fileDetails[part.fieldname] as FileDetail[]).push(fileDetail);
-            uploadedFiles.push(filePath);
+            uploadedFiles.push({...fileDetail, buffer: undefined}); // Avoid storing large buffers in uploadedFiles
 
         } catch (error) {
             // Clean up partial file on error
@@ -211,18 +211,18 @@ export class PayloadGuard implements CanActivate {
     }
 
     // Optimized cleanup with better error handling
-    private async cleanupFilesOptimized(uploadedFiles: string[]): Promise<void> {
+    private async cleanupFilesOptimized(uploadedFiles: FileDetail[]): Promise<void> {
         if (uploadedFiles.length === 0) return;
 
         const results = await Promise.allSettled(
-            uploadedFiles.map(filePath => fs.promises.unlink(filePath))
+            uploadedFiles.map(fileDetail => fs.promises.unlink(fileDetail.filePath))
         );
 
         // Log any cleanup failures in development
         if (process.env.NODE_ENV === 'development') {
             results.forEach((result, index) => {
                 if (result.status === 'rejected') {
-                    console.warn(`Failed to cleanup file: ${uploadedFiles[index]}`);
+                    console.warn(`Failed to cleanup file: ${uploadedFiles[index].filePath}`);
                 }
             });
         }

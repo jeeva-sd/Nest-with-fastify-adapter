@@ -1,4 +1,5 @@
 import { FastifyRequest } from 'fastify';
+import { FileDetail } from '../guards';
 
 export type TokenData = {
     id: string;
@@ -12,8 +13,10 @@ export type TokenData = {
 };
 
 export interface RequestX extends FastifyRequest {
-    uploadedFiles?: string[];
+    uploadedFiles?: FileDetail[];
     user: TokenData;
     payload?: any;
     startTime?: number;
+    skipFileCleanup?: boolean; // Flag to skip file cleanup entirely
+    skipFileCleanupFields?: string[]; // Field names whose files should not be deleted
 }
