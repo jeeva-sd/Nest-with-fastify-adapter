@@ -3,5 +3,42 @@
         "port": 5050,
         "mode": "development",
         "allowExceptionLogs": true
+    },
+    "database": {
+        "sql": {
+            "connectionLimit": 5,
+            "host": "localhost",
+            "port": 3306,
+            "username": "demoUser",
+            "password": "QwertyuI@123",
+            "database": "boiler-plate",
+            "allowSeed": true
+        }
+    },
+    "microservices": {
+        "rabbitmq": {
+            "uri": "amqp://localhost/",
+            "exchange": {
+                "name": "ex_delay",
+                "type": "x-delayed-message",
+                "options": {
+                    "arguments": {
+                        "x-delayed-type": "direct"
+                    }
+                }
+            },
+            "queues": {
+                "general": {
+                    "name": "boiler-plate",
+                    "prefetchCount": 20,
+                    "durable": true
+                },
+                "singleConsumerQueue": {
+                    "name": "boiler-plate-single-consumer",
+                    "prefetchCount": 1,
+                    "durable": true
+                }
+            }
+        }
     }
 }

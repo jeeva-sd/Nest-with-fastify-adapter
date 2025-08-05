@@ -42,7 +42,7 @@ export class ArrayUtils {
     /**
      * Sorts an array of objects by the specified key, optionally in ascending or descending order.
      */
-    static sortByKey<T>(array: T[], key: keyof T, ascending: boolean = true): T[] {
+    static sortByKey<T>(array: T[], key: keyof T, ascending = true): T[] {
         return array.slice().sort((a, b) => {
             const valueA = a[key];
             const valueB = b[key];

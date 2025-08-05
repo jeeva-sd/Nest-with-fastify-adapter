@@ -1,14 +1,14 @@
-import { randomUUID } from "node:crypto";
-import * as fs from 'fs';
-import * as path from 'path';
-import { Helper } from "./helpers";
+import { randomUUID } from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { Helper } from './helpers';
 
 export class FileUtils {
     /**
      * Generates a unique and slugified filename with timestamp and UUID.
      * Useful for saving files without collisions.
      */
-    static generateFilename(originalFilename: string): string {
+    static generateUploadFilename(originalFilename: string): string {
         const uuid = randomUUID();
         const extension = originalFilename.split('.').pop();
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace('T', '-').replace(/\..+/, '');
@@ -43,7 +43,7 @@ export class FileUtils {
      * Defaults to KB and 2 decimal places.
      */
     static convertBytes(bytes: number, unit: 'B' | 'KB' | 'MB' | 'GB' = 'KB', decimals = 2) {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0) return 0;
 
         const units = {
             B: 1,

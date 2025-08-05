@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { ALL_FILE_TYPES, oneKb } from '~/constants';
 
 export interface FileSchemaOverrides {
@@ -7,6 +7,7 @@ export interface FileSchemaOverrides {
     maxFileSize?: number; // Maximum file size in MB
     required?: boolean;
     fieldName?: string | null;
+    includeBuffer?: boolean; // Flag to include buffer in the schema
 }
 
 export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
@@ -15,46 +16,42 @@ export const createFileRule = (overrides: FileSchemaOverrides = {}) => {
         minFileSize = 0.001, // 1 KB
         maxFileSize = 10,
         required = false,
-        fieldName = null
+        fieldName = null,
+        includeBuffer = false // Default to not including buffer
     } = overrides;
 
     const withFieldName = (message: string) => (fieldName ? `${fieldName}: ${message}` : message);
 
     // Define the file schema
     const fileSchema = z.object({
-        mimetype: z
-            .string()
-            .refine((value) => allowedMimeTypes.includes(value), {
-                message: withFieldName('Invalid file mimetype'),
-            }),
-        fileName: z.string().nonempty(withFieldName('Invalid file name')),
-        filePath: z.string().nonempty(withFieldName('File path is required')),
+        mimetype: z.string().refine(value => allowedMimeTypes.includes(value), {
+            message: withFieldName('The file type is not supported.')
+        }),
+        fileId: z.string().nullable().default(null),
+        fileName: z.string().nonempty(withFieldName('The file name cannot be empty.')),
+        filePath: z.string().nonempty(withFieldName('The file path is required.')),
         fileSize: z
             .number()
             .min(minFileSize, {
-                message: withFieldName(`File size must be at least ${minFileSize} MB (${minFileSize * oneKb} KB)`),
+                message: withFieldName(
+                    `The file size must be at least ${minFileSize} MB (${Math.round(minFileSize * oneKb)} KB).`
+                )
             })
             .max(maxFileSize, {
-                message: withFieldName(`File size must be less than ${maxFileSize} MB (${maxFileSize * oneKb} KB)`),
+                message: withFieldName(
+                    `The file size must be less than ${maxFileSize} MB (${Math.round(maxFileSize * oneKb)} KB).`
+                )
             })
-            .refine((value) => !isNaN(value), {
-                message: withFieldName('Invalid file parameters'),
+            .refine(value => !Number.isNaN(value), {
+                message: withFieldName('The file size is invalid.')
             }),
+        ...(includeBuffer ? { buffer: z.instanceof(Buffer) } : {}) // Include buffer if requested
     });
 
-    // Define the array schema
-    const fileArraySchema = z
-        .array(fileSchema, {
-            invalid_type_error: withFieldName('Invalid file parameters'),
-        })
-        .superRefine((files, ctx) => {
-            if (required && files.length === 0) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: withFieldName('File attachment is required'),
-                });
-            }
-        });
+    // Define the array schema dynamically based on the `required` flag
+    const fileArraySchema = required
+        ? z.array(fileSchema).min(1, withFieldName('At least one file must be uploaded.'))
+        : z.array(fileSchema).optional(); // Make the array optional if not required
 
     return fileArraySchema;
 };

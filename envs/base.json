@@ -1,14 +1,149 @@
 {
     "server": {
-        "port": 5051,
+        "port": 3010,
         "version": "1",
         "routePrefix": "api",
-        "logger": false,
-        "bodyLimit": 1048576,
-        "caseSensitive": false,
-        "ignoreTrailingSlash": true,
-        "ignoreDuplicateSlashes": true,
-        "allowExceptionLogs": false
+        "mode": "development",
+        "host": "0.0.0.0",
+        "allowExceptionLogs": false,
+        "bufferLogs": true,
+        "abortOnError": false
+    },
+    "fastify": {
+        "adapter": {
+            "logger": false,
+            "trustProxy": true,
+            "ignoreTrailingSlash": true,
+            "ignoreDuplicateSlashes": true,
+            "caseSensitive": false,
+            "maxParamLength": 100,
+            "bodyLimit": 1048576
+        },
+        "hooks": {
+            "performanceLogging": true,
+            "slowRequestThreshold": 100,
+            "enableRequestTiming": true
+        }
+    },
+    "plugins": {
+        "helmet": {
+            "enabled": true
+        },
+        "cors": {
+            "enabled": true,
+            "origin": ["http://localhost:3000"],
+            "credentials": true,
+            "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+        },
+        "cookies": {
+            "enabled": true
+        },
+        "multipart": {
+            "enabled": true,
+            "attachFieldsToBody": false,
+            "sharedSchemaId": "MultipartFileType",
+            "limits": {
+                "fileSize": 5242880,
+                "fieldSize": 1048576,
+                "fields": 10,
+                "files": 1
+            }
+        },
+        "csrf": {
+            "enabled": true
+        },
+        "static": {
+            "enabled": true,
+            "root": "public",
+            "prefix": "/static/",
+            "maxAge": 2592000000,
+            "etag": true,
+            "lastModified": true,
+            "immutable": true,
+            "cacheControl": true
+        },
+        "rateLimit": {
+            "enabled": true,
+            "max": 100,
+            "timeWindow": "1 minute",
+            "allowList": ["127.0.0.1"],
+            "ban": 1,
+            "skipOnError": true,
+            "addHeaders": true
+        },
+        "compression": {
+            "enabled": true,
+            "encodings": ["gzip", "deflate", "br"],
+            "threshold": 1024,
+            "zlibLevel": 6,
+            "chunkSize": 1024,
+            "contentTypeFilter": "^text/|\\+json$|\\+text$|\\+xml$",
+            "brotliOptions": {
+                "params": {
+                    "BROTLI_PARAM_QUALITY": 4
+                }
+            }
+        }
+    },
+    "database": {
+        "sql": {
+            "performance": {
+                "poolTimeout": 20,
+                "socketTimeout": 30,
+                "connectTimeout": 10,
+                "queryTimeout": 30000
+            }
+        }
+    },
+    "microservices": {
+        "rabbitmq": {
+            "enabled": true,
+            "continueOnFailure": true,
+            "uri": "amqp://localhost:5672",
+            "exchange": {
+                "name": "default_exchange",
+                "type": "topic",
+                "options": {
+                    "arguments": {
+                        "x-delayed-type": "topic"
+                    }
+                }
+            },
+            "queues": {
+                "general": {
+                    "name": "general_queue",
+                    "prefetchCount": 10,
+                    "durable": true
+                },
+                "singleConsumerQueue": {
+                    "name": "single_consumer_queue",
+                    "prefetchCount": 1,
+                    "durable": true
+                }
+            }
+        }
+    },
+    "monitoring": {
+        "performance": {
+            "enabled": true,
+            "slowRequestThreshold": 1000,
+            "mediumRequestThreshold": 500,
+            "fastRequestThreshold": 100
+        },
+        "memory": {
+            "enabled": true,
+            "warningThreshold": 52428800,
+            "criticalThreshold": 104857600,
+            "checkInterval": 30000
+        },
+        "startup": {
+            "logProcessInfo": true
+        }
+    },
+    "gracefulShutdown": {
+        "enabled": true,
+        "signals": ["SIGTERM", "SIGINT"],
+        "logShutdown": true
     },
     "auth": {
         "skipJwtAuthKey": "cm4yg6uzn00000cjf6sgm90dy",
@@ -35,46 +170,8 @@
             "skipFormatKey": "cma81qmo700070cif5pop4mov"
         }
     },
-    "multiPart": {
-        "limits": {
-            "fileSize": 5242880,
-            "fieldSize": 1048576,
-            "fields": 10,
-            "files": 1
-        }
-    },
-    "cors": {
-        "allowedDomains": ["http://localhost:3000"],
-        "credentials": true
-    },
-    "staticFiles": {
-        "staticRoot": "public",
-        "staticPrefix": "/static/"
-    },
     "views": {
         "engine": "handlebars",
         "templatesDir": "src/views"
-    },
-    "compression": {
-        "encodings": ["gzip", "deflate", "br"],
-        "threshold": 1024,
-        "brotliOptions": {
-            "params": {
-                "BROTLI_PARAM_QUALITY": 4
-            }
-        }
-    },
-    "rabbitMq": {
-        "general": {
-            "name": "GENERAL_MQ",
-            "options": {
-                "urls": ["amqp://localhost"],
-                "queue": "localTestQueue",
-                "noAck": false,
-                "queueOptions": {
-                    "durable": true
-                }
-            }
-        }
     }
 }

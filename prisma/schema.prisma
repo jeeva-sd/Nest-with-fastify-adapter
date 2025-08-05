@@ -1,0 +1,66 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+// *******************************************************************************************
+
+model User {
+    id        String   @id @default(cuid())
+    fname     String   @db.VarChar(50)
+    lname     String   @db.VarChar(50)
+    email     String   @unique(map: "uk_user_email") @db.VarChar(255)
+    roleId    String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    role Role? @relation(fields: [roleId], references: [id], onDelete: SetNull, map: "fk_user_role")
+
+    @@index([fname], map: "idx_user_fname")
+    @@index([lname], map: "idx_user_name")
+    @@map("users")
+}
+
+model Role {
+    id          String   @id @default(cuid())
+    name        String   @unique(map: "uk_role_name") @db.VarChar(100)
+    description String?  @db.VarChar(255)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    users           User[]
+    rolePermissions RolePermission[]
+
+    @@index([name], map: "idx_role_name")
+    @@map("roles")
+}
+
+model Permission {
+    id          String   @id @default(cuid())
+    name        String   @unique(map: "uk_perm_name") @db.VarChar(100)
+    description String?  @db.VarChar(255)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    rolePermissions RolePermission[]
+
+    @@index([name], map: "idx_perm_name")
+    @@map("permissions")
+}
+
+model RolePermission {
+    roleId       String
+    permissionId String
+    createdAt    DateTime @default(now())
+
+    role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "fk_role_perm_role")
+    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade, map: "fk_role_perm_perm")
+
+    @@id([roleId, permissionId])
+    @@index([createdAt], map: "idx_rperm_created")
+    @@map("role_permissions")
+}

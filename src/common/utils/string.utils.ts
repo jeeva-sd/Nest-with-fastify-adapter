@@ -7,7 +7,7 @@ export class StringUtils {
         return str
             .trim()
             .toLowerCase()
-            .replace(/\b\w/g, (char) => char.toUpperCase());
+            .replace(/\b\w/g, char => char.toUpperCase());
     }
 
     /**
@@ -19,7 +19,7 @@ export class StringUtils {
             .trim()
             .toLowerCase()
             .replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/\b\w/g, (c) => c.toUpperCase());
+            .replace(/\b\w/g, c => c.toUpperCase());
     }
 
     /**
@@ -35,7 +35,7 @@ export class StringUtils {
      */
     static truncate(str: string, maxLength: number): string {
         if (!str || maxLength <= 0) return '';
-        return str.length > maxLength ? str.trim().slice(0, maxLength) + '...' : str;
+        return str.length > maxLength ? `${str.trim().slice(0, maxLength)}...` : str;
     }
 
     /**
@@ -58,7 +58,7 @@ export class StringUtils {
      */
     static countWords(str: string): number {
         if (!str) return 0;
-        const words = str.split(/\s+/).filter((word) => word.length > 0);
+        const words = str.split(/\s+/).filter(word => word.length > 0);
         return words.length;
     }
 
@@ -104,7 +104,7 @@ export class StringUtils {
     /**
      * Pads a string equally on both sides with the specified character to reach the given length.
      */
-    static padString(str: string, length: number, char: string = ' '): string {
+    static padString(str: string, length: number, char = ' '): string {
         if (!str || length <= str.length) return str;
         const pad = char.repeat(length - str.length);
         return pad.slice(0, Math.floor(pad.length / 2)) + str + pad.slice(Math.floor(pad.length / 2));

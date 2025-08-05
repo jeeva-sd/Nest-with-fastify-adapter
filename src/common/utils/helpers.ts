@@ -1,10 +1,10 @@
 import * as CryptoJS from 'crypto-js';
 import { appConfig } from '~/configs';
 import { ArrayUtils } from './array.utils';
-import { ObjectUtils } from './object.utils';
-import { StringUtils } from './string.utils';
 import { FileUtils } from './file.utils';
 import { NumberUtils } from './number.utils';
+import { ObjectUtils } from './object.utils';
+import { StringUtils } from './string.utils';
 
 export class Helper {
     static Array = ArrayUtils;
@@ -21,7 +21,7 @@ export class Helper {
      * Returns a Promise that resolves after a specified delay (in milliseconds).
      */
     static wait(ms: number): Promise<void> {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     /**

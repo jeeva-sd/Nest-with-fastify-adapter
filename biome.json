@@ -7,7 +7,7 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "ignore": ["dist", "common"]
+        "ignore": ["dist", "common", "scripts"]
     },
     "formatter": {
         "enabled": true,
@@ -25,7 +25,9 @@
             "complexity": {
                 "useLiteralKeys": "off",
                 "noUselessConstructor": "off",
-                "noExtraBooleanCast": "warn"
+                "noExtraBooleanCast": "warn",
+                "noStaticOnlyClass": "off",
+                "noForEach": "off"
             },
             "style": {
                 "useImportType": "off",
@@ -35,11 +37,13 @@
             "correctness": {
                 "noUnusedVariables": "warn",
                 "noUnsafeFinally": "warn",
-                "noUnusedImports": "warn"
+                "noUnusedImports": "warn",
+                "noUnsafeOptionalChaining": "warn"
             },
             "suspicious": {
                 "noAsyncPromiseExecutor": "warn",
-                "noDebugger": "warn"
+                "noDebugger": "warn",
+                "noExplicitAny": "warn"
             }
         }
     },
@@ -51,7 +55,7 @@
             "quoteStyle": "single",
             "semicolons": "always",
             "trailingCommas": "none",
-            "arrowParentheses": "always",
+            "arrowParentheses": "asNeeded",
             "bracketSameLine": false
         }
     },

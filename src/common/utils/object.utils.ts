@@ -7,7 +7,7 @@ export class ObjectUtils {
             // If the value is an object (not null, not array), merge recursively
             if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key])) {
                 if (!(key in base)) base[key] = {};
-                base[key] = this.deepMerge(base[key], newObj[key]);
+                base[key] = ObjectUtils.deepMerge(base[key], newObj[key]);
             } else {
                 // Overwrite the value from newObj to base
                 if (key in newObj) base[key] = newObj[key];
@@ -64,7 +64,7 @@ export class ObjectUtils {
      */
     static pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
         const result: Partial<T> = {};
-        keys.forEach((key) => {
+        keys.forEach(key => {
             if (key in obj) {
                 result[key] = obj[key];
             }
@@ -76,8 +76,8 @@ export class ObjectUtils {
      * Omits specific keys from an object and returns a new object without those keys.
      */
     static omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
-        const result: Partial<T> = { ...obj };
-        keys.forEach((key) => {
+        const result: Partial<T> = JSON.parse(JSON.stringify(obj));
+        keys.forEach(key => {
             delete result[key];
         });
         return result as Omit<T, K>;

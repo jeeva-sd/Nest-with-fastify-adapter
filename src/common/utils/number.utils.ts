@@ -6,8 +6,8 @@ export class NumberUtils {
      * @returns The rounded number.
      */
     static roundToDecimal(num: number, decimalPlaces = 2): number {
-        if (isNaN(num)) return NaN;
-        const factor = Math.pow(10, decimalPlaces);
+        if (Number.isNaN(num)) return Number.NaN;
+        const factor = 10 ** decimalPlaces;
         return Math.round(num * factor) / factor;
     }
 
@@ -36,10 +36,10 @@ export class NumberUtils {
      * @returns Formatted string (e.g., 1500 -> "1.5K").
      */
     static formatLargeNumber(num: number): string {
-        if (isNaN(num)) return '0';
-        if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + 'B';
-        if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
-        if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+        if (Number.isNaN(num)) return '0';
+        if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1)}B`;
+        if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+        if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
         return num.toString();
     }
 
@@ -52,7 +52,7 @@ export class NumberUtils {
     static getPercentageChange(oldValue: number, newValue: number): string {
         if (oldValue === 0) return 'N/A';
         const change = ((newValue - oldValue) / oldValue) * 100;
-        return change.toFixed(2) + '%';
+        return `${change.toFixed(2)}%`;
     }
 
     /**
@@ -91,7 +91,7 @@ export class NumberUtils {
      * @returns A cleaned string representation.
      */
     static toCleanFixed(num: number, decimals = 2): string {
-        return parseFloat(num.toFixed(decimals)).toString();
+        return Number.parseFloat(num.toFixed(decimals)).toString();
     }
 
     /**
@@ -101,6 +101,6 @@ export class NumberUtils {
      * @returns Percentage string (e.g., 0.1234 -> "12.34%").
      */
     static toPercentage(fraction: number, decimals = 2): string {
-        return (fraction * 100).toFixed(decimals) + '%';
+        return `${(fraction * 100).toFixed(decimals)}%`;
     }
 }

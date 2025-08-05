@@ -1,17 +1,44 @@
 {
     "server": {
-        "port": 1314,
-        "mode": "development"
+        "port": 5050,
+        "mode": "development",
+        "allowExceptionLogs": true
     },
-    "auth": {
-        "encryptionKey": "cm4ybfhbd00000cmkbov75r84",
-        "jwt": {
-            "secret": "cm4l37kx000010cl42l2d3jck",
-            "expiresIn": "5h"
+    "database": {
+        "sql": {
+            "connectionLimit": 5,
+            "host": "localhost",
+            "port": 3306,
+            "username": "demoUser",
+            "password": "QwertyuI@123",
+            "database": "boiler-plate",
+            "allowSeed": true
         }
     },
-    "cors": {
-        "allowedDomains": ["http://localhost:3000"],
-        "credentials": true
+    "microservices": {
+        "rabbitmq": {
+            "uri": "amqp://localhost/",
+            "exchange": {
+                "name": "ex_delay",
+                "type": "x-delayed-message",
+                "options": {
+                    "arguments": {
+                        "x-delayed-type": "direct"
+                    }
+                }
+            },
+            "queues": {
+                "general": {
+                    "name": "boiler-plate",
+                    "prefetchCount": 20,
+                    "durable": true
+                },
+                "singleConsumerQueue": {
+                    "name": "boiler-plate-single-consumer",
+                    "prefetchCount": 1,
+                    "durable": true
+                }
+            }
+        }
     }
 }

@@ -1,3 +1,3 @@
 export * from './logging.interceptor';
-export * from './file-cleanup.interceptor';
 export * from './response.interceptor';
+export * from './performance.interceptor';

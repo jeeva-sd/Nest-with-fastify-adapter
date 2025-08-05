@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { UserEvents } from './user.events';
+import { RoleModule } from '../roles/roles.module';
+import { EcoAppsEvents } from './eco-apps.events';
 
 @Module({
-    controllers: [UserEvents]
+    imports: [RoleModule],
+    controllers: [EcoAppsEvents]
 })
 export class EventsModule {}

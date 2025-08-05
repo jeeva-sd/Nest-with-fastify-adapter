@@ -1,4 +1,4 @@
-import { applyDecorators, SetMetadata } from '@nestjs/common';
+import { SetMetadata, applyDecorators } from '@nestjs/common';
 import { appConfig } from '~/configs';
 
 export interface AccessOptions {
@@ -8,8 +8,7 @@ export interface AccessOptions {
     matchAllPermissions?: boolean;
 }
 
-export const Roles = (roles: string[], matchAll = false) =>
-    SetMetadata(appConfig.auth.roleKey, { roles, matchAll });
+export const Roles = (roles: string[], matchAll = false) => SetMetadata(appConfig.auth.roleKey, { roles, matchAll });
 
 export const Permissions = (permissions: string[], matchAll = false) =>
     SetMetadata(appConfig.auth.permissionKey, { permissions, matchAll });
@@ -18,9 +17,5 @@ export const Access = ({
     roles = [],
     permissions = [],
     matchAllRoles = false,
-    matchAllPermissions = false,
-}: AccessOptions) =>
-    applyDecorators(
-        Roles(roles, matchAllRoles),
-        Permissions(permissions, matchAllPermissions)
-    );
+    matchAllPermissions = false
+}: AccessOptions) => applyDecorators(Roles(roles, matchAllRoles), Permissions(permissions, matchAllPermissions));
