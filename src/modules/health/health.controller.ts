@@ -10,10 +10,10 @@ export class HealthController {
     @Get()
     @Public()
     async checkHealth() {
-        const startTime = Date.now();
 
         try {
             // Check database connectivity
+            const startTime = Date.now();
             await this.prismaService.$queryRaw`SELECT 1`;
             const dbLatency = Date.now() - startTime;
 
