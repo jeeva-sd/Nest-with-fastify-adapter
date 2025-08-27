@@ -11,12 +11,13 @@
         "predev": "npx prisma generate",
         "dev": "cross-env NODE_ENV=development nest start --watch",
         "prod": "cross-env NODE_ENV=production node dist/src/main",
-        "format": "biome check --write --no-errors-on-unmatched",
-        "deepFormat": "biome check --write --unsafe --no-errors-on-unmatched",
+        "lint": "biome check --write --no-errors-on-unmatched",
         "db:generate": "npx prisma generate && cross-env NODE_ENV=development ts-node scripts/run-prisma.ts migrate dev --create-only",
         "db:update": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts migrate dev",
         "db:push": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts db push",
-        "db:pushToProd": "cross-env NODE_ENV=production ts-node scripts/run-prisma.ts db push"
+        "db:pushToProd": "cross-env NODE_ENV=production ts-node scripts/run-prisma.ts db push",
+        "db:studio": "cross-env NODE_ENV=development ts-node scripts/run-prisma.ts studio",
+        "db:seed": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/modules/database/seed.ts"
     },
     "dependencies": {
         "@fastify/compress": "^8.0.1",
