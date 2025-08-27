@@ -7,8 +7,8 @@ export const ProfileImageDto = z.object({
         allowedMimeTypes: [FileTypes.IMAGE_PNG],
         fieldName: 'profileImage',
         includeBuffer: true,
-        maxFileSize: 3, // 5 MB
-        minFileSize: 0.1 // 1 MB
+        maxFileSize: 3, // 3 MB
+        minFileSize: 0.1 // 100 kB
     })
 });
 

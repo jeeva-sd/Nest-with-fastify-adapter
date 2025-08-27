@@ -6,9 +6,6 @@ if (!env) {
     process.exit(1);
 }
 
-// Set NODE_ENV early before any imports
-process.env.NODE_ENV = env;
-
 // Register tsconfig paths to resolve ~ aliases
 require('tsconfig-paths/register');
 
