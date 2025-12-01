@@ -39,7 +39,6 @@
         "amqp-connection-manager": "^5.0.0",
         "amqplib": "^0.10.9",
         "axios": "^1.13.2",
-        "chalk": "^5.6.2",
         "cross-env": "^10.1.0",
         "crypto-js": "^4.2.0",
         "fastify": "^5.6.2",

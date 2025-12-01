@@ -4,8 +4,8 @@ import {
     ExceptionFilter,
     HttpException,
     HttpStatus,
+    Logger,
 } from '@nestjs/common';
-import { Chalk } from '../interceptors';
 import { appConfig } from '~/configs';
 import { createId } from '@paralleldrive/cuid2';
 import { Prisma } from '@prisma/client';
@@ -13,7 +13,7 @@ import { readError } from '../utils';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-    private readonly logger = new Chalk(HttpExceptionFilter.name);
+    private readonly logger = new Logger(HttpExceptionFilter.name);
 
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
@@ -42,7 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         // Log the exception with trace ID
         if (appConfig.server.allowExceptionLogs) {
-            this.logger.exception(exception, traceId);
+            this.logger.error(exception, traceId);
         }
 
         // Send the response

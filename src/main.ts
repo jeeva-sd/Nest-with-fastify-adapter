@@ -10,9 +10,7 @@ import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import * as chalk from 'chalk';
 import {
-    Chalk,
     HttpExceptionFilter,
     PayloadGuard,
     RequestX,
@@ -28,8 +26,6 @@ class App {
     private reflector: Reflector;
 
     async createApp() {
-        const chalkLogger = new Chalk();
-
         const fastifyAdapter = new FastifyAdapter({
             logger: appConfig.fastify.adapter.logger,
             trustProxy: appConfig.fastify.adapter.trustProxy, // Enable if behind reverse proxy (load balancer, nginx)
@@ -40,7 +36,6 @@ class App {
         });
 
         this.app = await NestFactory.create<NestFastifyApplication>(AppModule, fastifyAdapter, {
-            logger: chalkLogger,
             bufferLogs: appConfig.server.bufferLogs, // Buffer logs during startup for better performance
             abortOnError: appConfig.server.abortOnError // Continue startup even if some modules fail
         });
@@ -216,13 +211,13 @@ class App {
 
         await this.app.listen(port, host);
         const url = await this.app.getUrl();
-        Logger.log(chalk.cyan(`Application is running on: ${url}`));
+        Logger.log(`Application is running on: ${url}`);
 
         // Log additional startup information
         if (appConfig.monitoring.startup.logProcessInfo) {
-            Logger.log(chalk.green(`Process ID: ${process.pid}`));
-            Logger.log(chalk.green(`Environment: ${appConfig.server.mode}`));
-            Logger.log(chalk.green(`Node version: ${process.version}`));
+            Logger.log(`Process ID: ${process.pid}`);
+            Logger.log(`Environment: ${appConfig.server.mode}`);
+            Logger.log(`Node version: ${process.version}`);
         }
     }
 
@@ -266,16 +261,12 @@ class App {
             this.app.connectMicroservice(createRmqMicroserviceOptions(RABBIT_MQ_QUEUE_KEYS.SINGLE_CONSUMER));
 
             await this.app.startAllMicroservices();
-            Logger.log(chalk.green('All microservices started successfully'));
+            Logger.log('All microservices started successfully');
 
             // Log RabbitMQ connection info
             if (appConfig.monitoring.startup.logProcessInfo) {
-                Logger.log(chalk.green(`RabbitMQ connected to: ${appConfig.microservices.rabbitmq.uri}`));
-                Logger.log(
-                    chalk.green(
-                        `Exchange: ${appConfig.microservices.rabbitmq.exchange.name} (${appConfig.microservices.rabbitmq.exchange.type})`
-                    )
-                );
+                Logger.log(`RabbitMQ connected to: ${appConfig.microservices.rabbitmq.uri}`);
+                Logger.log(`Exchange: ${appConfig.microservices.rabbitmq.exchange.name} (${appConfig.microservices.rabbitmq.exchange.type})`);
             }
         } catch (error) {
             Logger.error('Failed to start microservices:', error);

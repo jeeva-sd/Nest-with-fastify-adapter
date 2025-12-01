@@ -1,6 +1,5 @@
-import { Injectable, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { Chalk } from '~/common';
 import { appConfig } from '~/configs';
 import { seedDatabase } from './seed';
 
@@ -12,25 +11,20 @@ if (!process.env.DATABASE_URL) {
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnApplicationBootstrap, OnModuleDestroy {
-    private readonly chalk = new Chalk('PrismaService');
+    private readonly logger = new Logger(PrismaService.name);
     private static isSeeded = false;
     private static isConnected = false;
 
     constructor() {
         super({
-            datasources: {
-                db: {
-                    url: process.env.DATABASE_URL // Use optimized connection string with performance parameters
-                }
-            },
             log: [
                 // Environment-aware logging configuration
                 ...(appConfig.server.mode === 'development'
                     ? [
-                          { emit: 'event', level: 'query' }, // Log all queries in development
-                          { emit: 'event', level: 'info' }, // Log info messages in development
-                          { emit: 'event', level: 'warn' } // Log warnings in development
-                      ]
+                        { emit: 'event', level: 'query' }, // Log all queries in development
+                        { emit: 'event', level: 'info' }, // Log info messages in development
+                        { emit: 'event', level: 'warn' } // Log warnings in development
+                    ]
                     : []),
                 { emit: 'event', level: 'error' } // Always log errors regardless of environment
             ] as Prisma.LogDefinition[],
@@ -47,26 +41,26 @@ export class PrismaService extends PrismaClient implements OnApplicationBootstra
                 const duration = e.duration;
                 // Use monitoring configuration for query performance thresholds
                 if (duration > appConfig.monitoring.performance.slowRequestThreshold) {
-                    this.chalk.warn(`Slow query (${duration}ms): ${e.query.substring(0, 100)}...`);
+                    this.logger.warn(`Slow query (${duration}ms): ${e.query.substring(0, 100)}...`);
                 } else if (duration > appConfig.monitoring.performance.mediumRequestThreshold) {
-                    this.chalk.debug(`Medium query (${duration}ms): ${e.query.substring(0, 50)}...`);
+                    this.logger.debug(`Medium query (${duration}ms): ${e.query.substring(0, 50)}...`);
                 } else if (duration > appConfig.monitoring.performance.fastRequestThreshold) {
-                    this.chalk.debug(`Query (${duration}ms): ${e.query.substring(0, 50)}...`);
+                    this.logger.debug(`Query (${duration}ms): ${e.query.substring(0, 50)}...`);
                 }
             });
 
             this.$on('info' as never, (e: Prisma.LogEvent) => {
-                this.chalk.info(e.message);
+                this.logger.log(e.message);
             });
         }
 
         // Always log errors and warnings
         this.$on('error' as never, (e: Prisma.LogEvent) => {
-            this.chalk.error(`Database error: ${e.message}`);
+            this.logger.error(`Database error: ${e.message}`);
         });
 
         this.$on('warn' as never, (e: Prisma.LogEvent) => {
-            this.chalk.warn(`Database warning: ${e.message}`);
+            this.logger.warn(`Database warning: ${e.message}`);
         });
     }
 
@@ -75,7 +69,7 @@ export class PrismaService extends PrismaClient implements OnApplicationBootstra
             if (!PrismaService.isConnected) {
                 await this.$connect(); // Connect to database using optimized connection parameters
                 PrismaService.isConnected = true;
-                this.chalk.success('Database connection established');
+                this.logger.log('Database connection established');
             }
 
             // Run seeding asynchronously to not block startup if database seeding is enabled
@@ -84,14 +78,14 @@ export class PrismaService extends PrismaClient implements OnApplicationBootstra
                     try {
                         await seedDatabase();
                         PrismaService.isSeeded = true;
-                        this.chalk.success('Database seeding completed');
+                        this.logger.log('Database seeding completed');
                     } catch (error) {
-                        this.chalk.error('Database seeding failed:', error);
+                        this.logger.error('Database seeding failed:', error);
                     }
                 });
             }
         } catch (error) {
-            this.chalk.error('Failed to connect to database:', error);
+            this.logger.error('Failed to connect to database:', error);
             throw error;
         }
     }
@@ -100,7 +94,7 @@ export class PrismaService extends PrismaClient implements OnApplicationBootstra
         if (PrismaService.isConnected) {
             await this.$disconnect(); // Gracefully disconnect from database
             PrismaService.isConnected = false;
-            this.chalk.info('Database connection closed');
+            this.logger.log('Database connection closed');
         }
     }
 

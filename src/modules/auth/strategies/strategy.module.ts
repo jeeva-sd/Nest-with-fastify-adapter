@@ -12,7 +12,7 @@ import { JwtStrategy } from './jwt.strategy';
             useFactory: () => {
                 return new JwtService({
                     secret: appConfig.auth.basicJWT.secret,
-                    signOptions: { expiresIn: appConfig.auth.basicJWT.expiresIn }
+                    signOptions: { expiresIn: appConfig.auth.basicJWT.expiresIn}
                 });
             }
         }

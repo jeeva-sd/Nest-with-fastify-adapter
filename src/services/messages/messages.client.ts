@@ -1,8 +1,7 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import * as amqp from 'amqplib';
 import { firstValueFrom } from 'rxjs';
-import { Chalk } from '~/common';
 import { appConfig } from '~/configs';
 import { generalEvents, singleConsumerEvents } from '~/constants';
 import { extractRoutingKeys } from './messages.config';
@@ -10,7 +9,7 @@ import { extractRoutingKeys } from './messages.config';
 @Injectable()
 export class MessagesClient implements OnModuleInit {
     private readonly config = appConfig.microservices.rabbitmq;
-    private readonly logger = new Chalk(MessagesClient.name);
+    private readonly logger = new Logger(MessagesClient.name);
 
     constructor(
         @Inject('RmqGeneralClient')

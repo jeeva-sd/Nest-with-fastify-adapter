@@ -106,7 +106,7 @@ const authConfigSchema = z.object({
     basicJWT: z.object({
         name: z.string(),
         secret: z.string(),
-        expiresIn: z.string()
+        expiresIn: z.number()
     })
 });
 

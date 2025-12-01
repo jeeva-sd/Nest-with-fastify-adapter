@@ -1,9 +1,29 @@
+import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { Chalk } from '~/common';
-import { permissions, standardRoles } from '~/configs';
+import { appConfig, permissions, standardRoles } from '~/configs';
 
-const prisma = new PrismaClient();
-const chalk = new Chalk('seedRolesAndPermissions');
+const { sql } = appConfig.database;
+
+if (!process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = `mysql://${sql.username}:${sql.password}@${sql.host}:${sql.port}/${sql.database}?connection_limit=${sql.connectionLimit}&pool_timeout=${sql.performance.poolTimeout}&socket_timeout=${sql.performance.socketTimeout}&connect_timeout=${sql.performance.connectTimeout}&sslmode=PREFERRED&query_timeout=${sql.performance.queryTimeout}`;
+}
+
+const prisma = new PrismaClient({
+    log: [
+        // Environment-aware logging configuration
+        ...(appConfig.server.mode === 'development'
+            ? [
+                { emit: 'event', level: 'query' }, // Log all queries in development
+                { emit: 'event', level: 'info' }, // Log info messages in development
+                { emit: 'event', level: 'warn' } // Log warnings in development
+            ]
+            : []),
+        { emit: 'event', level: 'error' } // Always log errors regardless of environment
+    ] as any[],
+    errorFormat: appConfig.server.mode === 'development' ? 'pretty' : 'minimal' // Pretty errors in dev, minimal in prod
+});
+
+const logger = new Logger('seedRolesAndPermissions');
 
 export async function seedRolesAndPermissions() {
     await prisma.$transaction(
@@ -79,10 +99,12 @@ export async function seedRolesAndPermissions() {
                 skipDuplicates: true
             });
 
-            chalk.success('Seeded roles, permissions, and role-permission mappings.');
+            logger.log('Seeded roles, permissions, and role-permission mappings.');
         },
         {
             timeout: 30000 // 30 seconds
         }
     );
+
+    await prisma.$disconnect();
 }

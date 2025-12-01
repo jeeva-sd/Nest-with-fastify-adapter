@@ -26,7 +26,7 @@ async function runPrismaCommand() {
         const appConfig = ConfigReader.getInstance().config;
 
         // Extract database configuration
-        const dbConfig = appConfig.database?.sql || {};
+        const dbConfig = appConfig.database?.sql;
         const { username, password, host, port, database } = dbConfig;
 
         const DATABASE_URL = `mysql://${username}:${password}@${host}:${port}/${database}?connection_limit=${1}`;
