@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
-import { ZodType } from 'zod/v4';
+import { ZodType } from 'zod';
 import { badMessage } from '~/constants/events';
 
 const logger = new Logger('RabbitMQDecorator');
@@ -26,8 +26,9 @@ export function AckHandler(schema?: ZodType<unknown>) {
                     try {
                         schema.parse(payload); // Zod's `parse` method for validation
                     } catch (validationError) {
+                        const zodError = validationError as { errors?: { message?: string }[]; message?: string };
                         logger.warn(
-                            `🚨 Validation failed in ${propertyKey}: ${validationError.errors?.[0]?.message || validationError.message}`
+                            `Validation failed in ${propertyKey}: ${zodError.errors?.[0]?.message || zodError.message}`
                         );
                         channel.nack(message, false, false); // Discard message permanently
                         return null;
@@ -37,7 +38,7 @@ export function AckHandler(schema?: ZodType<unknown>) {
                 const result = await originalMethod.apply(this, args);
 
                 if (result === badMessage) {
-                    logger.warn(`🚨 Discarding message in ${propertyKey}`);
+                    logger.warn(`Discarding message in ${propertyKey}`);
                     channel.nack(message, false, false); // Discard the message permanently
                     return null;
                 }
@@ -45,7 +46,8 @@ export function AckHandler(schema?: ZodType<unknown>) {
                 channel.ack(message);
                 return result;
             } catch (error) {
-                logger.error(`❌ Error in ${propertyKey}: ${error.message}`, error.stack);
+                const err = error as Error;
+                logger.error(`Error in ${propertyKey}: ${err.message}`, err.stack);
                 channel.nack(message, false, true); // Retry message
             }
         };

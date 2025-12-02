@@ -89,7 +89,7 @@ export class ObjectUtils {
     static flattenObject(obj: object, prefix = ''): object {
         const result: any = {};
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 const value = obj[key];
                 const newKey = prefix ? `${prefix}.${key}` : key;
                 if (ObjectUtils.isObject(value) && !Array.isArray(value)) {
@@ -108,7 +108,7 @@ export class ObjectUtils {
     static unflattenObject(obj: object): object {
         const result: any = {};
         for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            if (Object.hasOwn(obj, key)) {
                 const value = obj[key];
                 // Split the key by dot and build the nested structure
                 key.split('.').reduce((acc: any, part: string, index: number, parts: string[]) => {

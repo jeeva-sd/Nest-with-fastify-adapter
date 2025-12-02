@@ -1,5 +1,5 @@
-import { z } from 'zod/v4';
-import { FileTypes, createFileRule } from '~/common';
+import { z } from 'zod';
+import { createFileRule, FileTypes } from '~/common';
 
 export const ProfileImageDto = z.object({
     profileImage: createFileRule({

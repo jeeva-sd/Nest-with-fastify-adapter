@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
-import { RequestX } from '../types';
+import { FastifyRequest } from 'fastify/types/request';
 import { appConfig } from '~/configs';
+import { RequestX } from '../types';
 
 export const fileCleaner = async (request: RequestX) => {
     const uploadedFiles = request.uploadedFiles || [];
@@ -25,7 +26,9 @@ export const fileCleaner = async (request: RequestX) => {
 
             if (appConfig.server.mode === 'development' && request.skipFileCleanupFields?.length > 0) {
                 const skippedCount = uploadedFiles.length - filesToDelete.length;
-                console.log(`File cleanup: ${filesToDelete.length} files will be deleted, ${skippedCount} files skipped for fields: [${request.skipFileCleanupFields.join(', ')}]`);
+                console.log(
+                    `File cleanup: ${filesToDelete.length} files will be deleted, ${skippedCount} files skipped for fields: [${request.skipFileCleanupFields.join(', ')}]`
+                );
             }
 
             // Delete filtered files in parallel
@@ -34,7 +37,8 @@ export const fileCleaner = async (request: RequestX) => {
                     try {
                         await fs.promises.unlink(file.filePath);
                     } catch (err) {
-                        console.error(`Failed to delete file ${file.filePath}: ${err.message}`);
+                        const errorMsg = err instanceof Error ? err.message : String(err);
+                        console.error(`Failed to delete file ${file.filePath}: ${errorMsg}`);
                     }
                 })
             );

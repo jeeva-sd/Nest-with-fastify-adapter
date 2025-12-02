@@ -37,7 +37,11 @@ export class ConfigReader {
             // Cache the validated config
             ConfigReader.configCache.set(cacheKey, this.config);
         } catch (error) {
-            this.logger.error(`Failed to load configuration: ${error.message}`);
+            const errorMsg =
+                typeof error === 'object' && error !== null && 'message' in error
+                    ? (error as { message: string }).message
+                    : String(error);
+            this.logger.error(`Failed to load configuration: ${errorMsg}`);
             process.exit(1);
         }
     }
@@ -89,7 +93,11 @@ export class ConfigReader {
         try {
             return AppConfigRule.parse(mergedConfigs);
         } catch (e) {
-            this.logger.error(`Configuration validation failed:\n${z.prettifyError(e)}`);
+            if (e instanceof z.ZodError) {
+                this.logger.error(`Configuration validation failed:\n${z.prettifyError(e)}`);
+            } else {
+                this.logger.error(`Configuration validation failed: ${e instanceof Error ? e.message : String(e)}`);
+            }
             process.exit(1);
         }
     }

@@ -10,16 +10,10 @@ import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import {
-    HttpExceptionFilter,
-    PayloadGuard,
-    RequestX,
-    ResponseTransformInterceptor,
-    fileCleaner
-} from '~/common';
+import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX, ResponseTransformInterceptor } from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
-import { RABBIT_MQ_QUEUE_KEYS, createRmqMicroserviceOptions } from './services';
+import { createRmqMicroserviceOptions, RABBIT_MQ_QUEUE_KEYS } from './services';
 
 class App {
     private app: NestFastifyApplication;
@@ -29,10 +23,12 @@ class App {
         const fastifyAdapter = new FastifyAdapter({
             logger: appConfig.fastify.adapter.logger,
             trustProxy: appConfig.fastify.adapter.trustProxy, // Enable if behind reverse proxy (load balancer, nginx)
-            ignoreTrailingSlash: appConfig.fastify.adapter.ignoreTrailingSlash, // Treat /api/users and /api/users/ as same route
-            ignoreDuplicateSlashes: appConfig.fastify.adapter.ignoreDuplicateSlashes, // Treat /api//users as /api/users
-            caseSensitive: appConfig.fastify.adapter.caseSensitive, // Make routes case insensitive
-            maxParamLength: appConfig.fastify.adapter.maxParamLength // Maximum length for URL parameters
+            routerOptions: {
+                ignoreTrailingSlash: appConfig.fastify.adapter.ignoreTrailingSlash, // Treat /api/users and /api/users/ as same route
+                ignoreDuplicateSlashes: appConfig.fastify.adapter.ignoreDuplicateSlashes, // Treat /api//users as /api/users
+                caseSensitive: appConfig.fastify.adapter.caseSensitive, // Make routes case insensitive
+                maxParamLength: appConfig.fastify.adapter.maxParamLength // Maximum length for URL parameters
+            }
         });
 
         this.app = await NestFactory.create<NestFastifyApplication>(AppModule, fastifyAdapter, {
@@ -266,7 +262,9 @@ class App {
             // Log RabbitMQ connection info
             if (appConfig.monitoring.startup.logProcessInfo) {
                 Logger.log(`RabbitMQ connected to: ${appConfig.microservices.rabbitmq.uri}`);
-                Logger.log(`Exchange: ${appConfig.microservices.rabbitmq.exchange.name} (${appConfig.microservices.rabbitmq.exchange.type})`);
+                Logger.log(
+                    `Exchange: ${appConfig.microservices.rabbitmq.exchange.name} (${appConfig.microservices.rabbitmq.exchange.type})`
+                );
             }
         } catch (error) {
             Logger.error('Failed to start microservices:', error);

@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const ListRolesDto = z.object({
     page: z.coerce.number().min(1).default(1),

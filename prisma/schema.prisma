@@ -1,9 +1,10 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
-    provider = "mysql"
+  provider = "mysql"
 }
 
 // *******************************************************************************************
@@ -42,6 +43,7 @@ model Permission {
     id          String   @id @default(cuid())
     name        String   @unique(map: "uk_perm_name") @db.VarChar(100)
     description String?  @db.VarChar(255)
+    dummyField   String?  @db.VarChar(50)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 

@@ -1,0 +1,20 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "~/*": ["./*"],
+            "src/*": ["*"]
+        },
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false
+    },
+    "ts-node": {
+        "require": ["tsconfig-paths/register"],
+        "transpileOnly": true,
+        "esm": false
+    }
+}

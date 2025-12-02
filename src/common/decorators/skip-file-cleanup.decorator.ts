@@ -22,8 +22,11 @@ export const SkipFileCleanup = (fieldNames: string[]) => {
             // In NestJS controllers, the request object is typically injected via @Req() decorator
             // We need to find it in the arguments and modify it before the method executes
             args.forEach(arg => {
-                if (arg && typeof arg === 'object' &&
-                    (arg.url !== undefined || arg.method !== undefined || arg.headers !== undefined)) {
+                if (
+                    arg &&
+                    typeof arg === 'object' &&
+                    (arg.url !== undefined || arg.method !== undefined || arg.headers !== undefined)
+                ) {
                     // This looks like a request object
                     arg.skipFileCleanupFields = fieldNames;
                 }

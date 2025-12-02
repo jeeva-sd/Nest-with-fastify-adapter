@@ -1,20 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from '~/common';
-import { PrismaService } from '~/modules/database';
 import { appConfig } from '~/configs';
+import { prisma } from '../database';
 
 @Controller('health')
 export class HealthController {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor() {}
 
     @Get()
     @Public()
     async checkHealth() {
-
         try {
             // Check database connectivity
             const startTime = Date.now();
-            await this.prismaService.$queryRaw`SELECT 1`;
+            await prisma.$queryRaw`SELECT 1`;
             const dbLatency = Date.now() - startTime;
 
             return {
@@ -37,7 +36,7 @@ export class HealthController {
             return {
                 status: 'error',
                 timestamp: new Date().toISOString(),
-                error: error.message
+                error: error
             };
         }
     }

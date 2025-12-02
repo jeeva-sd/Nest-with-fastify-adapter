@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { permissions } from '~/configs';
 
 const validPermissionKeys = Object.keys(permissions).map(key => key.toLowerCase()) as [string, ...string[]];

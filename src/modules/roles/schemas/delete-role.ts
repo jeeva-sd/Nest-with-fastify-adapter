@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const DeleteRolesDto = z.object({
     roleId: z.string().cuid()

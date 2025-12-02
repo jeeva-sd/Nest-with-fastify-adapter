@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { ALL_FILE_TYPES, oneKb } from '~/constants';
 
 export interface FileSchemaOverrides {

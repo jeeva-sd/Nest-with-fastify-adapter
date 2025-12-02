@@ -1,14 +1,7 @@
-import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
-} from '@nestjs/common';
-import { appConfig } from '~/configs';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { createId } from '@paralleldrive/cuid2';
 import { Prisma } from '@prisma/client';
+import { appConfig } from '~/configs';
 import { readError } from '../utils';
 
 @Catch()
@@ -51,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message,
             traceId,
             timestamp: new Date().toISOString(),
-            error: errorDetails,
+            error: errorDetails
         });
     }
 
@@ -65,36 +58,40 @@ export class HttpExceptionFilter implements ExceptionFilter {
         );
     }
 
-    private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError | unknown): { status: number; message: string; error: any; } {
+    private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError | unknown): {
+        status: number;
+        message: string;
+        error: any;
+    } {
         if (exception instanceof Prisma.PrismaClientKnownRequestError) {
             return {
                 status: HttpStatus.BAD_REQUEST,
                 message: 'A database error occurred', // Simple message for the client
-                error: exception, // Include raw error details
+                error: exception // Include raw error details
             };
         } else if (exception instanceof Prisma.PrismaClientUnknownRequestError) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'An unknown database error occurred',
-                error: exception,
+                error: exception
             };
         } else if (exception instanceof Prisma.PrismaClientRustPanicError) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'A database panic occurred',
-                error: exception,
+                error: exception
             };
         } else if (exception instanceof Prisma.PrismaClientInitializationError) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'Database initialization error',
-                error: exception,
+                error: exception
             };
         } else if (exception instanceof Prisma.PrismaClientValidationError) {
             return {
                 status: HttpStatus.BAD_REQUEST,
                 message: 'A validation error occurred',
-                error: exception,
+                error: exception
             };
         }
 
@@ -102,7 +99,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
             message: 'An unexpected database error occurred',
-            error: exception,
+            error: exception
         };
     }
 }

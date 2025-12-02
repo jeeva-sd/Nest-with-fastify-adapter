@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { z, ZodType } from 'zod/v4';
+import { ZodType, z } from 'zod';
 import { appConfig } from '~/configs';
 import { Helper, readError } from '../utils';
 
@@ -118,9 +118,7 @@ export class PayloadGuard implements CanActivate {
             if (e instanceof z.ZodError) {
                 const issue = e.issues[0];
                 const path = issue?.path?.length > 0 ? issue.path.join('.') : 'unknown';
-                message = issue?.code === 'custom'
-                    ? issue.message
-                    : `${issue.message} at ${path}`;
+                message = issue?.code === 'custom' ? issue.message : `${issue.message} at ${path}`;
             } else {
                 message = readError(e) || 'Payload validation failed';
             }
@@ -173,7 +171,7 @@ export class PayloadGuard implements CanActivate {
             }
 
             await new Promise<void>((resolve, reject) => {
-                writeStream.end((err) => {
+                writeStream.end(err => {
                     if (err) reject(err);
                     else resolve();
                 });
@@ -197,8 +195,7 @@ export class PayloadGuard implements CanActivate {
                 fileDetails[part.fieldname] = [];
             }
             (fileDetails[part.fieldname] as FileDetail[]).push(fileDetail);
-            uploadedFiles.push({...fileDetail, buffer: undefined}); // Avoid storing large buffers in uploadedFiles
-
+            uploadedFiles.push({ ...fileDetail, buffer: undefined }); // Avoid storing large buffers in uploadedFiles
         } catch (error) {
             // Clean up partial file on error
             try {

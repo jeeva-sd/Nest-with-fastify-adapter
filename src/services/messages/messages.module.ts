@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
 import { MessagesClient } from './messages.client';
-import { RABBIT_MQ_QUEUE_KEYS, createRmqClientOptions } from './messages.config';
+import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './messages.config';
 
 @Module({
     imports: [

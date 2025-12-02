@@ -29,10 +29,11 @@ export class FileUtils {
             const data = await fs.promises.readFile(filePath);
             return data; // Return the content as a Buffer
         } catch (error) {
-            if (error.code === 'ENOENT') {
+            const err = error as NodeJS.ErrnoException;
+            if (err.code === 'ENOENT') {
                 console.error(`File does not exist at ${filePath}`);
             } else {
-                console.error(`Failed to read file at ${filePath}: ${error.message}`);
+                console.error(`Failed to read file at ${filePath}: ${err.message}`);
             }
             throw error;
         }
@@ -63,7 +64,7 @@ export class FileUtils {
         try {
             await fs.promises.unlink(filePath);
         } catch (error) {
-            console.error(`Error deleting file at ${filePath}: ${error.message}`);
+            console.error(`Error deleting file at ${filePath}: ${(error as Error).message}`);
             throw error;
         }
     }
@@ -102,7 +103,7 @@ export class FileUtils {
         try {
             await fs.promises.writeFile(filePath, data);
         } catch (error) {
-            console.error(`Error writing to file at ${filePath}: ${error.message}`);
+            console.error(`Error writing to file at ${filePath}: ${(error as Error).message}`);
             throw error;
         }
     }
@@ -115,7 +116,7 @@ export class FileUtils {
             const stats = await fs.promises.stat(filePath);
             return stats.size;
         } catch (error) {
-            console.error(`Error getting size of file at ${filePath}: ${error.message}`);
+            console.error(`Error getting size of file at ${filePath}: ${(error as Error).message}`);
             throw error;
         }
     }
@@ -127,7 +128,7 @@ export class FileUtils {
         try {
             await fs.promises.rename(oldPath, newPath);
         } catch (error) {
-            console.error(`Error renaming file from ${oldPath} to ${newPath}: ${error.message}`);
+            console.error(`Error renaming file from ${oldPath} to ${newPath}: ${(error as Error).message}`);
             throw error;
         }
     }

@@ -1,7 +1,7 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { ClsService } from 'nestjs-cls';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { ClsService } from 'nestjs-cls';
 
 interface PerformanceMetrics {
     requestId: string;
@@ -47,7 +47,7 @@ export class PerformanceInterceptor implements NestInterceptor {
                 next: () => {
                     this.completeMetrics(requestId, response.statusCode);
                 },
-                error: (error) => {
+                error: error => {
                     this.completeMetrics(requestId, error.status || 500);
                 }
             })

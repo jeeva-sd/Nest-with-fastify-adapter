@@ -70,3 +70,5 @@ uploads/*
 # Build outputs
 dist/
 build/
+
+prisma/generated
