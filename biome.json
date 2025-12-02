@@ -2,14 +2,14 @@
     "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
 
     "vcs": {
-        "enabled": false,
+        "enabled": true,
         "clientKind": "git",
-        "useIgnoreFile": false
+        "useIgnoreFile": true
     },
 
     "files": {
         "ignoreUnknown": false,
-        "experimentalScannerIgnores": ["dist", "common", "scripts"]
+        "includes": ["src/**/*"]
     },
 
     "formatter": {
@@ -25,29 +25,36 @@
             "recommended": true,
 
             "complexity": {
+                "noForEach": "off",
                 "useLiteralKeys": "off",
-                "noUselessConstructor": "off",
                 "noExtraBooleanCast": "warn",
                 "noStaticOnlyClass": "off",
-                "noForEach": "off"
+                "noUselessConstructor": "off"
             },
 
             "correctness": {
+                "noUnusedImports": "warn",
                 "noUnusedVariables": "warn",
                 "noUnsafeFinally": "warn",
-                "noUnusedImports": "warn",
-                "noUnsafeOptionalChaining": "warn"
+                "noUnsafeOptionalChaining": "warn",
+                "noConstAssign": "error"
             },
 
             "style": {
                 "useImportType": "off",
-                "useConst": "warn"
+                "useConst": "warn",
+                "useObjectSpread": "warn",
+                "useShorthandAssign": "warn",
+                "useNumericSeparators": "warn",
+                "useTemplate": "warn",
+                "useArrayLiterals": "warn"
             },
 
             "suspicious": {
-                "noAsyncPromiseExecutor": "warn",
                 "noDebugger": "warn",
-                "noExplicitAny": "warn"
+                "noAsyncPromiseExecutor": "warn",
+                "noExplicitAny": "warn",
+                "noMisleadingCharacterClass": "warn"
             }
         }
     },

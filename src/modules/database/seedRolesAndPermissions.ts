@@ -81,7 +81,7 @@ export async function seedRolesAndPermissions() {
             logger.log('Seeded roles, permissions, and role-permission mappings.');
         },
         {
-            timeout: 30000 // 30 seconds
+            timeout: 30_000 // 30 seconds
         }
     );
 

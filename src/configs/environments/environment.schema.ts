@@ -127,7 +127,7 @@ export const interceptorSchema = z.object({
 
 const sqlRule = z.object({
     host: z.string(),
-    port: z.number().min(1).max(65535),
+    port: z.number().min(1).max(65_535),
     username: z.string().min(1),
     password: z.string().min(1),
     database: z.string().min(1),

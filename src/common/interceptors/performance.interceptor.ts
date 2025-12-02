@@ -123,7 +123,7 @@ export class MemoryMonitor {
             } else if (heapUsed > this.thresholds.warning) {
                 console.warn(`⚠️  WARNING: Elevated memory usage: ${this.formatBytes(heapUsed)}`);
             }
-        }, 30000);
+        }, 30_000);
     }
 
     private formatBytes(bytes: number): string {
