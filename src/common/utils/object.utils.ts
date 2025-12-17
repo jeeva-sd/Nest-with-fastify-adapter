@@ -27,14 +27,14 @@ export class ObjectUtils {
     /**
      * Checks if a value is a plain object (not null, not array).
      */
-    static isObject(value: any): boolean {
+    static isObject(value: unknown): boolean {
         return typeof value === 'object' && value !== null && !Array.isArray(value);
     }
 
     /**
      * Checks if a value is a function.
      */
-    static isFunction(value: any): boolean {
+    static isFunction(value: unknown): boolean {
         return typeof value === 'function';
     }
 
@@ -55,7 +55,7 @@ export class ObjectUtils {
     /**
      * Returns an array of the object's own values.
      */
-    static getObjectValues(obj: object): any[] {
+    static getObjectValues(obj: object): unknown[] {
         return Object.values(obj);
     }
 
@@ -87,7 +87,7 @@ export class ObjectUtils {
      * Flattens a nested object into a single-level object using dot notation keys.
      */
     static flattenObject(obj: object, prefix = ''): object {
-        const result: any = {};
+        const result: Record<string, unknown> = {};
         for (const key in obj) {
             if (Object.hasOwn(obj, key)) {
                 const value = obj[key];
@@ -106,12 +106,12 @@ export class ObjectUtils {
      * Converts a flattened object (dot notation keys) back into a nested object.
      */
     static unflattenObject(obj: object): object {
-        const result: any = {};
+        const result: Record<string, unknown> = {};
         for (const key in obj) {
             if (Object.hasOwn(obj, key)) {
                 const value = obj[key];
                 // Split the key by dot and build the nested structure
-                key.split('.').reduce((acc: any, part: string, index: number, parts: string[]) => {
+                key.split('.').reduce((acc: Record<string, unknown>, part: string, index: number, parts: string[]) => {
                     if (index === parts.length - 1) {
                         acc[part] = value;
                     } else {

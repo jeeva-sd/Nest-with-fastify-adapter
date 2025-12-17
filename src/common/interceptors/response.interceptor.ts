@@ -15,7 +15,7 @@ export class ResponseTransformInterceptor implements NestInterceptor {
         this.skipKey = appConfig.interceptors.response.skipFormatKey;
     }
 
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         // Early return if formatting is globally disabled
         if (!this.shouldFormat) {
             return next.handle();

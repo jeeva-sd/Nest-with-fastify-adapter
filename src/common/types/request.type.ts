@@ -15,7 +15,7 @@ export type TokenData = {
 export interface RequestX extends FastifyRequest {
     uploadedFiles?: FileDetail[];
     user: TokenData;
-    payload?: any;
+    payload?: unknown;
     startTime?: number;
     skipFileCleanup?: boolean; // Flag to skip file cleanup entirely
     skipFileCleanupFields?: string[]; // Field names whose files should not be deleted

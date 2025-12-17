@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         let status = HttpStatus.INTERNAL_SERVER_ERROR;
         let message = 'Internal server error';
-        let errorDetails: any = null;
+        let errorDetails: unknown = null;
 
         // Handle Prisma errors
         if (this.isPrismaError(exception)) {
@@ -61,7 +61,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError | unknown): {
         status: number;
         message: string;
-        error: any;
+        error: unknown;
     } {
         if (exception instanceof Prisma.PrismaClientKnownRequestError) {
             return {

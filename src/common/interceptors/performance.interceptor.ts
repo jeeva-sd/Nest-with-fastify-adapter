@@ -24,7 +24,7 @@ export class PerformanceInterceptor implements NestInterceptor {
         this.isDev = process.env.NODE_ENV === 'development';
     }
 
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
 

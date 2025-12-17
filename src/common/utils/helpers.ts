@@ -28,7 +28,7 @@ export class Helper {
      * Encrypts any JavaScript value using AES encryption.
      * Returns the encrypted string or null on error.
      */
-    static encrypt(data: any): string | null {
+    static encrypt(data: unknown): string | null {
         try {
             const jsonData = JSON.stringify(data);
             const encrypted = CryptoJS.AES.encrypt(jsonData, appConfig.auth.encryptionKey);
@@ -43,7 +43,7 @@ export class Helper {
      * Decrypts a previously encrypted AES string and parses it back into an object.
      * Returns null on failure.
      */
-    static decrypt(encryptedData: string): any | null {
+    static decrypt(encryptedData: string): unknown | null {
         try {
             const decrypted = CryptoJS.AES.decrypt(encryptedData, appConfig.auth.encryptionKey);
             const parsedData = decrypted.toString(CryptoJS.enc.Utf8);

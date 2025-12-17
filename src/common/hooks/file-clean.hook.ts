@@ -1,5 +1,4 @@
 import * as fs from 'node:fs';
-import { FastifyRequest } from 'fastify/types/request';
 import { appConfig } from '~/configs';
 import { RequestX } from '../types';
 

@@ -11,34 +11,34 @@ export class RolesController {
     @Get('view')
     @Sanitize(ViewRoleDto)
     async getRoleById(@Req() req: RequestX) {
-        return this.roleService.getRoleById(req.payload);
+        return this.roleService.getRoleById(req.payload as ViewRoleDto);
     }
 
     @Get()
     @Sanitize(ListRolesDto)
     async getFile(@Req() req: RequestX) {
-        return this.roleService.listRoles(req.payload);
+        return this.roleService.listRoles(req.payload as ListRolesDto);
     }
 
     @Post()
     @Sanitize(CreateRoleDto)
     @Access(ACL.superAdminOnly)
     async createRole(@Req() req: RequestX) {
-        return this.roleService.createRole(req.payload);
+        return this.roleService.createRole(req.payload as CreateRoleDto);
     }
 
     @Patch()
     @Sanitize(UpdateRoleDto)
     @Access(ACL.superAdminOnly)
     async updateRole(@Req() req: RequestX) {
-        return this.roleService.updateRole(req.payload);
+        return this.roleService.updateRole(req.payload as UpdateRoleDto);
     }
 
     @Delete()
     @Sanitize(DeleteRolesDto)
     @Access(ACL.superAdminOnly)
     async deleteRoles(@Req() req: RequestX) {
-        return this.roleService.deleteRole(req.payload);
+        return this.roleService.deleteRole(req.payload as DeleteRolesDto);
     }
 
     @Get('permissions')

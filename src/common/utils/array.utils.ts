@@ -3,9 +3,9 @@ export class ArrayUtils {
      * Groups an array of objects by the specified key.
      * Optionally accepts a formatter function to customize the grouping key.
      */
-    static groupBy(key: string, formatter?: (value: any) => string) {
-        return (array: any[]) => {
-            return array.reduce((obj: any, item: any) => {
+    static groupBy(key: string, formatter?: (value: unknown) => string) {
+        return (array: unknown[]) => {
+            return array.reduce((obj: Record<string, unknown[]>, item: unknown) => {
                 let value = item[key];
                 if (formatter) value = formatter(value); // apply the formatter if provided
                 obj[value] = (obj[value] || []).concat(item);
@@ -19,8 +19,8 @@ export class ArrayUtils {
      * Each key will point to the corresponding object.
      */
     static objectById(key: string) {
-        return (array: any[]) => {
-            return array.reduce((obj: any, item: any) => {
+        return (array: unknown[]) => {
+            return array.reduce((obj: Record<string, unknown>, item: unknown) => {
                 const value = item[key];
                 obj[value] = item;
                 return obj;
@@ -75,8 +75,8 @@ export class ArrayUtils {
     /**
      * Flattens an array one level deep.
      */
-    static flatten<T>(array: any[][]): T[] {
-        return array.reduce((acc, val) => acc.concat(val), []);
+    static flatten<T>(array: unknown[][]): T[] {
+        return array.reduce((acc, val) => acc.concat(val), []) as T[];
     }
 
     /**
