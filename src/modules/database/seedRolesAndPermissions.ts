@@ -1,8 +1,5 @@
-import { Logger } from '@nestjs/common';
 import { permissions, standardRoles } from '~/configs';
 import { prisma } from './prisma.service';
-
-const logger = new Logger('seedRolesAndPermissions');
 
 export async function seedRolesAndPermissions() {
     await prisma.$transaction(
@@ -77,8 +74,6 @@ export async function seedRolesAndPermissions() {
                 data: rolePermissionsData as { roleId: string; permissionId: string }[],
                 skipDuplicates: true
             });
-
-            logger.log('Seeded roles, permissions, and role-permission mappings.');
         },
         {
             timeout: 30_000 // 30 seconds

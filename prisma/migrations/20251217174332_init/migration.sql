@@ -32,6 +32,7 @@ CREATE TABLE `permissions` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `description` VARCHAR(255) NULL,
+    `dummyField` VARCHAR(50) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

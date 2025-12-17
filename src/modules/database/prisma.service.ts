@@ -1,6 +1,7 @@
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import { PrismaClient } from '@prisma/client';
 import { appConfig } from '~/configs';
+import { seedDatabase } from './seed';
 
 const { sql } = appConfig.database;
 
@@ -18,3 +19,5 @@ const adapter = new PrismaMariaDb({
 });
 
 export const prisma = new PrismaClient({ adapter });
+
+seedDatabase();
