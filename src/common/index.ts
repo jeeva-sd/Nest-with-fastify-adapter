@@ -4,7 +4,7 @@ export {
     FileTypes,
     IMAGE_FILE_TYPES,
     OTHER_FILE_TYPES
-} from '../constants/file-types';
+} from '../services/storage/file-types';
 export { Store } from '../store/types';
 export { AckHandler } from './decorators/ack.decorator';
 export { Access, AccessOptions, Permissions, Roles } from './decorators/apply-roles.decorator';
