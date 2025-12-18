@@ -1,49 +1,52 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RequestX } from '~/common';
+import { PermissionCacheService } from '../permission-cache.service';
 import { appConfig } from '~/configs';
+import { PermissionName } from '~/modules/roles/role.constants';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {}
+    constructor(
+        private readonly reflector: Reflector,
+        private readonly permissionCache: PermissionCacheService
+    ) {}
 
-    canActivate(context: ExecutionContext): boolean {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const handler = context.getHandler();
         const controller = context.getClass();
         const request: RequestX = context.switchToHttp().getRequest();
-        const user = request.user;
+        const jwtUser = request.user;
 
-        if (!user) {
+        if (!(jwtUser && 'permVer' in jwtUser)) {
             throw new ForbiddenException('User not authenticated');
         }
 
-        // // Roles
-        // const roleMeta = this.reflector.getAllAndOverride<{ roles: string[]; matchAll: boolean }>(
-        //     appConfig.auth.roleKey,
-        //     [handler, controller]
-        // );
-
-        // if (roleMeta?.roles?.length) {
-        //     const hasRoles = this.match(user.roles || [], roleMeta.roles, roleMeta.matchAll);
-        //     if (!hasRoles) throw new ForbiddenException('Insufficient role permissions');
-        // }
-
-        // Permissions
-        const permissionMeta = this.reflector.getAllAndOverride<{ permissions: string[]; matchAll: boolean }>(
+        const permissionMeta = this.reflector.getAllAndOverride<{ permissions: PermissionName[]; matchAll: boolean }>(
             appConfig.auth.permissionKey,
             [handler, controller]
         );
 
-        if (permissionMeta?.permissions?.length) {
-            const hasPerms = this.match(user.permissions || [], permissionMeta.permissions, permissionMeta.matchAll);
-            if (!hasPerms) throw new ForbiddenException('Insufficient permissions to access this resource');
+        console.log(permissionMeta, 'permissionMeta')
+
+        if (!permissionMeta?.permissions?.length) {
+            return true; // No permissions required
+        }
+
+        const { permissions: requiredPermissions, matchAll } = permissionMeta;
+
+        const userPermissions = await this.permissionCache.getPermissions(jwtUser.permVer, jwtUser.roleIds);
+
+        console.log(userPermissions, 'userPermissions')
+
+        const hasPermissions = matchAll
+            ? requiredPermissions.every(perm => userPermissions.includes(perm))
+            : requiredPermissions.some(perm => userPermissions.includes(perm));
+
+        if (!hasPermissions) {
+            throw new ForbiddenException('Insufficient permissions to access this resource');
         }
 
         return true;
-    }
-
-    private match(userValues: string[], required: string[], matchAll: boolean): boolean {
-        if (matchAll) return required.every(val => userValues.includes(val));
-        return required.some(val => userValues.includes(val));
     }
 }

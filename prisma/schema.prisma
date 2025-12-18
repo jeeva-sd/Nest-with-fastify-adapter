@@ -9,14 +9,13 @@ datasource db {
 
 // *******************************************************************************************
 
-
 model User {
     id             String   @id @default(cuid())
     fname          String   @db.VarChar(50)
     lname          String   @db.VarChar(50)
     email          String   @unique(map: "uk_user_email") @db.VarChar(255)
     organizationId String
-    roleId         String?
+    roleId         String
     bio            String?  @db.VarChar(300)
     phone          String?  @db.VarChar(20)
     status         Int?
@@ -26,12 +25,12 @@ model User {
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 
-    role               Role?                @relation(fields: [roleId], references: [id], onDelete: SetNull, map: "fk_user_role")
+    role               Role                 @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "fk_user_role")
     departments        UserDepartment[]
     userDepSupervisors UserDeptSupervisor[]
 
     @@index([fname], map: "idx_user_fname")
-    @@index([lname], map: "idx_user_name")
+    @@index([lname], map: "idx_user_lname")
     @@index([organizationId], map: "idx_user_org")
     @@map("users")
 }
@@ -64,11 +63,12 @@ model UserDeptSupervisor {
 }
 
 model Role {
-    id          String   @id @default(cuid())
-    name        String   @unique(map: "uk_role_name") @db.VarChar(100)
-    description String?  @db.VarChar(255)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id                 String   @id @default(cuid())
+    name               String   @unique(map: "uk_role_name") @db.VarChar(100)
+    description        String?  @db.VarChar(255)
+    permissionRevision Int      @default(0)
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
 
     users           User[]
     rolePermissions RolePermission[]

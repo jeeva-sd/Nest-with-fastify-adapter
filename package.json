@@ -48,6 +48,7 @@
         "fastify": "^5.6.2",
         "file-type": "^21.1.1",
         "handlebars": "^4.7.8",
+        "lru-cache": "^11.2.4",
         "nestjs-cls": "^6.1.0",
         "passport": "^0.7.0",
         "passport-custom": "^1.1.1",

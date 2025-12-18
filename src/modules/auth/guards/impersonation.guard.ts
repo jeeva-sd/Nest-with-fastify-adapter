@@ -57,11 +57,10 @@ export class ImpersonationGuard implements CanActivate {
 
         // Check if the user to impersonate is valid
         if (!existingUser) throw new NotFoundException('User not found');
-        if (request.user.id === existingUser.id) throw new BadRequestException('Cannot impersonate yourself');
+        if (request.user.sub === existingUser.id) throw new BadRequestException('Cannot impersonate yourself');
         // Check if the user is allowed to update users from different organizations
         if (
-            !requestedUser?.permissions.includes(permissions.SWITCH_ORGANIZATIONS.name) &&
-            request.user.organizationId !== existingUser.organizationId
+            request.user.orgId !== existingUser.organizationId
         ) {
             throw new ForbiddenException('You are not allowed to impersonate users from different organizations');
         }

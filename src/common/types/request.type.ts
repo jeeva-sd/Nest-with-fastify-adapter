@@ -2,14 +2,10 @@ import { FastifyRequest } from 'fastify';
 import { FileDetail } from '../guards/req-payload.guard';
 
 export type TokenData = {
-    id: string;
-    fname: string;
-    lname: string;
-    email: string;
-    roleId: string | null;
-    organizationId: string;
-    timezone: string;
-    permissions: string[]; // Assigned permission names
+    sub: string; // userId
+    orgId: string;
+    roleIds: string[];
+    permVer: string;
 };
 
 export interface RequestX extends FastifyRequest {

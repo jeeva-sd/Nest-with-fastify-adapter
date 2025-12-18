@@ -34,4 +34,5 @@ export const standardRoles = {
 };
 
 // Flat permission names
-export const availableLeavePermissions = Object.values(permissions).map(p => p.name);
+export const standardPermissions = Object.values(permissions).map(p => p.name);
+export type PermissionName = typeof standardPermissions[number];

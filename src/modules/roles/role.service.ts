@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../services/database/prisma.service';
 import { PortalRoleType } from '../eco-apps/types/portal-roles';
-import { standardRoles } from './role.constants';
+import { PermissionName, standardRoles } from './role.constants';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
 
 @Injectable()
@@ -202,5 +202,40 @@ export class RoleService {
         else if (roleType === PortalRoleType.ORG_ADMIN) roleId = standardRoles.ORG_ADMIN.id;
 
         return roleId;
+    }
+
+    async getPermissions(roleIds: string[]): Promise<PermissionName[]> {
+        if (roleIds.length === 0) return [];
+
+        const rolePermissions = await prisma.rolePermission.findMany({
+            where: {
+                roleId: { in: roleIds },
+            },
+            include: {
+                permission: true,
+            },
+        });
+
+        const permissions = rolePermissions.map(rp => rp.permission.name as PermissionName);
+        return [...new Set(permissions)]; // distinct
+    }
+
+    async getPermissionRevisions(roleIds: string[]): Promise<Record<string, number>> {
+        if (roleIds.length === 0) return {};
+
+        const roles = await prisma.role.findMany({
+            where: {
+                id: { in: roleIds },
+            },
+            select: {
+                id: true,
+                permissionRevision: true,
+            },
+        });
+
+        return roles.reduce((acc, role) => {
+            acc[role.id] = role.permissionRevision;
+            return acc;
+        }, {} as Record<string, number>);
     }
 }
