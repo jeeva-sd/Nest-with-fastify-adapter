@@ -1,10 +1,3 @@
-export {
-    ALL_FILE_TYPES,
-    DOCUMENT_FILE_TYPES,
-    FileTypes,
-    IMAGE_FILE_TYPES,
-    OTHER_FILE_TYPES
-} from '../services/storage/storage.constants';
 export { Store } from '../store/types';
 export { AckHandler } from './decorators/ack.decorator';
 export { Sanitize } from './decorators/payload-sanitizer.decorator';

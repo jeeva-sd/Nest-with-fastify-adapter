@@ -1,5 +1,6 @@
 import { z } from 'zod/v4';
-import { createFileRule, FileTypes } from '~/common';
+import { createFileRule } from '~/common';
+import { FileTypes } from '~/services';
 
 export const profileImageRule = createFileRule({
     maxFileSize: 0.2, // in MB
