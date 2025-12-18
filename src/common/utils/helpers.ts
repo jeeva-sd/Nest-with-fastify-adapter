@@ -1,5 +1,5 @@
 import * as CryptoJS from 'crypto-js';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 import { ArrayUtils } from './array.utils';
 import { FileUtils } from './file.utils';
 import { NumberUtils } from './number.utils';

@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ZodType, z } from 'zod';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 import { readError } from '../utils/error-reader';
 import { Helper } from '../utils/helpers';
 

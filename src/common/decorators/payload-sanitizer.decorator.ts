@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 import { ZodType } from 'zod';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 import { metadataCache } from '../guards/req-payload.guard'; // WeakMap
 
 export const Sanitize = (schema: ZodType<unknown>) => {

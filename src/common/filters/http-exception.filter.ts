@@ -1,8 +1,8 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { createId } from '@paralleldrive/cuid2';
 import { Prisma } from '@prisma/client';
-import { AxiosError } from 'axios';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
+import { ResponseX } from '../types/replay.type';
 import { readError } from '../utils/error-reader';
 
 @Catch()
@@ -10,10 +10,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     private readonly logger = new Logger(HttpExceptionFilter.name);
 
     catch(exception: unknown, host: ArgumentsHost): void {
-        const response = host.switchToHttp().getResponse();
+        const response = host.switchToHttp().getResponse() as ResponseX;
         const traceId = appConfig.server.allowExceptionLogs ? createId() : undefined;
 
-        const { status, message } = this.resolve(exception);
+        const { status, message, error } = this.resolveException(exception);
 
         if (appConfig.server.allowExceptionLogs) {
             this.logger.error(exception, traceId);
@@ -27,31 +27,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
         });
     }
 
-    private resolve(exception: unknown): {
+    private resolveException(exception: unknown): {
         status: number;
         message: string;
+        error: unknown;
     } {
-        // Nest / HTTP errors
         if (exception instanceof HttpException) {
             return {
                 status: exception.getStatus(),
-                message: readError(exception)
+                message: readError(exception),
+                error: exception.getResponse()
             };
         }
 
-        // Axios / external HTTP errors
-        if (exception instanceof AxiosError) {
-            return {
-                status: exception.response?.status ?? HttpStatus.BAD_GATEWAY,
-                message: exception.response?.data?.message ?? exception.message
-            };
-        }
-
-        // Prisma errors
         if (exception instanceof Prisma.PrismaClientValidationError) {
             return {
                 status: HttpStatus.BAD_REQUEST,
-                message: 'Database validation error'
+                message: 'Database validation error',
+                error: exception
             };
         }
 
@@ -63,22 +56,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ) {
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message: 'Database error'
+                message: 'Database error',
+                error: exception
             };
         }
 
-        // Generic JS errors
-        if (exception instanceof Error) {
-            return {
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message: exception.message
-            };
-        }
-
-        // Fallback
         return {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            error: exception
         };
     }
 }

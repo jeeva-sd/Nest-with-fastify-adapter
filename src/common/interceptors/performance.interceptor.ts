@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } fr
 import { ClsService } from 'nestjs-cls';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 
 interface PerformanceMetrics {
     requestId: string;

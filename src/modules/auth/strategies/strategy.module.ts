@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({

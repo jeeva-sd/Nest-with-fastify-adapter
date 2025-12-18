@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from '~/common';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 import { prisma } from '../../services/database/prisma.service';
 import { HealthService } from './health.service';
 

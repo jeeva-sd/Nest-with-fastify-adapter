@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 
 @Injectable()
 export class HealthService implements OnModuleInit, OnModuleDestroy {

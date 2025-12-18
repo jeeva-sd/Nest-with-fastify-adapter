@@ -1,5 +1,5 @@
 import { ClientProviderOptions, RmqOptions, Transport } from '@nestjs/microservices';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 
 export const RABBIT_MQ_QUEUE_KEYS = {
     GENERAL: 'general',

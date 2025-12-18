@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { appConfig } from '~/configs/config.reader';
+import { appConfig } from '~/configs';
 
 const { sql } = appConfig.database;
 

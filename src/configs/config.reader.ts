@@ -114,15 +114,3 @@ export class ConfigReader {
         ConfigReader.configCache.clear();
     }
 }
-
-// Create a singleton instance with lazy loading
-let configInstance: AppConfig | null = null;
-
-export const appConfig = new Proxy({} as AppConfig, {
-    get(_target, prop) {
-        if (!configInstance) {
-            configInstance = ConfigReader.getInstance().getAll();
-        }
-        return configInstance[prop as keyof AppConfig];
-    }
-});
