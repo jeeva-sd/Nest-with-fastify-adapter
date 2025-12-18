@@ -19,6 +19,7 @@ import { createRmqMicroserviceOptions } from './services/jobs/jobs.helpers';
 class App {
     private app: NestFastifyApplication;
     private reflector: Reflector;
+    private isShuttingDown = false;
 
     async createApp() {
         const fastifyAdapter = new FastifyAdapter({
@@ -221,10 +222,13 @@ class App {
         if (appConfig.gracefulShutdown.enabled) {
             for (const signal of appConfig.gracefulShutdown.signals) {
                 process.on(signal as NodeJS.Signals, () => {
-                    if (appConfig.gracefulShutdown.logShutdown) {
-                        Logger.log(`${signal} received, shutting down gracefully`);
+                    if (!this.isShuttingDown) {
+                        this.isShuttingDown = true;
+                        if (appConfig.gracefulShutdown.logShutdown) {
+                            Logger.log(`${signal} received, shutting down gracefully`);
+                        }
+                        this.app.close();
                     }
-                    this.app.close();
                 });
             }
         }

@@ -2,9 +2,12 @@ import { Controller, Get } from '@nestjs/common';
 import { Public } from '~/common';
 import { appConfig } from '~/configs';
 import { prisma } from '../database';
+import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
+    constructor(private readonly healthService: HealthService) {}
+
     @Get()
     @Public()
     async checkHealth() {
@@ -13,6 +16,8 @@ export class HealthController {
             const startTime = Date.now();
             await prisma.$queryRaw`SELECT 1`;
             const dbLatency = Date.now() - startTime;
+
+            const memoryInfo = this.healthService.getMemoryInfo();
 
             return {
                 status: 'ok',
@@ -28,7 +33,8 @@ export class HealthController {
                     rabbitmq: {
                         status: appConfig.microservices.rabbitmq.enabled ? 'enabled' : 'disabled'
                     }
-                }
+                },
+                memory: memoryInfo
             };
         } catch (error) {
             return {
