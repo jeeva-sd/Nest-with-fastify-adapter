@@ -5,6 +5,7 @@ import { ClsService } from 'nestjs-cls';
 import { Helper, Store } from '~/common';
 import { appConfig } from '~/configs';
 import { prisma } from '~/services/database/prisma.service';
+import { PortalRoleType } from '../eco-apps/types/portal-roles';
 import { PermissionCacheService } from '../roles';
 import { RoleService } from '../roles/role.service';
 import { PortalCookieDto } from './schemas/portal-cookie-values';
@@ -126,9 +127,9 @@ export class AuthService {
         const userDataToUpdate = { ...Helper.Object.omit(portalUserData, ['roleId']) } as Partial<
             typeof portalUserData
         >;
-        // if ([PortalRoleType.ORG_ADMIN, PortalRoleType.SUPER_ADMIN].includes(portalResponse.roleType)) {
-        //     userDataToUpdate.roleId = portalResponse.roleId;
-        // }
+        if ([PortalRoleType.ORG_ADMIN, PortalRoleType.SUPER_ADMIN].includes(portalResponse.roleType)) {
+            userDataToUpdate.roleId = portalResponse.roleId;
+        }
 
         const user = await prisma.$transaction(async prisma => {
             // Upsert user

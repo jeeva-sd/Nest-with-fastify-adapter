@@ -3,10 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { appConfig } from '~/configs';
 import { EcoAppsModule } from '~/modules/eco-apps/eco-apps.module';
 import { RoleModule } from '~/modules/roles/role.module';
+import { ImpersonationGuard, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard } from '../guards';
 import { JwtStrategy } from './jwt.strategy';
 import { PortalBasicAuthStrategy } from './portal-basic.strategy';
 import { PortalCookieAuthStrategy } from './portal-cookie.strategy';
-import { ImpersonationGuard, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard } from '../guards';
 
 @Module({
     imports: [RoleModule, EcoAppsModule],
@@ -37,6 +37,12 @@ import { ImpersonationGuard, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAut
         //     }
         // }
     ],
-    exports: [appConfig.auth.basicJWT.name, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard, ImpersonationGuard]
+    exports: [
+        appConfig.auth.basicJWT.name,
+        JwtAuthGuard,
+        PortalBasicAuthGuard,
+        PortalCookieAuthGuard,
+        ImpersonationGuard
+    ]
 })
 export class StrategyModule {}
