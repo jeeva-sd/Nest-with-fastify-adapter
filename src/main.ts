@@ -13,7 +13,8 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX } from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
-import { createRmqMicroserviceOptions, RABBIT_MQ_QUEUE_KEYS } from './services';
+import { RABBIT_MQ_QUEUE_KEYS } from './services';
+import { createRmqMicroserviceOptions } from './services/jobs/jobs.helpers';
 
 class App {
     private app: NestFastifyApplication;
