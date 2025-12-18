@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RequestX } from '~/common';
-import { PermissionCacheService } from '../permission-cache.service';
 import { appConfig } from '~/configs';
 import { PermissionName } from '~/modules/roles/role.constants';
+import { PermissionCacheService } from '../permission-cache.service';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -18,7 +18,7 @@ export class RoleGuard implements CanActivate {
         const request: RequestX = context.switchToHttp().getRequest();
         const jwtUser = request.user;
 
-        if (!(jwtUser && 'permVer' in jwtUser)) {
+        if (!jwtUser?.accessId) {
             throw new ForbiddenException('User not authenticated');
         }
 
@@ -27,17 +27,12 @@ export class RoleGuard implements CanActivate {
             [handler, controller]
         );
 
-        console.log(permissionMeta, 'permissionMeta')
-
         if (!permissionMeta?.permissions?.length) {
             return true; // No permissions required
         }
 
         const { permissions: requiredPermissions, matchAll } = permissionMeta;
-
-        const userPermissions = await this.permissionCache.getPermissions(jwtUser.permVer, jwtUser.roleIds);
-
-        console.log(userPermissions, 'userPermissions')
+        const userPermissions = await this.permissionCache.getPermissions(jwtUser.accessId, jwtUser.roleId);
 
         const hasPermissions = matchAll
             ? requiredPermissions.every(perm => userPermissions.includes(perm))

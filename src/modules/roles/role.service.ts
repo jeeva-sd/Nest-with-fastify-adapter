@@ -204,38 +204,35 @@ export class RoleService {
         return roleId;
     }
 
-    async getPermissions(roleIds: string[]): Promise<PermissionName[]> {
-        if (roleIds.length === 0) return [];
+    async getPermissions(roleId: string): Promise<PermissionName[]> {
+        if (!roleId) return [];
 
         const rolePermissions = await prisma.rolePermission.findMany({
             where: {
-                roleId: { in: roleIds },
+                roleId: roleId
             },
             include: {
-                permission: true,
-            },
+                permission: true
+            }
         });
 
         const permissions = rolePermissions.map(rp => rp.permission.name as PermissionName);
         return [...new Set(permissions)]; // distinct
     }
 
-    async getPermissionRevisions(roleIds: string[]): Promise<Record<string, number>> {
-        if (roleIds.length === 0) return {};
+    async getPermissionRevision(roleId: string) {
+        if (!roleId) return 0;
 
-        const roles = await prisma.role.findMany({
+        const role = await prisma.role.findUnique({
             where: {
-                id: { in: roleIds },
+                id: roleId
             },
             select: {
                 id: true,
-                permissionRevision: true,
-            },
+                permissionRevision: true
+            }
         });
 
-        return roles.reduce((acc, role) => {
-            acc[role.id] = role.permissionRevision;
-            return acc;
-        }, {} as Record<string, number>);
+        return role.permissionRevision;
     }
 }

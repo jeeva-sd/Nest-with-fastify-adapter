@@ -6,6 +6,7 @@ import { RoleModule } from '~/modules/roles/role.module';
 import { JwtStrategy } from './jwt.strategy';
 import { PortalBasicAuthStrategy } from './portal-basic.strategy';
 import { PortalCookieAuthStrategy } from './portal-cookie.strategy';
+import { ImpersonationGuard, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard } from '../guards';
 
 @Module({
     imports: [RoleModule, EcoAppsModule],
@@ -13,6 +14,10 @@ import { PortalCookieAuthStrategy } from './portal-cookie.strategy';
         JwtStrategy,
         PortalBasicAuthStrategy,
         PortalCookieAuthStrategy,
+        JwtAuthGuard,
+        PortalBasicAuthGuard,
+        PortalCookieAuthGuard,
+        ImpersonationGuard,
         {
             provide: appConfig.auth.basicJWT.name,
             useFactory: () => {
@@ -32,6 +37,6 @@ import { PortalCookieAuthStrategy } from './portal-cookie.strategy';
         //     }
         // }
     ],
-    exports: [appConfig.auth.basicJWT.name]
+    exports: [appConfig.auth.basicJWT.name, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard, ImpersonationGuard]
 })
 export class StrategyModule {}

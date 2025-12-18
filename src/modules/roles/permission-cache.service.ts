@@ -1,8 +1,8 @@
+import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { LRUCache } from 'lru-cache';
-import { createHash } from 'node:crypto';
-import { RoleService } from './role.service';
 import { PermissionName } from './role.constants';
+import { RoleService } from './role.service';
 
 const PERMISSION_SCHEMA_VERSION = '1.0';
 
@@ -17,23 +17,26 @@ export class PermissionCacheService {
         });
     }
 
-    async getPermissions(permVer: string, roleIds: string[]): Promise<PermissionName[]> {
-        let permissions = this.cache.get(permVer);
+    async getPermissions(accessId: string, roleId: string): Promise<PermissionName[]> {
+        let permissions = this.cache.get(accessId);
         if (!permissions) {
-            permissions = await this.roleService.getPermissions(roleIds);
-            this.cache.set(permVer, permissions);
+            permissions = await this.roleService.getPermissions(roleId);
+            this.cache.set(accessId, permissions);
         }
         return permissions;
     }
 
-    generatePermissionVersion(
-        orgId: string,
-        roleIds: string[],
-        permissionRevisions: Record<string, number>
-    ): string {
-        const sortedRoleIds = [...roleIds].sort();
-        const revisionParts = sortedRoleIds.map(roleId => `${roleId}:${permissionRevisions[roleId] || 0}`);
-        const input = `${orgId}|${sortedRoleIds.join(',')}|${revisionParts.join(',')}|${PERMISSION_SCHEMA_VERSION}`;
+    generateAccessId(orgId: string, roleId: string, permissionRevisions: number): string {
+        const revisionParts = `${roleId}:${permissionRevisions || 0}`;
+        const input = `${orgId}|${roleId}|${revisionParts}|${PERMISSION_SCHEMA_VERSION}`;
         return createHash('sha1').update(input).digest('hex').slice(0, 8);
+    }
+
+    async clearCache(accessId: string): Promise<void> {
+        this.cache.delete(accessId);
+    }
+
+    async clearAllCache(): Promise<void> {
+        this.cache.clear();
     }
 }

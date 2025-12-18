@@ -4,8 +4,8 @@ import { FileDetail } from '../guards/req-payload.guard';
 export type TokenData = {
     sub: string; // userId
     orgId: string;
-    roleIds: string[];
-    permVer: string;
+    roleId: string;
+    accessId: string;
 };
 
 export interface RequestX extends FastifyRequest {

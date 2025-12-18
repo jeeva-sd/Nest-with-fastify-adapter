@@ -1,10 +1,10 @@
 import { Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { RequestX, Sanitize } from '~/common';
+import { RoleGuard } from '.';
 import { ACL } from './guards/role.policies';
 import { Access } from './role.decorators';
 import { RoleService } from './role.service';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
-import { RoleGuard } from '.';
 
 @Controller('roles')
 export class RolesController {

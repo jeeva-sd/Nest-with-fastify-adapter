@@ -5,9 +5,9 @@ import { ClsService } from 'nestjs-cls';
 import { Helper, Store } from '~/common';
 import { appConfig } from '~/configs';
 import { prisma } from '~/services/database/prisma.service';
-import { PortalCookieDto } from './schemas/portal-cookie-values';
-import { RoleService } from '../roles/role.service';
 import { PermissionCacheService } from '../roles';
+import { RoleService } from '../roles/role.service';
+import { PortalCookieDto } from './schemas/portal-cookie-values';
 
 // Define the type for users with roles and permissions
 export type UserWithRolePermissions = Prisma.UserGetPayload<{
@@ -84,9 +84,9 @@ export class AuthService {
     }
 
     private async mapLoginData(user: UserWithRolePermissions) {
-        const roleIds = [user.roleId];
-        const permissionRevisions = await this.roleService.getPermissionRevisions(roleIds);
-        const permVer = this.permissionCacheService.generatePermissionVersion(user.organizationId, roleIds, permissionRevisions);
+        const roleId = user.roleId;
+        const permissionRevision = await this.roleService.getPermissionRevision(roleId);
+        const accessId = this.permissionCacheService.generateAccessId(user.organizationId, roleId, permissionRevision);
 
         return {
             userData: {
@@ -94,7 +94,7 @@ export class AuthService {
                 fname: user.fname,
                 lname: user.lname,
                 email: user.email,
-                roleId: user.role?.id,
+                roleId: roleId,
                 roleName: user.role?.name,
                 phone: user.phone,
                 bio: user.bio,
@@ -106,8 +106,8 @@ export class AuthService {
             tokenData: {
                 sub: user.id,
                 orgId: user.organizationId,
-                roleIds,
-                permVer
+                roleId: roleId,
+                accessId
             }
         };
     }

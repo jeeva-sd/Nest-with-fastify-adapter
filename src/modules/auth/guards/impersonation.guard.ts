@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { RequestX, Store } from '~/common';
-import { permissions } from '~/modules/roles/role.constants';
 import { prisma } from '~/services/database/prisma.service';
 import { ImpersonateUserDto } from '../schemas/user-impersonation';
 
@@ -18,7 +17,7 @@ export class ImpersonationGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: RequestX = context.switchToHttp().getRequest();
-        const requestedUser = request.user;
+        const _requestedUser = request.user;
         const payload = request.payload as ImpersonateUserDto;
 
         // Fetch the user to impersonate
@@ -59,9 +58,7 @@ export class ImpersonationGuard implements CanActivate {
         if (!existingUser) throw new NotFoundException('User not found');
         if (request.user.sub === existingUser.id) throw new BadRequestException('Cannot impersonate yourself');
         // Check if the user is allowed to update users from different organizations
-        if (
-            request.user.orgId !== existingUser.organizationId
-        ) {
+        if (request.user.orgId !== existingUser.organizationId) {
             throw new ForbiddenException('You are not allowed to impersonate users from different organizations');
         }
 
