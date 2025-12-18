@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { appConfig } from '~/configs';
+import { appConfig } from '~/configs/envs/envs.reader';
 import { seedRolesAndPermissions } from './seedRoles';
 
 export async function seedDatabase() {

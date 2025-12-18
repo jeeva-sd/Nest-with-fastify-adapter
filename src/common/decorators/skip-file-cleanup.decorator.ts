@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { RequestX } from '../types';
+import { RequestX } from '../types/request.type';
 
 // biome-ignore lint/security/noSecrets: key for metadata, not a secret
 const SKIP_FILE_CLEANUP_KEY = 'skipFileCleanup';

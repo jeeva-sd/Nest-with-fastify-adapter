@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { appConfig } from '~/configs';
-import { generalEvents, singleConsumerEvents } from '~/constants';
+import { appConfig } from '~/configs/envs/envs.reader';
+import { generalEvents, singleConsumerEvents } from '~/constants/events';
 import { JobsService } from '~/services';
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify';
-import { FileDetail } from '../guards';
+import { FileDetail } from '../guards/req-payload.guard';
 
 export type TokenData = {
     id: string;

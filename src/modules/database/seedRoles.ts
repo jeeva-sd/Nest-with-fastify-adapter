@@ -1,4 +1,4 @@
-import { permissions, standardRoles } from '~/configs';
+import { permissions, standardRoles } from '~/configs/roles/role.defaults';
 import { prisma } from './prisma.service';
 
 export async function seedRolesAndPermissions() {

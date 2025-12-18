@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { ALL_FILE_TYPES, oneKb } from '~/constants';
+import { ALL_FILE_TYPES } from '~/constants/file-types';
+import { oneKb } from '~/constants/units';
 
 export interface FileSchemaOverrides {
     allowedMimeTypes?: string[];

@@ -2,7 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logge
 import { createId } from '@paralleldrive/cuid2';
 import { Prisma } from '@prisma/client';
 import { appConfig } from '~/configs';
-import { readError } from '../utils';
+import { readError } from '../utils/error-reader';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

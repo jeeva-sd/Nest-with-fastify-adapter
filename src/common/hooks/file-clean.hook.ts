@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import { appConfig } from '~/configs';
-import { RequestX } from '../types';
+import { RequestX } from '../types/request.type';
 
 export const fileCleaner = async (request: RequestX) => {
     const uploadedFiles = request.uploadedFiles || [];

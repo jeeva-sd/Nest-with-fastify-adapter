@@ -1,5 +1,5 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common';
-import { appConfig } from '~/configs';
+import { appConfig } from '~/configs/envs/envs.reader';
 
 export interface AccessOptions {
     roles?: string[];

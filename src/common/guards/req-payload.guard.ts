@@ -4,7 +4,8 @@ import { BadRequestException, CanActivate, ExecutionContext } from '@nestjs/comm
 import { Reflector } from '@nestjs/core';
 import { ZodType, z } from 'zod';
 import { appConfig } from '~/configs';
-import { Helper, readError } from '../utils';
+import { Helper } from '../utils/helpers';
+import { readError } from '../utils/error-reader';
 
 // Define types for multipart parts
 interface MultipartFile {
