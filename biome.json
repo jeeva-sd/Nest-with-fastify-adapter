@@ -91,7 +91,7 @@
             },
 
             "performance": {
-                "noBarrelFile": "warn",
+                "noBarrelFile": "off",
                 "noDelete": "warn",
                 "noReExportAll": "error"
             },

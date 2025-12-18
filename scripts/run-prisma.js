@@ -31,7 +31,7 @@ if (!prismaArgs.length) {
 async function runPrismaCommand() {
     try {
         // Use direct require with destructuring for ES6 modules
-        const { ConfigReader } = require('../src/configs/environments/environment.reader');
+        const { ConfigReader } = require('../src/configs/config.reader');
 
         // Get the config instance
         const appConfig = ConfigReader.getInstance().config;

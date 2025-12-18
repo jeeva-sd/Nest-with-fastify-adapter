@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { appConfig } from '~/configs';
 
 @Injectable()
-export class LocalAuthGuard extends AuthGuard('local') {
+export class PortalCookieAuthGuard extends AuthGuard('portal-cookie') {
     constructor(private reflector: Reflector) {
         super();
     }

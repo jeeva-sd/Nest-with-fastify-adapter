@@ -1,5 +1,6 @@
 {
     "server": {
+        "appId": 1,
         "port": 3010,
         "version": "1",
         "routePrefix": "api",
@@ -176,5 +177,16 @@
         "from": "dummy@abc.com",
         "apiKey": "sendgrid_api_key_here",
         "enabled": false
+    },
+    "ecoApps": {
+        "portal": {
+            "auth": {
+                "userName": "6846d7d0007a3a4b4d07806c",
+                "password": "EgbU1oguR7LTLl1iEUx66VLeW3D7OfAx"
+            },
+            "baseUrl": "https://staging.users.api.maximumaccountability.net/api/v1/",
+            "tokenCookieName": "stagingAuthToken",
+            "domainForCookie": "localhost"
+        }
     }
 }

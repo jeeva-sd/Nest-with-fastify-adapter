@@ -4,7 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
 import * as Handlebars from 'handlebars';
 import { appConfig } from '~/configs';
-import { EmailParams, SendHtmlParams } from './email.types';
+import { EmailParams } from './email.types';
 
 @Injectable()
 export class EmailsService {
@@ -23,6 +23,7 @@ export class EmailsService {
         }
         // Register 'getChangeNumber' helper for Handlebars if not already registered
         if (!Handlebars.helpers.getChangeNumber) {
+            // biome-ignore lint/security/noSecrets: key for metadata, not a secret
             Handlebars.registerHelper('getChangeNumber', str => {
                 // Extracts the first number (positive or negative, integer or float) from the string
                 const match = str.match(/(-?\d+(?:\.\d+)?)/);

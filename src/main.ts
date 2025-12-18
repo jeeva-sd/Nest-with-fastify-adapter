@@ -11,8 +11,8 @@ import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX } from '~/common';
-import { AppModule } from './app.module';
 import { appConfig } from '~/configs';
+import { AppModule } from './app.module';
 import { RABBIT_MQ_QUEUE_KEYS } from './services';
 import { createRmqMicroserviceOptions } from './services/jobs/job.helper';
 

@@ -13,7 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const response = host.switchToHttp().getResponse() as ResponseX;
         const traceId = appConfig.server.allowExceptionLogs ? createId() : undefined;
 
-        const { status, message, error } = this.resolveException(exception);
+        const { status, message } = this.resolveException(exception);
 
         if (appConfig.server.allowExceptionLogs) {
             this.logger.error(exception, traceId);

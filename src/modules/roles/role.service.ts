@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../services/database/prisma.service';
+import { PortalRoleType } from '../eco-apps/types/portal-roles';
+import { standardRoles } from './role.constants';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
 
 @Injectable()
@@ -192,5 +194,13 @@ export class RoleService {
             orderBy: { name: 'asc' },
             select: { name: true, description: true }
         });
+    }
+
+    getRoleIdFromPortalRoleType(roleType: string): string {
+        let roleId: string = standardRoles.USER.id;
+        if (roleType === PortalRoleType.SUPER_ADMIN) roleId = standardRoles.SUPER_ADMIN.id;
+        else if (roleType === PortalRoleType.ORG_ADMIN) roleId = standardRoles.ORG_ADMIN.id;
+
+        return roleId;
     }
 }

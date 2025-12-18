@@ -1,6 +1,7 @@
 import * as z from 'zod';
 
 const serverConfigSchema = z.object({
+    appId: z.number(),
     port: z.number(),
     routePrefix: z.string(),
     version: z.string(),
@@ -202,17 +203,37 @@ const gracefulShutdownConfigSchema = z.object({
     logShutdown: z.boolean()
 });
 
-const blobStorageSchema = z.object({
-    container: z.string().nonempty('Azure container is required'),
-    connection: z.string().nonempty('Azure connection string is required'),
-    assets: z.string().nonempty('Assets path is required')
-}).optional();
+const blobStorageSchema = z
+    .object({
+        container: z.string().nonempty('Azure container is required'),
+        connection: z.string().nonempty('Azure connection string is required'),
+        assets: z.string().nonempty('Assets path is required')
+    })
+    .optional();
 
-const emailConfigSchema = z.object({
-    from: z.email('Invalid from email address'),
-    apiKey: z.string().nonempty('SendGrid API key is required'),
-    enabled: z.boolean()
-}).optional();
+const emailConfigSchema = z
+    .object({
+        from: z.email('Invalid from email address'),
+        apiKey: z.string().nonempty('SendGrid API key is required'),
+        enabled: z.boolean()
+    })
+    .optional();
+
+// -------------------------------------------- EcoApps --------------------------------------------
+
+const portalConfigSchema = z.object({
+    auth: z.object({
+        userName: z.string().nonempty('Portal Username is required'),
+        password: z.string().nonempty('Portal Password is required')
+    }),
+    baseUrl: z.string().nonempty('Portal Base URL is required'),
+    tokenCookieName: z.string().nonempty('Token Cookie Name is required'),
+    domainForCookie: z.string().nonempty('Domain for Cookie is required')
+});
+
+export const ecoAppSchema = z.object({
+    portal: portalConfigSchema
+});
 
 // ----------------------------------------------------------------------------------------------------------
 
@@ -228,7 +249,8 @@ export const AppConfigRule = z.object({
     views: viewEngineSchema,
     database: databaseRule,
     blobStorage: blobStorageSchema,
-    email: emailConfigSchema
+    email: emailConfigSchema,
+    ecoApps: ecoAppSchema
 });
 
 // ------------------------------------------------------------------------------------------------------------------

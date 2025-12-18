@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { AppConfig, AppConfigRule } from './config.schema';
 
 export class ConfigReader {

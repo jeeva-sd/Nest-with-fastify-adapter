@@ -9,20 +9,58 @@ datasource db {
 
 // *******************************************************************************************
 
-model User {
-    id        String   @id @default(cuid())
-    fname     String   @db.VarChar(50)
-    lname     String   @db.VarChar(50)
-    email     String   @unique(map: "uk_user_email") @db.VarChar(255)
-    roleId    String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 
-    role Role? @relation(fields: [roleId], references: [id], onDelete: SetNull, map: "fk_user_role")
+model User {
+    id             String   @id @default(cuid())
+    fname          String   @db.VarChar(50)
+    lname          String   @db.VarChar(50)
+    email          String   @unique(map: "uk_user_email") @db.VarChar(255)
+    organizationId String
+    roleId         String?
+    bio            String?  @db.VarChar(300)
+    phone          String?  @db.VarChar(20)
+    status         Int?
+    country        String?  @db.VarChar(100)
+    timezone       String   @default("UTC-05:00") @db.VarChar(50)
+    profileImage   Boolean  @default(false)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    role               Role?                @relation(fields: [roleId], references: [id], onDelete: SetNull, map: "fk_user_role")
+    departments        UserDepartment[]
+    userDepSupervisors UserDeptSupervisor[]
 
     @@index([fname], map: "idx_user_fname")
     @@index([lname], map: "idx_user_name")
+    @@index([organizationId], map: "idx_user_org")
     @@map("users")
+}
+
+model UserDepartment {
+    id           String  @id @default(cuid())
+    userId       String
+    departmentId Int
+    title        String? @db.VarChar(255)
+
+    user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_udept_user")
+    supervisors UserDeptSupervisor[]
+
+    @@unique([userId, departmentId], map: "uk_udept_user_dept")
+    @@index([departmentId], map: "idx_udept_dept")
+    @@map("user_departments")
+}
+
+model UserDeptSupervisor {
+    id               String  @id @default(cuid())
+    userDepartmentId String
+    supervisorId     String?
+
+    userDepartment UserDepartment @relation(fields: [userDepartmentId], references: [id], onDelete: Cascade, map: "fk_usup_udept")
+    supervisor     User?          @relation(fields: [supervisorId], references: [id], onDelete: Cascade, map: "fk_usup_user")
+
+    @@index([userDepartmentId], map: "idx_usup_udept")
+    @@index([supervisorId], map: "idx_usup_supervisor")
+    @@map("user_department_supervisors")
 }
 
 model Role {

@@ -1,5 +1,5 @@
-import { ConfigReader } from "./config.reader";
-import { AppConfig } from "./config.schema";
+import { ConfigReader } from './config.reader';
+import { AppConfig } from './config.schema';
 
 // Create a singleton instance with lazy loading
 let configInstance: AppConfig | null = null;

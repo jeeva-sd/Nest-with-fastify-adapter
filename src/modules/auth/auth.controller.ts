@@ -1,25 +1,36 @@
-import { Controller, HttpCode, Post, Request } from '@nestjs/common';
-import { RequestX } from '~/common';
-import { Events } from '../events/event.emitter';
+import { Controller, Get, HttpCode, Post, Request, Response, UseGuards } from '@nestjs/common';
+import { RequestX, ResponseX, Sanitize } from '~/common';
+import { appConfig } from '~/configs';
+import { ACL, Access, RoleGuard } from '../roles';
 import { AuthService } from './auth.service';
+import { ImpersonationGuard, JwtAuthGuard, PortalCookieAuthGuard } from './guards';
+import { ImpersonateUserDto, PortalCookieDto } from './schemas';
 
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private readonly authService: AuthService,
-        private readonly events: Events
-    ) {}
+    constructor(private readonly authService: AuthService) {}
 
     @HttpCode(200)
-    @Post('login')
-    async checkLogin(@Request() _req: RequestX) {
-        return this.authService.login();
+    @Post('check-login')
+    @UseGuards(PortalCookieAuthGuard)
+    async checkLogin(@Request() req: RequestX) {
+        return this.authService.checkLogin(req.payload as PortalCookieDto);
     }
 
     @HttpCode(200)
-    @Post('profile')
-    // @Sanitize(ProfileImageDto)
-    async profile(@Request() _req: RequestX) {
-        await this.events.createUser({ message: 'hi' });
+    @Post('logout')
+    @UseGuards(JwtAuthGuard)
+    async logoutUser(@Response() res: ResponseX) {
+        const { tokenCookieName, domainForCookie } = appConfig.ecoApps.portal;
+        res.clearCookie(tokenCookieName, { domain: domainForCookie });
+        res.send({ message: 'Logged out successfully' });
+    }
+
+    @Get('impersonate')
+    @Access(ACL.manageUsers)
+    @Sanitize(ImpersonateUserDto)
+    @UseGuards(JwtAuthGuard, RoleGuard, ImpersonationGuard)
+    async impersonate() {
+        return this.authService.impersonate();
     }
 }
