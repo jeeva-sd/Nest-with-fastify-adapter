@@ -1,5 +1,6 @@
-import { Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { RequestX, Sanitize } from '~/common';
+import { RoleGuard } from './guards/role.guard';
 import { ACL } from './guards/role.policies';
 import { Access } from './role.decorators';
 import { RoleService } from './role.service';
@@ -16,6 +17,7 @@ export class RolesController {
     }
 
     @Post()
+    @UseGuards(RoleGuard)
     @Sanitize(CreateRoleDto)
     @Access(ACL.superAdminOnly)
     async createRole(@Req() req: RequestX) {
@@ -23,6 +25,7 @@ export class RolesController {
     }
 
     @Patch()
+    @UseGuards(RoleGuard)
     @Sanitize(UpdateRoleDto)
     @Access(ACL.superAdminOnly)
     async updateRole(@Req() req: RequestX) {
@@ -30,6 +33,7 @@ export class RolesController {
     }
 
     @Delete()
+    @UseGuards(RoleGuard)
     @Sanitize(DeleteRolesDto)
     @Access(ACL.superAdminOnly)
     async deleteRoles(@Req() req: RequestX) {

@@ -10,7 +10,6 @@ export { AckHandler } from './decorators/ack.decorator';
 export { Sanitize } from './decorators/payload-sanitizer.decorator';
 export { Public } from './decorators/public.decorator';
 export { SkipFileCleanup } from './decorators/skip-file-cleanup.decorator';
-export { SkipJwtAuth } from './decorators/skip-jwt-auth.decorator';
 export { HttpExceptionFilter } from './filters/http-exception.filter';
 export { FileDetail, metadataCache, PayloadGuard } from './guards/req-payload.guard';
 export { fileCleaner } from './hooks/file-clean.hook';
