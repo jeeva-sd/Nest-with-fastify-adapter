@@ -1,4 +1,3 @@
-
 export const generalEvents = {
     ecoApps: {
         departmentSync: 'ecoApps.department.sync'

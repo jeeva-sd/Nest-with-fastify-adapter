@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as amqp from 'amqplib';
-import { generalEvents, singleConsumerEvents } from '~/common';
 import { appConfig } from '~/configs/config.reader';
+import { generalEvents, singleConsumerEvents } from '~/modules/events/event.patterns';
 import { extractRoutingKeys } from './jobs.helpers';
 
 @Injectable()
