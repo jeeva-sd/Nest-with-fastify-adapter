@@ -1,9 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { RmqContext } from '@nestjs/microservices';
 import { ZodType } from 'zod';
-import { badMessage } from '~/constants/events';
 
-const logger = new Logger('RabbitMQDecorator');
+const logger = new Logger('RMQDecorator');
 
 export function AckHandler(schema?: ZodType<unknown>) {
     return (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
@@ -37,7 +36,7 @@ export function AckHandler(schema?: ZodType<unknown>) {
 
                 const result = await originalMethod.apply(this, args);
 
-                if (result === badMessage) {
+                if (result === null) {
                     logger.warn(`Discarding message in ${propertyKey}`);
                     channel.nack(message, false, false); // Discard the message permanently
                     return null;

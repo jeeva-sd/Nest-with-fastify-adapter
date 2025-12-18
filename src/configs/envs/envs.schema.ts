@@ -115,14 +115,6 @@ export const viewEngineSchema = z.object({
     templatesDir: z.string()
 });
 
-export const interceptorSchema = z.object({
-    response: z.object({
-        format: z.boolean(),
-        formatKey: z.string(),
-        skipFormatKey: z.string()
-    })
-});
-
 // -------------------------------------------- Database --------------------------------------------
 
 const sqlRule = z.object({
@@ -221,7 +213,6 @@ export const AppConfigRule = z.object({
     gracefulShutdown: gracefulShutdownConfigSchema,
     auth: authConfigSchema,
     payloadValidation: payloadConfigSchema,
-    interceptors: interceptorSchema,
     views: viewEngineSchema,
     database: databaseRule
 });

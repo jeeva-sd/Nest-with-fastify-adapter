@@ -10,15 +10,15 @@ export type RabbitMqQueueKey = (typeof RABBIT_MQ_QUEUE_KEYS)[keyof typeof RABBIT
 
 // Use consolidated microservices.rabbitmq configuration
 const BASE_OPTIONS = {
-    urls: [appConfig.microservices.rabbitmq.uri], // Updated path
-    exchange: appConfig.microservices.rabbitmq.exchange.name, // Updated path
-    exchangeType: appConfig.microservices.rabbitmq.exchange.type, // Updated path
-    exchangeArguments: appConfig.microservices.rabbitmq.exchange.options.arguments, // Updated path
+    urls: [appConfig.microservices.rabbitmq.uri],
+    exchange: appConfig.microservices.rabbitmq.exchange.name,
+    exchangeType: appConfig.microservices.rabbitmq.exchange.type,
+    exchangeArguments: appConfig.microservices.rabbitmq.exchange.options.arguments,
     queueOptions: { durable: true }
 };
 
 function getQueueConfig(queueKey: RabbitMqQueueKey) {
-    const queueConfig = appConfig.microservices.rabbitmq.queues[queueKey]; // Updated path
+    const queueConfig = appConfig.microservices.rabbitmq.queues[queueKey];
 
     if (!queueConfig) {
         throw new Error(`Queue config for key '${queueKey}' not found`);

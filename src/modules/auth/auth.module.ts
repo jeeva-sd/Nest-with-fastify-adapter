@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MessagesModule } from '~/services';
+import { EventsModule } from '../events/events.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { StrategyModule } from './strategies';
 
 @Module({
-    imports: [StrategyModule, MessagesModule],
+    imports: [StrategyModule, EventsModule],
     controllers: [AuthController],
     providers: [AuthService]
 })

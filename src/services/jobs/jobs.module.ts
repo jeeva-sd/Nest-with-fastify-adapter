@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { MessagesClient } from './messages.client';
-import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './messages.config';
+import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './jobs.config';
+import { JobsService } from './jobs.service';
 
 @Module({
     imports: [
@@ -10,7 +10,7 @@ import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './messages.config'
             createRmqClientOptions('RmqSingleConsumerClient', RABBIT_MQ_QUEUE_KEYS.SINGLE_CONSUMER)
         ])
     ],
-    providers: [MessagesClient],
-    exports: [ClientsModule, MessagesClient]
+    providers: [JobsService],
+    exports: [ClientsModule, JobsService]
 })
-export class MessagesModule {}
+export class JobsModule {}

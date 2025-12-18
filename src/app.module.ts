@@ -4,13 +4,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { EventsModule } from './modules/events/events.module';
 import { HealthModule } from './modules/health/health.module';
 import { RoleModule } from './modules/roles/roles.module';
-import { MessagesModule } from './services';
+import { JobsModule } from './services';
 
 @Module({
     imports: [
         AuthModule,
         RoleModule,
-        MessagesModule,
+        JobsModule,
         EventsModule,
         HealthModule,
         ClsModule.forRoot({

@@ -11,7 +11,7 @@
         "predev": "cross-env NODE_ENV=development npx prisma generate",
         "dev": "cross-env NODE_ENV=development nest start --watch",
         "prod": "cross-env NODE_ENV=production node dist/src/main",
-        "lint": "biome check --write --no-errors-on-unmatched",
+        "lint": "biome check --write --unsafe --no-errors-on-unmatched",
         "db:generate": "cross-env NODE_ENV=development sh -c \"npx prisma generate && node scripts/run-prisma.js migrate dev --create-only\"",
         "db:reset": "cross-env NODE_ENV=development node scripts/run-prisma.js migrate reset",
         "db:update": "cross-env NODE_ENV=development node scripts/run-prisma.js migrate dev",

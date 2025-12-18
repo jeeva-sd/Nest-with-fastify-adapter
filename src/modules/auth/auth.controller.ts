@@ -1,11 +1,14 @@
 import { Controller, HttpCode, Post, Request } from '@nestjs/common';
-import { RequestX, Sanitize } from '~/common';
+import { RequestX } from '~/common';
+import { Events } from '../events/event.emitter';
 import { AuthService } from './auth.service';
-import { ProfileImageDto } from './dto/profile.dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly events: Events
+    ) {}
 
     @HttpCode(200)
     @Post('login')
@@ -15,8 +18,8 @@ export class AuthController {
 
     @HttpCode(200)
     @Post('profile')
-    @Sanitize(ProfileImageDto)
-    async profile(@Request() req: RequestX) {
-        console.log(req.payload);
+    // @Sanitize(ProfileImageDto)
+    async profile(@Request() _req: RequestX) {
+        await this.events.createUser({ message: 'hi' });
     }
 }

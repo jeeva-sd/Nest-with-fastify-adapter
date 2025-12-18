@@ -10,7 +10,7 @@ import { fastifyStatic } from '@fastify/static';
 import { Logger, VersioningType } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX, ResponseTransformInterceptor } from '~/common';
+import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX } from '~/common';
 import { AppModule } from './app.module';
 import { appConfig } from './configs';
 import { createRmqMicroserviceOptions, RABBIT_MQ_QUEUE_KEYS } from './services';
@@ -195,11 +195,6 @@ class App {
         this.app.useGlobalFilters(new HttpExceptionFilter()); // Global exception handling
     }
 
-    // Set up global interceptors
-    setUpInterceptors() {
-        this.app.useGlobalInterceptors(new ResponseTransformInterceptor(this.reflector)); // Global response formatting
-    }
-
     // Start listening on the configured port with host binding
     async startServer() {
         const port = appConfig.server.port; // Server port from configuration
@@ -292,7 +287,6 @@ class App {
                 Promise.resolve(this.setupVersioning()),
                 Promise.resolve(this.setupGuards()),
                 Promise.resolve(this.setUpFilters()),
-                Promise.resolve(this.setUpInterceptors()),
                 Promise.resolve(this.setupViewEngine()),
                 this.enableShutdownHooks()
             ]);
