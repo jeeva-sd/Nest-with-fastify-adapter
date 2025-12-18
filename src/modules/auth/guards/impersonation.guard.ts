@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { RequestX, Store } from '~/common';
-import { prisma } from '~/services/database/prisma.service';
+import { PrismaService } from '~/services';
 import { ImpersonateUserDto } from '../schemas/user-impersonation';
 
 @Injectable()
 export class ImpersonationGuard implements CanActivate {
-    constructor(private readonly cls: ClsService<Store>) {}
+    constructor(private readonly cls: ClsService<Store>, private readonly prisma: PrismaService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: RequestX = context.switchToHttp().getRequest();
@@ -21,7 +21,7 @@ export class ImpersonationGuard implements CanActivate {
         const payload = request.payload as ImpersonateUserDto;
 
         // Fetch the user to impersonate
-        const existingUser = await prisma.user.findFirst({
+        const existingUser = await this.prisma.user.findFirst({
             where: { id: payload.userId },
             select: {
                 id: true,

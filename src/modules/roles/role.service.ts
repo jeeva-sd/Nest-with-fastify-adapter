@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { prisma } from '../../services/database/prisma.service';
+import { PrismaService } from '../../services';
 import { PortalRoleType } from '../eco-apps/types/portal-roles';
 import { PermissionName, standardRoles } from './role.constants';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
 
 @Injectable()
 export class RoleService {
+    constructor(private readonly prisma: PrismaService) {}
+
     async getRoleById(roleId: string, dto: ViewRoleDto) {
         const { includePermissions = false } = dto;
 
-        const role = await prisma.role.findUnique({
+        const role = await this.prisma.role.findUnique({
             where: { id: roleId },
             include: includePermissions ? { rolePermissions: { include: { permission: true } } } : undefined
         });
@@ -33,14 +35,14 @@ export class RoleService {
         const where: Prisma.RoleWhereInput = searchTerm ? { name: { contains: searchTerm } } : {};
 
         const [items, total] = await Promise.all([
-            prisma.role.findMany({
+            this.prisma.role.findMany({
                 where,
                 take: limit,
                 skip: (page - 1) * limit,
                 orderBy: { [sortBy]: sortOrder },
                 include: includePermissions ? { rolePermissions: { include: { permission: true } } } : undefined
             }),
-            prisma.role.count({ where })
+            this.prisma.role.count({ where })
         ]);
 
         const roles = items.map(role => ({
@@ -57,19 +59,19 @@ export class RoleService {
         const { name, description, permissions: permissionNames } = dto;
 
         // Check for duplicate role name
-        const existingRole = await prisma.role.findFirst({ where: { name } });
+        const existingRole = await this.prisma.role.findFirst({ where: { name } });
         if (existingRole) {
             throw new BadRequestException('Role with this name already exists');
         }
 
         // Create the role
-        const newRole = await prisma.role.create({
+        const newRole = await this.prisma.role.create({
             data: { name, description }
         });
 
         // Attach permissions by name (lookup IDs)
         if (permissionNames.length > 0) {
-            const permissions = await prisma.permission.findMany({
+            const permissions = await this.prisma.permission.findMany({
                 where: { name: { in: permissionNames } }
             });
 
@@ -77,7 +79,7 @@ export class RoleService {
                 throw new BadRequestException('One or more permissions are invalid');
             }
 
-            await prisma.rolePermission.createMany({
+            await this.prisma.rolePermission.createMany({
                 data: permissions.map(perm => ({
                     roleId: newRole.id,
                     permissionId: perm.id
@@ -96,7 +98,7 @@ export class RoleService {
     async updateRole(dto: UpdateRoleDto) {
         const { roleId: id, name, description, permissions: permissionNames } = dto;
 
-        return prisma.$transaction(async tx => {
+        return this.prisma.$transaction(async tx => {
             // Fetch role and ensure it's custom
             const existingRole = await tx.role.findUnique({ where: { id } });
 
@@ -153,7 +155,7 @@ export class RoleService {
     }
 
     async deleteRole({ roleId }: DeleteRolesDto) {
-        return prisma.$transaction(async tx => {
+        return this.prisma.$transaction(async tx => {
             // Fetch the role to validate
             const role = await tx.role.findUnique({
                 where: { id: roleId },
@@ -182,7 +184,7 @@ export class RoleService {
     }
 
     async getAllPermissions() {
-        const permissions = await prisma.permission.findMany({
+        const permissions = await this.prisma.permission.findMany({
             orderBy: { name: 'asc' }
         });
 
@@ -190,7 +192,7 @@ export class RoleService {
     }
 
     async getAllPermissionsInfos() {
-        return await prisma.permission.findMany({
+        return await this.prisma.permission.findMany({
             orderBy: { name: 'asc' },
             select: { name: true, description: true }
         });
@@ -207,7 +209,7 @@ export class RoleService {
     async getPermissions(roleId: string): Promise<PermissionName[]> {
         if (!roleId) return [];
 
-        const rolePermissions = await prisma.rolePermission.findMany({
+        const rolePermissions = await this.prisma.rolePermission.findMany({
             where: {
                 roleId: roleId
             },
@@ -217,13 +219,13 @@ export class RoleService {
         });
 
         const permissions = rolePermissions.map(rp => rp.permission.name as PermissionName);
-        return [...new Set(permissions)]; // distinct
+        return Array.from(new Set(permissions)); // distinct
     }
 
     async getPermissionRevision(roleId: string) {
         if (!roleId) return 0;
 
-        const role = await prisma.role.findUnique({
+        const role = await this.prisma.role.findUnique({
             where: {
                 id: roleId
             },

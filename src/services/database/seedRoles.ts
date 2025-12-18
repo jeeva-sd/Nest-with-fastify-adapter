@@ -1,7 +1,6 @@
 import { permissions, standardRoles } from '~/modules/roles/role.constants';
-import { prisma } from './prisma.service';
 
-export async function seedRolesAndPermissions() {
+export async function seedRolesAndPermissions(prisma: any) {
     await prisma.$transaction(
         async tx => {
             // 1. Upsert Permissions and Roles in parallel

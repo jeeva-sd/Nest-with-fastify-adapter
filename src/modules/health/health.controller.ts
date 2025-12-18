@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { Public } from '~/common';
 import { appConfig } from '~/configs';
-import { prisma } from '../../services/database/prisma.service';
+import { PrismaService } from '../../services';
 import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
-    constructor(private readonly healthService: HealthService) {}
+    constructor(private readonly healthService: HealthService, private readonly prisma: PrismaService) {}
 
     @Get()
     @Public()
@@ -14,7 +14,7 @@ export class HealthController {
         try {
             // Check database connectivity
             const startTime = Date.now();
-            await prisma.$queryRaw`SELECT 1`;
+            await this.prisma.$queryRaw`SELECT 1`;
             const dbLatency = Date.now() - startTime;
 
             const memoryInfo = this.healthService.getMemoryInfo();

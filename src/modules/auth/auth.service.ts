@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 import { ClsService } from 'nestjs-cls';
 import { Helper, Store } from '~/common';
 import { appConfig } from '~/configs';
-import { prisma } from '~/services/database/prisma.service';
+import { PrismaService } from '~/services';
 import { PortalRoleType } from '../eco-apps/types/portal-roles';
 import { PermissionCacheService } from '../roles';
 import { RoleService } from '../roles/role.service';
@@ -49,7 +49,8 @@ export class AuthService {
         @Inject(appConfig.auth.basicJWT.name) private readonly jwtService: JwtService,
         private readonly cls: ClsService<Store>,
         private readonly roleService: RoleService,
-        private readonly permissionCacheService: PermissionCacheService
+        private readonly permissionCacheService: PermissionCacheService,
+        private readonly prisma: PrismaService
     ) {}
 
     private basicUserSelect(): Prisma.UserSelect {
@@ -131,7 +132,7 @@ export class AuthService {
             userDataToUpdate.roleId = portalResponse.roleId;
         }
 
-        const user = await prisma.$transaction(async prisma => {
+        const user = await this.prisma.$transaction(async prisma => {
             // Upsert user
             const userRes = await prisma.user.upsert({
                 where: { id: portalResponse.userId },
