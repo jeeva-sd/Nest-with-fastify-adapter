@@ -132,8 +132,8 @@
         },
         "memory": {
             "enabled": true,
-            "warningThreshold": 10,
-            "criticalThreshold": 100,
+            "warningThreshold": 25,
+            "criticalThreshold": 80,
             "checkInterval": 10000
         },
         "startup": {

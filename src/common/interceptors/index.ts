@@ -1,1 +1,1 @@
-export { MemoryMonitor, PerformanceInterceptor } from './performance.interceptor';
+export { PerformanceInterceptor } from './performance.interceptor';

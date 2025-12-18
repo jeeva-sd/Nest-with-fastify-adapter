@@ -1,7 +1,8 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { appConfig } from '~/configs';
 
 interface PerformanceMetrics {
     requestId: string;
@@ -17,14 +18,16 @@ interface PerformanceMetrics {
 
 @Injectable()
 export class PerformanceInterceptor implements NestInterceptor {
+    private readonly logger = new Logger(PerformanceInterceptor.name);
     private readonly metrics: Map<string, PerformanceMetrics> = new Map();
-    private readonly isDev: boolean;
 
-    constructor(private readonly cls: ClsService) {
-        this.isDev = process.env.NODE_ENV === 'development';
-    }
+    constructor(private readonly cls: ClsService) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+        if (!appConfig.monitoring.performance.enabled) {
+            return next.handle();
+        }
+
         const request = context.switchToHttp().getRequest();
         const response = context.switchToHttp().getResponse();
 
@@ -61,11 +64,9 @@ export class PerformanceInterceptor implements NestInterceptor {
             metrics.duration = metrics.endTime - metrics.startTime;
             metrics.statusCode = statusCode;
 
-            if (this.isDev) {
-                this.logPerformanceMetrics(metrics);
-            }
+            this.logPerformanceMetrics(metrics);
 
-            // Clean up metrics after processing
+            // Clean up metrics after processing to free memory
             this.metrics.delete(requestId);
         }
     }
@@ -73,73 +74,17 @@ export class PerformanceInterceptor implements NestInterceptor {
     private logPerformanceMetrics(metrics: PerformanceMetrics) {
         const { method, url, duration, statusCode } = metrics;
 
-        if (duration > 1000) {
-            console.warn(`🐌 SLOW REQUEST: ${method} ${url} - ${duration}ms (${statusCode})`);
-        } else if (duration > 500) {
-            console.log(`⚠️  MEDIUM REQUEST: ${method} ${url} - ${duration}ms (${statusCode})`);
-        } else if (duration > 100) {
-            console.log(`⚡ FAST REQUEST: ${method} ${url} - ${duration}ms (${statusCode})`);
+        if (duration > appConfig.monitoring.performance.slowRequestThreshold) {
+            this.logger.warn(`SLOW REQUEST: ${method} ${url} - ${duration}ms (${statusCode})`);
+        } else if (duration > appConfig.monitoring.performance.mediumRequestThreshold) {
+            this.logger.log(`MEDIUM REQUEST: ${method} ${url} - ${duration}ms (${statusCode})`);
         }
     }
 
     // Get current performance statistics
     getStats() {
         return {
-            activeRequests: this.metrics.size,
-            isDevelopment: this.isDev
+            activeRequests: this.metrics.size
         };
     }
 }
-
-// Memory usage monitor
-export class MemoryMonitor {
-    private static instance: MemoryMonitor;
-    private readonly thresholds = {
-        warning: 50 * 1024 * 1024, // 50MB
-        critical: 100 * 1024 * 1024 // 100MB
-    };
-
-    static getInstance(): MemoryMonitor {
-        if (!MemoryMonitor.instance) {
-            MemoryMonitor.instance = new MemoryMonitor();
-        }
-        return MemoryMonitor.instance;
-    }
-
-    private constructor() {
-        if (process.env.NODE_ENV === 'development') {
-            this.startMonitoring();
-        }
-    }
-
-    private startMonitoring() {
-        // Check memory usage every 30 seconds in development
-        setInterval(() => {
-            const usage = process.memoryUsage();
-            const heapUsed = usage.heapUsed;
-
-            if (heapUsed > this.thresholds.critical) {
-                console.error(`🚨 CRITICAL: High memory usage: ${this.formatBytes(heapUsed)}`);
-            } else if (heapUsed > this.thresholds.warning) {
-                console.warn(`⚠️  WARNING: Elevated memory usage: ${this.formatBytes(heapUsed)}`);
-            }
-        }, 30_000);
-    }
-
-    private formatBytes(bytes: number): string {
-        return `${(bytes / 1024 / 1024).toFixed(2)}MB`;
-    }
-
-    getMemoryUsage() {
-        const usage = process.memoryUsage();
-        return {
-            rss: this.formatBytes(usage.rss),
-            heapTotal: this.formatBytes(usage.heapTotal),
-            heapUsed: this.formatBytes(usage.heapUsed),
-            external: this.formatBytes(usage.external)
-        };
-    }
-}
-
-// Initialize memory monitor
-MemoryMonitor.getInstance();

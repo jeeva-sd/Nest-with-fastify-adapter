@@ -1,8 +1,8 @@
 {
     "server": {
         "port": 5050,
-        "mode": "development",
-        "allowExceptionLogs": true
+        "mode": "production",
+        "allowExceptionLogs": false
     },
     "database": {
         "sql": {

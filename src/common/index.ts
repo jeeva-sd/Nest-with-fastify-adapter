@@ -26,7 +26,7 @@ export { HttpExceptionFilter } from './filters';
 export { FileDetail, metadataCache, PayloadGuard, RolesGuard } from './guards';
 export { fileCleaner } from './hooks';
 export { ApiService } from './http-agent';
-export { MemoryMonitor, PerformanceInterceptor } from './interceptors';
+export { PerformanceInterceptor } from './interceptors';
 export { createFileRule, FileSchemaOverrides } from './pipes';
 export { RequestX, ResponseX } from './types';
 export { Helper, readError } from './utils';
