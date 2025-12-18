@@ -12,7 +12,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX } from '~/common';
 import { AppModule } from './app.module';
-import { appConfig } from './configs/envs/envs.reader';
+import { appConfig } from './configs/config.reader';
 import { RABBIT_MQ_QUEUE_KEYS } from './services';
 import { createRmqMicroserviceOptions } from './services/jobs/jobs.helpers';
 

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { appConfig } from '~/configs/envs/envs.reader';
+import { appConfig } from '~/configs/config.reader';
 
 @Injectable()
 export class AuthService {

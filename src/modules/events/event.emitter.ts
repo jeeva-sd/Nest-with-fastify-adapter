@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { appConfig } from '~/configs/envs/envs.reader';
-import { generalEvents, singleConsumerEvents } from '~/constants/events';
+import { generalEvents, singleConsumerEvents } from '~/modules/events/event.patterns';
 import { JobsService } from '~/services';
 
 @Injectable()
 export class Events {
-    private readonly exchange = appConfig.microservices.rabbitmq.exchange;
-
     constructor(private readonly jobsService: JobsService) {}
 
     async syncDepartment(data: unknown, delayMs?: number) {

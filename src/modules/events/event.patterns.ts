@@ -1,5 +1,3 @@
-export const ROUTE_HANDLER_KEY = 'ROUTE_HANDLER_KEY';
-export const INPUT_VALIDATOR_KEY = 'INPUT_VALIDATOR_KEY';
 
 export const generalEvents = {
     ecoApps: {

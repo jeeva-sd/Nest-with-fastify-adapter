@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { prisma } from '../../services/database/prisma.service';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
-import { prisma } from '../database/prisma.service';
 
 @Injectable()
 export class RoleService {

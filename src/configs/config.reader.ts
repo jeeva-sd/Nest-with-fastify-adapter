@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import { z } from 'zod/v4';
-import { AppConfig, AppConfigRule } from './envs.schema';
+import { AppConfig, AppConfigRule } from './config.schema';
 
 export class ConfigReader {
     private static instance: ConfigReader;
