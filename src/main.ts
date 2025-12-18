@@ -14,7 +14,7 @@ import { fileCleaner, HttpExceptionFilter, PayloadGuard, RequestX } from '~/comm
 import { AppModule } from './app.module';
 import { appConfig } from '~/configs';
 import { RABBIT_MQ_QUEUE_KEYS } from './services';
-import { createRmqMicroserviceOptions } from './services/jobs/jobs.helpers';
+import { createRmqMicroserviceOptions } from './services/jobs/job.helper';
 
 class App {
     private app: NestFastifyApplication;

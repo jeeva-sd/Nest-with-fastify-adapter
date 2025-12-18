@@ -1,3 +1,3 @@
-export { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './jobs/jobs.helpers';
-export { JobsModule } from './jobs/jobs.module';
-export { JobsService } from './jobs/jobs.service';
+export { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './jobs/job.helper';
+export { JobsModule } from './jobs/job.module';
+export { JobsService } from './jobs/job.service';

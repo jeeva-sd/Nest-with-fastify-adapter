@@ -1,3 +1,5 @@
+import { AccessOptions } from "./role.decorators";
+
 export const permissions = {
     SWITCH_ORGANIZATIONS: {
         id: 'cmboy34mj000007k09o5hau8p',

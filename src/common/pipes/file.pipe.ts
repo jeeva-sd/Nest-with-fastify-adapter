@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ALL_FILE_TYPES } from '~/services/storage/file-types';
+import { ALL_FILE_TYPES } from '~/services/storage/storage.constants';
 
 const oneKb = 1024;
 

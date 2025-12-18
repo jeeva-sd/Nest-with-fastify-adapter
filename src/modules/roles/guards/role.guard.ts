@@ -4,7 +4,7 @@ import { RequestX } from '~/common';
 import { appConfig } from '~/configs';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class RoleGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {

@@ -132,9 +132,9 @@
         },
         "memory": {
             "enabled": true,
-            "warningThreshold": 25,
-            "criticalThreshold": 80,
-            "checkInterval": 10000
+            "warningThreshold": 50,
+            "criticalThreshold": 100,
+            "checkInterval": 7200000
         },
         "startup": {
             "logProcessInfo": true

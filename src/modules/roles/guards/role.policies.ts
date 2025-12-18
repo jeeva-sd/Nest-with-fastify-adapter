@@ -1,5 +1,5 @@
-import { AccessOptions } from '~/common';
-import { permissions } from './role.defaults';
+import { permissions } from "../role.constants";
+import { AccessOptions } from "../role.decorators";
 
 export const ACL = {
     superAdminOnly: {

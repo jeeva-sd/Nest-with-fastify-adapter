@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { permissions } from '~/modules/roles/role.defaults';
+import { permissions } from '~/modules/roles/role.constants';
 
 const validPermissionKeys = Object.keys(permissions).map(key => key.toLowerCase()) as [string, ...string[]];
 

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './jobs.helpers';
-import { JobsService } from './jobs.service';
+import { createRmqClientOptions, RABBIT_MQ_QUEUE_KEYS } from './job.helper';
+import { JobsService } from './job.service';
 
 @Module({
     imports: [

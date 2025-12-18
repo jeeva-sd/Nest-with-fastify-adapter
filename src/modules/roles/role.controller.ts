@@ -1,18 +1,13 @@
-import { Controller, Delete, Get, Patch, Post, Req } from '@nestjs/common';
-import { Access, RequestX, Sanitize } from '~/common';
-import { ACL } from './access-policies';
-import { RoleService } from './roles.service';
+import { Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { RequestX, Sanitize } from '~/common';
+import { RoleService } from './role.service';
 import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto } from './schemas';
+import { Access } from './role.decorators';
+import { ACL } from './guards/role.policies';
 
 @Controller('roles')
 export class RolesController {
     constructor(private readonly roleService: RoleService) {}
-
-    @Get('view')
-    @Sanitize(ViewRoleDto)
-    async getRoleById(@Req() req: RequestX) {
-        return this.roleService.getRoleById(req.payload as ViewRoleDto);
-    }
 
     @Get()
     @Sanitize(ListRolesDto)
@@ -44,5 +39,11 @@ export class RolesController {
     @Get('permissions')
     async getAllPermissions() {
         return this.roleService.getAllPermissionsInfos();
+    }
+
+    @Get(':roleId')
+    @Sanitize(ViewRoleDto)
+    async getRoleById(@Req() req: RequestX, @Param('roleId') roleId: string) {
+        return this.roleService.getRoleById(roleId, req.payload as ViewRoleDto);
     }
 }

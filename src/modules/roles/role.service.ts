@@ -5,8 +5,8 @@ import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto
 
 @Injectable()
 export class RoleService {
-    async getRoleById(dto: ViewRoleDto) {
-        const { roleId, includePermissions = false } = dto;
+    async getRoleById(roleId: string, dto: ViewRoleDto) {
+        const { includePermissions = false } = dto;
 
         const role = await prisma.role.findUnique({
             where: { id: roleId },
