@@ -1,1 +1,1 @@
-export * from './department-sync';
+export { DepartmentSyncDto } from './department-sync';

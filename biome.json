@@ -21,40 +21,90 @@
 
     "linter": {
         "enabled": true,
+
         "rules": {
-            "recommended": true,
-
-            "complexity": {
-                "noForEach": "off",
-                "useLiteralKeys": "off",
-                "noExtraBooleanCast": "warn",
-                "noStaticOnlyClass": "off",
-                "noUselessConstructor": "off"
-            },
-
-            "correctness": {
-                "noUnusedImports": "warn",
-                "noUnusedVariables": "warn",
-                "noUnsafeFinally": "warn",
-                "noUnsafeOptionalChaining": "warn",
-                "noConstAssign": "error"
-            },
-
             "style": {
-                "useImportType": "off",
-                "useConst": "warn",
-                "useObjectSpread": "warn",
-                "useShorthandAssign": "warn",
-                "useNumericSeparators": "warn",
-                "useTemplate": "warn",
-                "useArrayLiterals": "warn"
+                "useImportType": "off"
+            },
+            "recommended": true,
+            "correctness": {
+                "noConstAssign": "error",
+                "noConstantCondition": "error",
+                "noConstructorReturn": "error",
+                "noEmptyPattern": "error",
+                "noInvalidUseBeforeDeclaration": "error",
+                "noMissingVarFunction": "error",
+                "noPrecisionLoss": "error",
+                "noPrivateImports": "error",
+                "noProcessGlobal": "off",
+                "noSelfAssign": "error",
+                "noSetterReturn": "error",
+                "noSwitchDeclarations": "error",
+                "noUndeclaredDependencies": "error",
+                "noUndeclaredVariables": "error",
+                "noUnreachable": "error",
+                "noUnreachableSuper": "error",
+                "noUnsafeFinally": "error",
+                "noUnsafeOptionalChaining": "error",
+                "noVoidTypeReturn": "error",
+                "noChildrenProp": "error",
+                "noGlobalDirnameFilename": "error",
+                "noGlobalObjectCalls": "error",
+                "noInvalidBuiltinInstantiation": "error",
+                "noInvalidConstructorSuper": "error",
+                "noStringCaseMismatch": "error",
+                "noUnusedFunctionParameters": "warn"
             },
 
             "suspicious": {
                 "noDebugger": "warn",
-                "noAsyncPromiseExecutor": "warn",
-                "noExplicitAny": "warn",
+                "noDuplicateCase": "error",
+                "noDuplicateParameters": "error",
+                "noDuplicateObjectKeys": "error",
+                "noRedeclare": "error",
+                "noShadowRestrictedNames": "error",
+                "noVar": "error",
+                "noWith": "error",
+                "noDuplicateElseIf": "error",
+                "noSelfCompare": "error",
+                "noTemplateCurlyInString": "warn",
                 "noMisleadingCharacterClass": "warn"
+            },
+
+            "complexity": {
+                "noForEach": "warn",
+                "noStaticOnlyClass": "warn",
+                "noUselessConstructor": "warn",
+                "noUselessContinue": "warn",
+                "noUselessLabel": "warn",
+                "noUselessRename": "warn",
+                "noUselessSwitchCase": "warn",
+                "useArrowFunction": "warn",
+                "useIndexOf": "warn",
+                "useOptionalChain": "warn",
+                "useWhile": "warn",
+                "noUselessEmptyExport": "warn",
+                "noUselessFragments": "warn",
+                "noUselessStringConcat": "warn",
+                "noUselessThisAlias": "warn",
+                "useSimplifiedLogicExpression": "warn"
+            },
+
+            "performance": {
+                "noBarrelFile": "off",
+                "noReExportAll": "warn"
+            },
+
+            "security": {
+                "noSecrets": {
+                    "level": "warn",
+                    "options": {
+                        "entropyThreshold": 50
+                    }
+                },
+                "noGlobalEval": "error",
+                "noDangerouslySetInnerHtml": "error",
+                "noBlankTarget": "warn"
             }
         }
     },
@@ -67,8 +117,7 @@
             "quoteStyle": "single",
             "semicolons": "always",
             "trailingCommas": "none",
-            "arrowParentheses": "asNeeded",
-            "bracketSameLine": false
+            "arrowParentheses": "asNeeded"
         }
     },
 

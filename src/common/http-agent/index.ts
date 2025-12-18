@@ -8,4 +8,4 @@
 //     Authorization: `Basic ${encodedCredentials}`
 // });
 
-export * from './api.service';
+export { ApiService } from './api.service';

@@ -1,2 +1,2 @@
-export * from './replay.type';
-export * from './request.type';
+export { ResponseX } from './replay.type';
+export { RequestX } from './request.type';

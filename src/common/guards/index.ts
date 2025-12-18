@@ -1,2 +1,2 @@
-export * from './req-payload.guard';
-export * from './roles.guard';
+export { FileDetail, metadataCache, PayloadGuard } from './req-payload.guard';
+export { RolesGuard } from './roles.guard';

@@ -218,14 +218,14 @@ class App {
 
         // Add graceful shutdown handlers
         if (appConfig.gracefulShutdown.enabled) {
-            appConfig.gracefulShutdown.signals.forEach(signal => {
+            for (const signal of appConfig.gracefulShutdown.signals) {
                 process.on(signal as NodeJS.Signals, () => {
                     if (appConfig.gracefulShutdown.logShutdown) {
                         Logger.log(`${signal} received, shutting down gracefully`);
                     }
                     this.app.close();
                 });
-            });
+            }
         }
     }
 

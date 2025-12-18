@@ -1,2 +1,2 @@
-export * from './envs.reader';
-export * from './envs.schema';
+export { appConfig, ConfigReader } from './envs.reader';
+export { AppConfig, AppConfigRule } from './envs.schema';

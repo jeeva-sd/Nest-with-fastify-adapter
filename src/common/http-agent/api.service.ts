@@ -16,12 +16,12 @@ export class ApiService {
 
     // Method to set authorization header
     setAuth(token: string): void {
-        this.axiosInstance.defaults.headers.common['Authorization'] = token;
+        this.axiosInstance.defaults.headers.common.Authorization = token;
     }
 
     // Method to remove authorization header
     removeAuth(): void {
-        this.axiosInstance.defaults.headers.common['Authorization'] = undefined;
+        this.axiosInstance.defaults.headers.common.Authorization = undefined;
     }
 
     // Method to set or update headers dynamically

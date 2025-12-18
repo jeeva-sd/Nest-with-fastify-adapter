@@ -1,1 +1,1 @@
-export * from './file.pipe';
+export { createFileRule, FileSchemaOverrides } from './file.pipe';

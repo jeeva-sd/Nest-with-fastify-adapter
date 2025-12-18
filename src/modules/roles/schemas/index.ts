@@ -1,5 +1,5 @@
-export * from './create-role';
-export * from './delete-role';
-export * from './edit-role';
-export * from './list-roles';
-export * from './view-role';
+export { CreateRoleDto } from './create-role';
+export { DeleteRolesDto } from './delete-role';
+export { UpdateRoleDto } from './edit-role';
+export { ListRolesDto } from './list-roles';
+export { ViewRoleDto } from './view-role';

@@ -6,12 +6,12 @@ import { NumberUtils } from './number.utils';
 import { ObjectUtils } from './object.utils';
 import { StringUtils } from './string.utils';
 
-export class Helper {
-    static Array = ArrayUtils;
-    static Object = ObjectUtils;
-    static String = StringUtils;
-    static File = FileUtils;
-    static Number = NumberUtils;
+export const Helper = {
+    Array: ArrayUtils,
+    Object: ObjectUtils,
+    String: StringUtils,
+    File: FileUtils,
+    Number: NumberUtils,
 
     // ---------------------------------------
     // General Utility Functions
@@ -20,15 +20,15 @@ export class Helper {
     /**
      * Returns a Promise that resolves after a specified delay (in milliseconds).
      */
-    static wait(ms: number): Promise<void> {
+    wait: (ms: number): Promise<void> => {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    },
 
     /**
      * Encrypts any JavaScript value using AES encryption.
      * Returns the encrypted string or null on error.
      */
-    static encrypt(data: unknown): string | null {
+    encrypt: (data: unknown): string | null => {
         try {
             const jsonData = JSON.stringify(data);
             const encrypted = CryptoJS.AES.encrypt(jsonData, appConfig.auth.encryptionKey);
@@ -37,13 +37,13 @@ export class Helper {
             console.error('Encryption error:', error);
             return null;
         }
-    }
+    },
 
     /**
      * Decrypts a previously encrypted AES string and parses it back into an object.
      * Returns null on failure.
      */
-    static decrypt(encryptedData: string): unknown | null {
+    decrypt: (encryptedData: string): unknown | null => {
         try {
             const decrypted = CryptoJS.AES.decrypt(encryptedData, appConfig.auth.encryptionKey);
             const parsedData = decrypted.toString(CryptoJS.enc.Utf8);
@@ -53,4 +53,4 @@ export class Helper {
             return null;
         }
     }
-}
+};

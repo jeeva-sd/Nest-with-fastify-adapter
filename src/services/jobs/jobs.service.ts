@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import * as amqp from 'amqplib';
 import { appConfig } from '~/configs';
 import { generalEvents, singleConsumerEvents } from '~/constants';
-import { extractRoutingKeys } from './jobs.config';
+import { extractRoutingKeys } from './jobs.helpers';
 
 @Injectable()
 export class JobsService implements OnModuleInit, OnModuleDestroy {
@@ -245,7 +245,7 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
      * Ensure channel is available
      */
     private async ensureChannel(): Promise<amqp.Channel> {
-        if (!this.channel || !this.connection) {
+        if (!(this.channel && this.connection)) {
             await this.initializeChannel();
         }
         if (!this.channel) {
@@ -258,7 +258,6 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
      * Publish message to exchange
      */
     async publish(
-        exchangeName: string,
         routingKey: string,
         data: unknown,
         options?: {
@@ -266,10 +265,10 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
             persistent?: boolean;
         }
     ): Promise<boolean> {
+        const exchangeName = appConfig.microservices.rabbitmq.exchange;
+
         const channel = await this.ensureChannel();
-
         const payload = { pattern: routingKey, data };
-
         const publishOptions: amqp.Options.Publish = {
             contentType: 'application/json',
             persistent: options?.persistent ?? true
@@ -280,7 +279,6 @@ export class JobsService implements OnModuleInit, OnModuleDestroy {
         }
 
         const buffer = Buffer.from(JSON.stringify(payload));
-
         const published = channel.publish(exchangeName, routingKey, buffer, publishOptions);
 
         if (!published) {

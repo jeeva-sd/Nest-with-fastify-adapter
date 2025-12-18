@@ -1,8 +1,8 @@
-export class ObjectUtils {
+export const ObjectUtils = {
     /**
      * Deeply merges two objects. Modifies and returns the base object.
      */
-    static deepMerge(base, newObj) {
+    deepMerge: (base, newObj) => {
         for (const key of Object.keys(newObj)) {
             // If the value is an object (not null, not array), merge recursively
             if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key])) {
@@ -15,78 +15,78 @@ export class ObjectUtils {
         }
 
         return base;
-    }
+    },
 
     /**
      * Deep clones an object using JSON serialization.
      */
-    static deepClone<T>(obj: T): T {
+    deepClone: <T>(obj: T): T => {
         return JSON.parse(JSON.stringify(obj));
-    }
+    },
 
     /**
      * Checks if a value is a plain object (not null, not array).
      */
-    static isObject(value: unknown): boolean {
+    isObject: (value: unknown): boolean => {
         return typeof value === 'object' && value !== null && !Array.isArray(value);
-    }
+    },
 
     /**
      * Checks if a value is a function.
      */
-    static isFunction(value: unknown): boolean {
+    isFunction: (value: unknown): boolean => {
         return typeof value === 'function';
-    }
+    },
 
     /**
      * Checks if an object has no own enumerable keys.
      */
-    static isObjectEmpty(obj: object): boolean {
+    isObjectEmpty: (obj: object): boolean => {
         return Object.keys(obj).length === 0;
-    }
+    },
 
     /**
      * Returns an array of the object's own keys.
      */
-    static getObjectKeys(obj: object): string[] {
+    getObjectKeys: (obj: object): string[] => {
         return Object.keys(obj);
-    }
+    },
 
     /**
      * Returns an array of the object's own values.
      */
-    static getObjectValues(obj: object): unknown[] {
+    getObjectValues: (obj: object): unknown[] => {
         return Object.values(obj);
-    }
+    },
 
     /**
      * Picks specific keys from an object and returns a new object with those key-value pairs.
      */
-    static pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+    pick: <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
         const result: Partial<T> = {};
-        keys.forEach(key => {
+        for (const key of keys) {
             if (key in obj) {
                 result[key] = obj[key];
             }
-        });
+        }
         return result as Pick<T, K>;
-    }
+    },
 
     /**
      * Omits specific keys from an object and returns a new object without those keys.
      */
-    static omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+    omit: <T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
         const result: Partial<T> = JSON.parse(JSON.stringify(obj));
-        keys.forEach(key => {
+        for (const key of keys) {
             delete result[key];
-        });
+        }
         return result as Omit<T, K>;
-    }
+    },
 
     /**
      * Flattens a nested object into a single-level object using dot notation keys.
      */
-    static flattenObject(obj: object, prefix = ''): object {
+    flattenObject: (obj: object, prefix = ''): object => {
         const result: Record<string, unknown> = {};
         for (const key in obj) {
             if (Object.hasOwn(obj, key)) {
@@ -100,12 +100,12 @@ export class ObjectUtils {
             }
         }
         return result;
-    }
+    },
 
     /**
      * Converts a flattened object (dot notation keys) back into a nested object.
      */
-    static unflattenObject(obj: object): object {
+    unflattenObject: (obj: object): object => {
         const result: Record<string, unknown> = {};
         for (const key in obj) {
             if (Object.hasOwn(obj, key)) {
@@ -123,4 +123,4 @@ export class ObjectUtils {
         }
         return result;
     }
-}
+};

@@ -1,6 +1,7 @@
 import { SetMetadata } from '@nestjs/common';
 import { RequestX } from '../types';
 
+// biome-ignore lint/security/noSecrets: key for metadata, not a secret
 const SKIP_FILE_CLEANUP_KEY = 'skipFileCleanup';
 
 /**
@@ -22,12 +23,12 @@ export const SkipFileCleanup = (fieldNames: string[]) => {
         descriptor.value = function (...args: unknown[]) {
             // In NestJS controllers, the request object is typically injected via @Req() decorator
             // We need to find it in the arguments and modify it before the method executes
-            args.forEach(arg => {
+            for (const arg of args) {
                 if (arg && typeof arg === 'object' && 'url' in arg && 'method' in arg && 'headers' in arg) {
                     // This looks like a request object
                     (arg as RequestX).skipFileCleanupFields = fieldNames;
                 }
-            });
+            }
 
             return originalMethod.apply(this, args);
         };

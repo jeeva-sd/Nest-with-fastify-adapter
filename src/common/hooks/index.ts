@@ -1,1 +1,1 @@
-export * from './file-clean.hook';
+export { fileCleaner } from './file-clean.hook';

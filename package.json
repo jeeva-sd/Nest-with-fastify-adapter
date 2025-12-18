@@ -37,6 +37,7 @@
         "@nestjs/platform-fastify": "^11.1.9",
         "@prisma/adapter-mariadb": "^7.2.0",
         "@prisma/client": "^6.19.1",
+        "@paralleldrive/cuid2": "^2.2.2",
         "amqp-connection-manager": "^5.0.0",
         "amqplib": "^0.10.9",
         "axios": "^1.13.2",

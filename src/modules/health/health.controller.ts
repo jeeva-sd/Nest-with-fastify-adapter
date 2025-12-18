@@ -5,8 +5,6 @@ import { prisma } from '../database';
 
 @Controller('health')
 export class HealthController {
-    constructor() {}
-
     @Get()
     @Public()
     async checkHealth() {

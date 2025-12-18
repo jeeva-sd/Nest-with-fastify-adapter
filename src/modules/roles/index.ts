@@ -1,1 +1,1 @@
-export * from './roles.service';
+export { RoleService } from './roles.service';

@@ -11,11 +11,11 @@ export class Events {
 
     async syncDepartment(data: unknown, delayMs?: number) {
         const pattern = generalEvents.ecoApps.departmentSync;
-        return this.jobsService.publish(this.exchange.name, pattern, data, { delayMs });
+        return this.jobsService.publish(pattern, data, { delayMs });
     }
 
     async createUser(data: unknown, delayMs?: number) {
         const pattern = singleConsumerEvents.user.created;
-        return this.jobsService.publish(this.exchange.name, pattern, data, { delayMs });
+        return this.jobsService.publish(pattern, data, { delayMs });
     }
 }

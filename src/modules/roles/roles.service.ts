@@ -5,8 +5,6 @@ import { CreateRoleDto, DeleteRolesDto, ListRolesDto, UpdateRoleDto, ViewRoleDto
 
 @Injectable()
 export class RoleService {
-    constructor() {}
-
     async getRoleById(dto: ViewRoleDto) {
         const { roleId, includePermissions = false } = dto;
 

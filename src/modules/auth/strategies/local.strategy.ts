@@ -1,17 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
+import { RequestX } from '~/common';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-    constructor() {
-        super();
-    }
-
-    async validate(request: Request) {
+    async validate(request: RequestX) {
         // Check headers
-        const authHeader = request.headers['authorization'];
-        if (!authHeader || !authHeader.startsWith('Basic ')) {
+        const authHeader = request.headers.authorization;
+        if (!authHeader?.startsWith('Basic ')) {
             throw new UnauthorizedException(401);
         }
 
@@ -20,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
         const [username, password] = credentials.split(':');
 
-        if (!username || !password) {
+        if (!(username && password)) {
             throw new UnauthorizedException(401);
         }
 

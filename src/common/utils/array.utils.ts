@@ -1,9 +1,9 @@
-export class ArrayUtils {
+export const ArrayUtils = {
     /**
      * Groups an array of objects by the specified key.
      * Optionally accepts a formatter function to customize the grouping key.
      */
-    static groupBy(key: string, formatter?: (value: unknown) => string) {
+    groupBy: (key: string, formatter?: (value: unknown) => string) => {
         return (array: unknown[]) => {
             return array.reduce((obj: Record<string, unknown[]>, item: unknown) => {
                 let value = item[key];
@@ -12,13 +12,13 @@ export class ArrayUtils {
                 return obj;
             }, {});
         };
-    }
+    },
 
     /**
      * Converts an array of objects into an object, using the specified key as the object's key.
      * Each key will point to the corresponding object.
      */
-    static objectById(key: string) {
+    objectById: (key: string) => {
         return (array: unknown[]) => {
             return array.reduce((obj: Record<string, unknown>, item: unknown) => {
                 const value = item[key];
@@ -26,23 +26,23 @@ export class ArrayUtils {
                 return obj;
             }, {});
         };
-    }
+    },
 
     /**
      * Breaks an array into chunks of the specified size.
      */
-    static chunkArray<T>(array: T[], size: number): T[][] {
+    chunkArray: <T>(array: T[], size: number): T[][] => {
         const chunks: T[][] = [];
         for (let i = 0; i < array.length; i += size) {
             chunks.push(array.slice(i, i + size));
         }
         return chunks;
-    }
+    },
 
     /**
      * Sorts an array of objects by the specified key, optionally in ascending or descending order.
      */
-    static sortByKey<T>(array: T[], key: keyof T, ascending = true): T[] {
+    sortByKey: <T>(array: T[], key: keyof T, ascending = true): T[] => {
         return array.slice().sort((a, b) => {
             const valueA = a[key];
             const valueB = b[key];
@@ -50,19 +50,19 @@ export class ArrayUtils {
             if (valueA > valueB) return ascending ? 1 : -1;
             return 0;
         });
-    }
+    },
 
     /**
      * Removes duplicates from an array based on primitive values (strings, numbers, etc).
      */
-    static unique<T>(array: T[]): T[] {
+    unique: <T>(array: T[]): T[] => {
         return Array.from(new Set(array));
-    }
+    },
 
     /**
      * Removes duplicates from an array of objects based on a specified key.
      */
-    static uniqueBy<T>(array: T[], key: keyof T): T[] {
+    uniqueBy: <T>(array: T[], key: keyof T): T[] => {
         const seen = new Set();
         return array.filter(item => {
             const val = item[key];
@@ -70,49 +70,49 @@ export class ArrayUtils {
             seen.add(val);
             return true;
         });
-    }
+    },
 
     /**
      * Flattens an array one level deep.
      */
-    static flatten<T>(array: unknown[][]): T[] {
+    flatten: <T>(array: unknown[][]): T[] => {
         return array.reduce((acc, val) => acc.concat(val), []) as T[];
-    }
+    },
 
     /**
      * Returns the intersection of two arrays (elements common in both).
      */
-    static intersection<T>(array1: T[], array2: T[]): T[] {
+    intersection: <T>(array1: T[], array2: T[]): T[] => {
         const set = new Set(array2);
         return array1.filter(item => set.has(item));
-    }
+    },
 
     /**
      * Returns the difference between two arrays (items in array1 not in array2).
      */
-    static difference<T>(array1: T[], array2: T[]): T[] {
+    difference: <T>(array1: T[], array2: T[]): T[] => {
         const set = new Set(array2);
         return array1.filter(item => !set.has(item));
-    }
+    },
 
     /**
      * Shuffles an array in place using Fisher-Yates algorithm.
      */
-    static shuffle<T>(array: T[]): T[] {
+    shuffle: <T>(array: T[]): T[] => {
         const shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         return shuffled;
-    }
+    },
 
     /**
      * Returns a random element from the array.
      */
-    static randomElement<T>(array: T[]): T | undefined {
+    randomElement: <T>(array: T[]): T | undefined => {
         if (!array.length) return undefined;
         const index = Math.floor(Math.random() * array.length);
         return array[index];
     }
-}
+};

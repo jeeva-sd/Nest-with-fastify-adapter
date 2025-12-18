@@ -1,1 +1,1 @@
-export * from './types';
+export { Store } from './types';

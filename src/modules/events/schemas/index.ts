@@ -1,2 +1,2 @@
-export * from './eco-apps';
-export * from './user-create.schema';
+export { DepartmentSyncDto } from './eco-apps';
+export { UserCreatedMessage, userCreatedMessage } from './user-create.schema';
