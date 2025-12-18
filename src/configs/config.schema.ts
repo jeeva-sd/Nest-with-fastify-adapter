@@ -202,6 +202,18 @@ const gracefulShutdownConfigSchema = z.object({
     logShutdown: z.boolean()
 });
 
+const blobStorageSchema = z.object({
+    container: z.string().nonempty('Azure container is required'),
+    connection: z.string().nonempty('Azure connection string is required'),
+    assets: z.string().nonempty('Assets path is required')
+}).optional();
+
+const emailConfigSchema = z.object({
+    from: z.email('Invalid from email address'),
+    apiKey: z.string().nonempty('SendGrid API key is required'),
+    enabled: z.boolean()
+}).optional();
+
 // ----------------------------------------------------------------------------------------------------------
 
 export const AppConfigRule = z.object({
@@ -214,7 +226,9 @@ export const AppConfigRule = z.object({
     auth: authConfigSchema,
     payloadValidation: payloadConfigSchema,
     views: viewEngineSchema,
-    database: databaseRule
+    database: databaseRule,
+    blobStorage: blobStorageSchema,
+    email: emailConfigSchema
 });
 
 // ------------------------------------------------------------------------------------------------------------------

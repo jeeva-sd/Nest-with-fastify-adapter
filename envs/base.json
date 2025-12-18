@@ -166,5 +166,15 @@
     "views": {
         "engine": "handlebars",
         "templatesDir": "src/views"
+    },
+    "blobStorage": {
+        "container": "azure_blobs_container_here",
+        "connection": "azure_blobs_connection_string_here",
+        "assets": "assets"
+    },
+    "email": {
+        "from": "dummy@abc.com",
+        "apiKey": "sendgrid_api_key_here",
+        "enabled": false
     }
 }

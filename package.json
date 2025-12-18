@@ -17,9 +17,10 @@
         "db:update": "cross-env NODE_ENV=development node scripts/run-prisma.js migrate dev",
         "db:prod": "cross-env NODE_ENV=production node scripts/run-prisma.js db migrate deploy",
         "db:studio": "cross-env NODE_ENV=development node scripts/run-prisma.js studio",
-        "db:seed": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/modules/database/seed.ts"
+        "db:seed": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/services/database/seed.ts"
     },
     "dependencies": {
+        "@azure/storage-blob": "^12.29.1",
         "@fastify/compress": "^8.3.0",
         "@fastify/cookie": "^11.0.2",
         "@fastify/cors": "^11.1.0",
@@ -35,9 +36,10 @@
         "@nestjs/microservices": "^11.1.9",
         "@nestjs/passport": "^11.0.5",
         "@nestjs/platform-fastify": "^11.1.9",
+        "@paralleldrive/cuid2": "^2.2.2",
         "@prisma/adapter-mariadb": "^7.2.0",
         "@prisma/client": "^6.19.1",
-        "@paralleldrive/cuid2": "^2.2.2",
+        "@sendgrid/mail": "^8.1.6",
         "amqp-connection-manager": "^5.0.0",
         "amqplib": "^0.10.9",
         "axios": "^1.13.2",

@@ -7,12 +7,10 @@ export class Events {
     constructor(private readonly jobsService: JobsService) {}
 
     async syncDepartment(data: unknown, delayMs?: number) {
-        const pattern = generalEvents.ecoApps.departmentSync;
-        return this.jobsService.publish(pattern, data, { delayMs });
+        return this.jobsService.publish(generalEvents.ecoApps.departmentSync, data, { delayMs });
     }
 
     async createUser(data: unknown, delayMs?: number) {
-        const pattern = singleConsumerEvents.user.created;
-        return this.jobsService.publish(pattern, data, { delayMs });
+        return this.jobsService.publish(singleConsumerEvents.user.created, data, { delayMs });
     }
 }
