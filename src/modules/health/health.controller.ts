@@ -6,7 +6,10 @@ import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
-    constructor(private readonly healthService: HealthService, private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly healthService: HealthService,
+        private readonly prisma: PrismaService
+    ) {}
 
     @Get()
     @Public()

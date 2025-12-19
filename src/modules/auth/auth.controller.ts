@@ -17,13 +17,6 @@ export class AuthController {
         return this.authService.checkLogin(req.payload as PortalCookieDto);
     }
 
-    @Get('test')
-    @UseGuards(JwtAuthGuard, RoleGuard)
-    @Access(ACL.superAdminOr)
-    async testAuthGuard() {
-        return { message: 'Auth guard working fine' };
-    }
-
     @HttpCode(200)
     @Post('logout')
     @UseGuards(JwtAuthGuard)

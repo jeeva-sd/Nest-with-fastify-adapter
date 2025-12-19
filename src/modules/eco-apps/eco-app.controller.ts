@@ -1,9 +1,11 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
 import { RequestX, Sanitize } from '~/common';
-import { JwtAuthGuard } from '../auth/guards';
+import { appConfig } from '~/configs';
+import { SkipJwtAuth } from '../auth/decorators';
+import { JwtAuthGuard, PortalBasicAuthGuard } from '../auth/guards';
 import { ACL, Access, RoleGuard } from '../roles';
-import { EcoAppsService } from './eco-apps.service';
-import { CountryListDto, FindOrgDto, OrganizationListDto, TimezoneDto } from './schemas';
+import { EcoAppsService } from './eco-app.service';
+import { CountryListDto, FindOrgDto, OrganizationListDto, TimezoneDto, UserUpdateHookDto } from './schemas';
 
 @Controller('eco-apps')
 @UseGuards(JwtAuthGuard)
@@ -12,18 +14,18 @@ export class EcoAppsController {
 
     // -------------------------------------------- Portal --------------------------------------------
 
-    // @HttpCode(200)
-    // @Post('user-update-webhook')
-    // @Sanitize(UserUpdateHookDto)
-    // @SkipJwtAuth()
-    // @UseGuards(PortalBasicAuthGuard)
-    // async userProfile(@Request() req: RequestX) {
-    //     if (appConfig.server.mode !== 'production') {
-    //         console.log(JSON.stringify(req.payload, null, 2), 'user-update-webhook');
-    //     }
+    @HttpCode(200)
+    @Post('user-update-webhook')
+    @Sanitize(UserUpdateHookDto)
+    @SkipJwtAuth()
+    @UseGuards(PortalBasicAuthGuard)
+    async userProfile(@Request() req: RequestX) {
+        if (appConfig.server.mode !== 'production') {
+            console.log(JSON.stringify(req.payload, null, 2), 'user-update-webhook');
+        }
 
-    //     return this.ecoAppService.syncLocalUser(req.payload);
-    // }
+        return this.ecoAppService.syncLocalUser(req.payload as UserUpdateHookDto);
+    }
 
     @Get('timezone/list')
     @Sanitize(TimezoneDto)

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { appConfig } from '~/configs';
-import { EcoAppsModule } from '~/modules/eco-apps/eco-apps.module';
+import { EcoAppsModule } from '~/modules/eco-apps/eco-app.module';
 import { RoleModule } from '~/modules/roles/role.module';
 import { ImpersonationGuard, JwtAuthGuard, PortalBasicAuthGuard, PortalCookieAuthGuard } from '../guards';
 import { JwtStrategy } from './jwt.strategy';

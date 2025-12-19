@@ -6,6 +6,7 @@ import { Helper, Store } from '~/common';
 import { appConfig } from '~/configs';
 import { PrismaService } from '~/services';
 import { PortalRoleType } from '../eco-apps/types/portal-roles';
+import { AppEvents } from '../events/event.emitter';
 import { PermissionCacheService } from '../roles';
 import { RoleService } from '../roles/role.service';
 import { PortalCookieDto } from './schemas/portal-cookie-values';
@@ -50,7 +51,8 @@ export class AuthService {
         private readonly cls: ClsService<Store>,
         private readonly roleService: RoleService,
         private readonly permissionCacheService: PermissionCacheService,
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
+        private readonly event: AppEvents
     ) {}
 
     private basicUserSelect(): Prisma.UserSelect {
@@ -170,7 +172,7 @@ export class AuthService {
                     supervisorIds: (dep.supervisors || []).map(s => s.id)
                 }));
 
-                console.log(departmentInfo, 'departmentInfo');
+                await this.event.syncDepartment({ userId: portalResponse.userId, departmentInfo });
             }
 
             return userRes;

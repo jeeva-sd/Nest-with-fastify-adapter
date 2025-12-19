@@ -1,9 +1,11 @@
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Helper, readError } from '~/common';
 import { appConfig } from '~/configs';
+import { PrismaService } from '~/services';
+import { AppEvents } from '../events/event.emitter';
 import { RoleService } from '../roles/role.service';
+import { portalServer } from './eco-app.config';
 import { ecoAppEndpoints } from './eco-app.constants';
-import { portalServer } from './eco-apps.config';
 import { CountryListDto, CreateUserHookDto, OrganizationListDto, TimezoneDto, UserUpdateHookDto } from './schemas';
 import { PortalRoleType } from './types/portal-roles';
 
@@ -23,7 +25,11 @@ export interface PortalUserBasic {
 
 @Injectable()
 export class EcoAppsService {
-    constructor(private roleService: RoleService) {}
+    constructor(
+        private readonly roleService: RoleService,
+        private readonly prismaService: PrismaService,
+        private readonly event: AppEvents
+    ) {}
 
     async validatePortalCookie(cookieName: string, token: string) {
         try {
@@ -94,6 +100,28 @@ export class EcoAppsService {
         } catch (error) {
             throw new BadRequestException(readError(error));
         }
+    }
+
+    async syncLocalUser({ roleType, userId, departmentInfo, ...dto }: UserUpdateHookDto) {
+        const userExists = await this.prismaService.user.findUnique({ where: { id: userId } });
+        if (!userExists) return true;
+
+        if (roleType) {
+            const roleId = this.roleService.getRoleIdFromPortalRoleType(roleType);
+            dto.roleId = roleId;
+        }
+
+        if (departmentInfo && Array.isArray(departmentInfo)) {
+            await this.event.syncDepartment({ userId, departmentInfo });
+        }
+
+        // Step 7: Prepare user update operation
+        const updateUserOp = this.prismaService.user.update({
+            where: { id: userId.toString() },
+            data: dto
+        });
+
+        return await updateUserOp;
     }
 
     async findAllTimezones(dto: TimezoneDto) {

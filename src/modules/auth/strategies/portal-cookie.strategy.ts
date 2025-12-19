@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-custom';
 import { RequestX } from '~/common';
 import { appConfig } from '~/configs';
-import { EcoAppsService } from '~/modules/eco-apps/eco-apps.service';
+import { EcoAppsService } from '~/modules/eco-apps/eco-app.service';
 import { PortalLoginResponse } from '~/modules/eco-apps/types/portal-responses';
 import { RoleService } from '~/modules/roles/role.service';
 import { PortalCookieDto } from '../schemas/portal-cookie-values';

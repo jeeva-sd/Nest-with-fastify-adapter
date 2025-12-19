@@ -6,10 +6,6 @@ export const ACL = {
         permissions: [permissions.SWITCH_ORGANIZATIONS.name, permissions.MANAGE_USERS.name],
         matchAllPermissions: true
     },
-    superAdminOr: {
-        permissions: [permissions.SWITCH_ORGANIZATIONS.name, permissions.MANAGE_USERS.name],
-        matchAllPermissions: false
-    },
     switchOrganizations: {
         permissions: [permissions.SWITCH_ORGANIZATIONS.name],
         matchAllPermissions: true

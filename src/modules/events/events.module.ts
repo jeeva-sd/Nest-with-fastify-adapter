@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JobsModule } from '~/services';
-import { Events } from './event.emitter';
+import { AppEvents } from './event.emitter';
 
 @Module({
     imports: [JobsModule],
-    providers: [Events],
-    exports: [Events]
+    providers: [AppEvents],
+    exports: [AppEvents]
 })
 export class EventsModule {}

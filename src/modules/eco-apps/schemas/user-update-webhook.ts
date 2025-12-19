@@ -13,6 +13,7 @@ export const UserUpdateHookDto = z.object({
     roleType: z.enum(Object.values(PortalRoleType) as [PortalRoleType, ...PortalRoleType[]]).optional(),
     profileImage: z.boolean().optional(),
     profileImageBuffer: profileImageRule,
+    roleId: z.string().optional(), // set in service layer
     departmentInfo: z
         .array(
             z.object({

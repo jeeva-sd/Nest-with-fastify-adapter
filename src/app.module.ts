@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ClsModule } from 'nestjs-cls';
-import { DatabaseModule } from './services/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EventsModule } from './modules/events/events.module';
 import { HealthModule } from './modules/health/health.module';
 import { RoleModule } from './modules/roles/role.module';
 import { JobsModule } from './services';
+import { DatabaseModule } from './services/database/database.module';
 
 @Module({
     imports: [

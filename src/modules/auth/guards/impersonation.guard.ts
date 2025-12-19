@@ -13,7 +13,10 @@ import { ImpersonateUserDto } from '../schemas/user-impersonation';
 
 @Injectable()
 export class ImpersonationGuard implements CanActivate {
-    constructor(private readonly cls: ClsService<Store>, private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly cls: ClsService<Store>,
+        private readonly prisma: PrismaService
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: RequestX = context.switchToHttp().getRequest();
